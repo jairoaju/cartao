@@ -44,7 +44,7 @@
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200 relative">
                 
-                <!-- Caixa de Alerta Personalizada (Substitui o alert do navegador) -->
+                <!-- Caixa de Alerta Personalizada (Substitui os alerts e confirms do navegador) -->
                 <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all"></div>
 
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
@@ -162,21 +162,52 @@
         let db = null;
         const STORAGE_KEY = "sqlite_cartao_backup_v9";
         let idEmEdicao = null;
+        let temporizadorAlerta = null;
 
-        function mostrarAlerta(mensagem, tipo = 'erro') {
+        function mostrarAlerta(mensagem, tipo = 'erro', comBotoes = false, callbackConfirmacao = null) {
             const alerta = document.getElementById("app-alerta");
-            alerta.textContent = mensagem;
-            alerta.classList.remove("hidden");
             
-            if (tipo === 'erro') {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
-            } else {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
+            // Limpa qualquer temporizador anterior para o alerta sumir sozinho
+            if (temporizadorAlerta) {
+                clearTimeout(temporizadorAlerta);
+                temporizadorAlerta = null;
             }
 
-            setTimeout(() => {
-                alerta.classList.add("hidden");
-            }, 4000);
+            if (comBotoes) {
+                alerta.innerHTML = `
+                    <div class="flex flex-col gap-2">
+                        <span>${mensagem}</span>
+                        <div class="flex gap-2 justify-end mt-1">
+                            <button id="btn-alerta-nao" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded font-semibold text-xs transition-all">Cancelar</button>
+                            <button id="btn-alerta-sim" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded font-semibold text-xs transition-all">Excluir</button>
+                        </div>
+                    </div>
+                `;
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700/60 shadow-md";
+                alerta.classList.remove("hidden");
+
+                document.getElementById("btn-alerta-nao").onclick = () => {
+                    alerta.classList.add("hidden");
+                };
+
+                document.getElementById("btn-alerta-sim").onclick = () => {
+                    alerta.classList.add("hidden");
+                    if (callbackConfirmacao) callbackConfirmacao();
+                };
+            } else {
+                alerta.textContent = mensagem;
+                alerta.classList.remove("hidden");
+                
+                if (tipo === 'erro') {
+                    alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
+                } else {
+                    alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
+                }
+
+                temporizadorAlerta = setTimeout(() => {
+                    alerta.classList.add("hidden");
+                }, 4000);
+            }
         }
 
         function definirDataHoje() {
@@ -301,31 +332,29 @@
             const arquivo = event.target.files[0];
             if (!arquivo) return;
 
-            if (!confirm("A importação irá substituir todos os dados atuais pelos dados do arquivo. Deseja continuar?")) {
-                event.target.value = "";
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const uInt8Array = new Uint8Array(e.target.result);
-                    initSqlJs({
-                        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-                    }).then(SQL => {
-                        db = new SQL.Database(uInt8Array);
-                        persistirBackupDireto(uInt8Array);
-                        cancelarEdicao();
-                        atualizarAplicacao();
-                        mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
-                    });
-                } catch (err) {
-                    console.error(err);
-                    mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
-                }
-                event.target.value = "";
-            };
-            reader.readAsArrayBuffer(arquivo);
+            mostrarAlerta("A importação irá substituir os dados atuais. Deseja continuar?", "erro", true, () => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const uInt8Array = new Uint8Array(e.target.result);
+                        initSqlJs({
+                            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                        }).then(SQL => {
+                            db = new SQL.Database(uInt8Array);
+                            persistirBackupDireto(uInt8Array);
+                            cancelarEdicao();
+                            atualizarAplicacao();
+                            mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
+                        });
+                    } catch (err) {
+                        console.error(err);
+                        mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
+                    }
+                    event.target.value = "";
+                };
+                reader.readAsArrayBuffer(arquivo);
+            });
+            event.target.value = "";
         }
 
         function persistirBackupDireto(uInt8Array) {
@@ -405,7 +434,7 @@
                         </div>
                         <div class="flex items-center gap-1">
                             <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 p-2 transition-colors text-sm" title="Editar">✏️</button>
-                            <button onclick="excluirRegistro(${id}, '${estabelecimento}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm" title="Excluir">🗑️</button>
+                            <button onclick="excluirRegistro(${id}, '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm" title="Excluir">🗑️</button>
                         </div>
                     `;
                     lista.appendChild(li);
@@ -556,18 +585,19 @@
 
         function excluirRegistro(id, estabelecimento, valor) {
             if (!db) return;
-            if (!confirm(`Deseja excluir o lançamento de ${formatarMoeda(valor)} em "${estabelecimento}"?`)) return;
+            
+            mostrarAlerta(`Deseja excluir o lançamento de ${formatarMoeda(valor)} em "${estabelecimento}"?`, "erro", true, () => {
+                if (idEmEdicao === id) {
+                    cancelarEdicao();
+                }
 
-            if (idEmEdicao === id) {
-                cancelarEdicao();
-            }
+                const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
+                stmt.run([id]);
+                stmt.free();
 
-            const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
-            stmt.run([id]);
-            stmt.free();
-
-            persistirBanco();
-            atualizarAplicacao();
+                persistirBanco();
+                atualizarAplicacao();
+            });
         }
     </script>
 </body>
