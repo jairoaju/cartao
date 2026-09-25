@@ -44,7 +44,7 @@
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200 relative">
                 
-                <!-- Caixa de Alerta Personalizada para Avisos Gerais e Importações -->
+                <!-- Caixa de Alerta Personalizada para Avisos Gerais, Sucessos e Importações -->
                 <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all"></div>
 
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
@@ -162,7 +162,7 @@
         let db = null;
         const STORAGE_KEY = "sqlite_cartao_backup_v9";
         let idEmEdicao = null;
-        let idEmExclusaoPendente = null; // Controla qual item está aguardando confirmação inline
+        let idEmExclusaoPendente = null;
         let temporizadorAlerta = null;
 
         function mostrarAlerta(mensagem, tipo = 'erro') {
@@ -176,15 +176,15 @@
             alerta.textContent = mensagem;
             alerta.classList.remove("hidden");
             
-            if (tipo === 'erro') {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
+            if (tipo === 'sucesso') {
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-sm";
             } else {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60 shadow-sm";
             }
 
             temporizadorAlerta = setTimeout(() => {
                 alerta.classList.add("hidden");
-            }, 4000);
+            }, 3500);
         }
 
         function definirDataHoje() {
@@ -352,7 +352,7 @@
             const tabLanc = document.getElementById("tab-lancamentos");
             const tabRes = document.getElementById("tab-resumo");
 
-            idEmExclusaoPendente = null; // Reseta exclusão ao trocar de aba
+            idEmExclusaoPendente = null;
 
             if (aba === 'lancamentos') {
                 secLancamentos.classList.remove("hidden");
@@ -398,7 +398,6 @@
                     somaTotal += valor;
                     const li = document.createElement("li");
                     
-                    // Se este item específico está aguardando confirmação de exclusão, renderiza os botões no lugar do card!
                     if (idEmExclusaoPendente === id) {
                         li.className = "bg-amber-50 dark:bg-amber-950/60 p-3 rounded-lg border border-amber-300 dark:border-amber-700/60 flex flex-col gap-2 shadow-sm animate-pulse";
                         li.innerHTML = `
@@ -556,6 +555,7 @@
                 const stmt = db.prepare("INSERT INTO cartao_gastos (data, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?)");
                 stmt.run([data, cartao, dono, estabelecimento, valor]);
                 stmt.free();
+                mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
             } else {
                 const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
                 stmt.run([data, cartao, dono, estabelecimento, valor, idEmEdicao]);
@@ -564,6 +564,7 @@
                 document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
                 document.getElementById("titulo-formulario").className = "text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide";
                 document.getElementById("btn-cancelar").style.display = "none";
+                mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
             }
 
             persistirBanco();
@@ -600,6 +601,7 @@
             idEmExclusaoPendente = null;
             persistirBanco();
             atualizarAplicacao();
+            mostrarAlerta("Lançamento excluído com sucesso!", "sucesso");
         }
     </script>
 </body>
