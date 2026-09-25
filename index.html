@@ -44,7 +44,7 @@
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200 relative">
                 
-                <!-- Caixa de Alerta Personalizada (Substitui os alerts e confirms do navegador) -->
+                <!-- Caixa de Alerta Personalizada para Avisos Gerais e Importações -->
                 <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all"></div>
 
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
@@ -114,7 +114,7 @@
                     <h2 class="text-md font-semibold text-slate-700 dark:text-slate-200">Histórico de Gastos</h2>
                     <span id="total-geral" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded border border-emerald-200 dark:border-emerald-800/60">Total: R$ 0,00</span>
                 </div>
-                <div class="overflow-y-auto flex-1 max-h-[30vh]">
+                <div class="overflow-y-auto flex-1 max-h-[35vh]">
                     <ul id="lista-registros" class="space-y-2">
                         <li class="text-slate-400 dark:text-slate-500 text-sm text-center py-4">Carregando dados...</li>
                     </ul>
@@ -162,52 +162,29 @@
         let db = null;
         const STORAGE_KEY = "sqlite_cartao_backup_v9";
         let idEmEdicao = null;
+        let idEmExclusaoPendente = null; // Controla qual item está aguardando confirmação inline
         let temporizadorAlerta = null;
 
-        function mostrarAlerta(mensagem, tipo = 'erro', comBotoes = false, callbackConfirmacao = null) {
+        function mostrarAlerta(mensagem, tipo = 'erro') {
             const alerta = document.getElementById("app-alerta");
             
-            // Limpa qualquer temporizador anterior para o alerta sumir sozinho
             if (temporizadorAlerta) {
                 clearTimeout(temporizadorAlerta);
                 temporizadorAlerta = null;
             }
 
-            if (comBotoes) {
-                alerta.innerHTML = `
-                    <div class="flex flex-col gap-2">
-                        <span>${mensagem}</span>
-                        <div class="flex gap-2 justify-end mt-1">
-                            <button id="btn-alerta-nao" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded font-semibold text-xs transition-all">Cancelar</button>
-                            <button id="btn-alerta-sim" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded font-semibold text-xs transition-all">Excluir</button>
-                        </div>
-                    </div>
-                `;
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-700/60 shadow-md";
-                alerta.classList.remove("hidden");
-
-                document.getElementById("btn-alerta-nao").onclick = () => {
-                    alerta.classList.add("hidden");
-                };
-
-                document.getElementById("btn-alerta-sim").onclick = () => {
-                    alerta.classList.add("hidden");
-                    if (callbackConfirmacao) callbackConfirmacao();
-                };
+            alerta.textContent = mensagem;
+            alerta.classList.remove("hidden");
+            
+            if (tipo === 'erro') {
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
             } else {
-                alerta.textContent = mensagem;
-                alerta.classList.remove("hidden");
-                
-                if (tipo === 'erro') {
-                    alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
-                } else {
-                    alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
-                }
-
-                temporizadorAlerta = setTimeout(() => {
-                    alerta.classList.add("hidden");
-                }, 4000);
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
             }
+
+            temporizadorAlerta = setTimeout(() => {
+                alerta.classList.add("hidden");
+            }, 4000);
         }
 
         function definirDataHoje() {
@@ -332,29 +309,26 @@
             const arquivo = event.target.files[0];
             if (!arquivo) return;
 
-            mostrarAlerta("A importação irá substituir os dados atuais. Deseja continuar?", "erro", true, () => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const uInt8Array = new Uint8Array(e.target.result);
-                        initSqlJs({
-                            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-                        }).then(SQL => {
-                            db = new SQL.Database(uInt8Array);
-                            persistirBackupDireto(uInt8Array);
-                            cancelarEdicao();
-                            atualizarAplicacao();
-                            mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
-                        });
-                    } catch (err) {
-                        console.error(err);
-                        mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
-                    }
-                    event.target.value = "";
-                };
-                reader.readAsArrayBuffer(arquivo);
-            });
-            event.target.value = "";
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const uInt8Array = new Uint8Array(e.target.result);
+                    initSqlJs({
+                        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                    }).then(SQL => {
+                        db = new SQL.Database(uInt8Array);
+                        persistirBackupDireto(uInt8Array);
+                        cancelarEdicao();
+                        atualizarAplicacao();
+                        mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
+                    });
+                } catch (err) {
+                    console.error(err);
+                    mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
+                }
+                event.target.value = "";
+            };
+            reader.readAsArrayBuffer(arquivo);
         }
 
         function persistirBackupDireto(uInt8Array) {
@@ -377,6 +351,8 @@
             const secResumo = document.getElementById("secao-resumo");
             const tabLanc = document.getElementById("tab-lancamentos");
             const tabRes = document.getElementById("tab-resumo");
+
+            idEmExclusaoPendente = null; // Reseta exclusão ao trocar de aba
 
             if (aba === 'lancamentos') {
                 secLancamentos.classList.remove("hidden");
@@ -421,22 +397,38 @@
                     const [id, data, cartao, dono, estabelecimento, valor] = reg;
                     somaTotal += valor;
                     const li = document.createElement("li");
-                    li.className = "bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center gap-2";
                     
-                    li.innerHTML = `
-                        <div class="flex flex-col gap-0.5 flex-1">
-                            <div class="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 font-mono">
-                                <span>📅 ${formatarDataBR(data)}</span> 
-                                <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
+                    // Se este item específico está aguardando confirmação de exclusão, renderiza os botões no lugar do card!
+                    if (idEmExclusaoPendente === id) {
+                        li.className = "bg-amber-50 dark:bg-amber-950/60 p-3 rounded-lg border border-amber-300 dark:border-amber-700/60 flex flex-col gap-2 shadow-sm animate-pulse";
+                        li.innerHTML = `
+                            <div class="text-xs font-semibold text-amber-800 dark:text-amber-200 flex justify-between items-center">
+                                <span>⚠️ Confirmar exclusão deste item?</span>
+                                <span class="font-mono text-amber-900 dark:text-amber-100">${formatarMoeda(valor)}</span>
                             </div>
-                            <p class="text-slate-800 dark:text-slate-100 text-sm font-semibold mt-1">${estabelecimento}</p>
-                            <span class="text-[11px] text-slate-500 dark:text-slate-400">💳 ${cartao} • Usuário: ${dono}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 p-2 transition-colors text-sm" title="Editar">✏️</button>
-                            <button onclick="excluirRegistro(${id}, '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm" title="Excluir">🗑️</button>
-                        </div>
-                    `;
+                            <div class="text-[11px] text-amber-700 dark:text-amber-300 truncate">${estabelecimento}</div>
+                            <div class="flex gap-2 justify-end mt-1">
+                                <button onclick="cancelarExclusao()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded font-semibold text-xs transition-all cursor-pointer">Cancelar</button>
+                                <button onclick="efetivarExclusao(${id})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded font-semibold text-xs transition-all cursor-pointer">Sim, Excluir</button>
+                            </div>
+                        `;
+                    } else {
+                        li.className = "bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center gap-2";
+                        li.innerHTML = `
+                            <div class="flex flex-col gap-0.5 flex-1">
+                                <div class="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 font-mono">
+                                    <span>📅 ${formatarDataBR(data)}</span> 
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
+                                </div>
+                                <p class="text-slate-800 dark:text-slate-100 text-sm font-semibold mt-1">${estabelecimento}</p>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400">💳 ${cartao} • Usuário: ${dono}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 p-2 transition-colors text-sm cursor-pointer" title="Editar">✏️</button>
+                                <button onclick="pedirConfirmacaoExclusao(${id})" class="text-slate-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm cursor-pointer" title="Excluir">🗑️</button>
+                            </div>
+                        `;
+                    }
                     lista.appendChild(li);
                 });
                 document.getElementById("total-geral").textContent = `Total: ${formatarMoeda(somaTotal)}`;
@@ -502,6 +494,7 @@
 
         function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
             idEmEdicao = id;
+            idEmExclusaoPendente = null;
             document.getElementById("input-data").value = data;
             
             const radiosCartao = document.querySelectorAll('input[name="cartao"]');
@@ -583,21 +576,30 @@
             atualizarAplicacao();
         }
 
-        function excluirRegistro(id, estabelecimento, valor) {
+        function pedirConfirmacaoExclusao(id) {
+            idEmExclusaoPendente = id;
+            carregarRegistros();
+        }
+
+        function cancelarExclusao() {
+            idEmExclusaoPendente = null;
+            carregarRegistros();
+        }
+
+        function efetivarExclusao(id) {
             if (!db) return;
             
-            mostrarAlerta(`Deseja excluir o lançamento de ${formatarMoeda(valor)} em "${estabelecimento}"?`, "erro", true, () => {
-                if (idEmEdicao === id) {
-                    cancelarEdicao();
-                }
+            if (idEmEdicao === id) {
+                cancelarEdicao();
+            }
 
-                const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
-                stmt.run([id]);
-                stmt.free();
+            const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
+            stmt.run([id]);
+            stmt.free();
 
-                persistirBanco();
-                atualizarAplicacao();
-            });
+            idEmExclusaoPendente = null;
+            persistirBanco();
+            atualizarAplicacao();
         }
     </script>
 </body>
