@@ -6,7 +6,8 @@
     <title>PWA Controle de Cartão</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,22 +18,21 @@
     <!-- sql.js (SQLite para WebAssembly) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans select-none">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200">
 
     <!-- Header -->
-    <header class="p-4 bg-slate-800 shadow-md flex justify-between items-center">
-        <h1 class="text-xl font-bold text-emerald-400">Gastos do Cartão</h1>
-        <span id="status-db" class="text-xs bg-amber-700/50 px-2 py-1 rounded text-amber-200">Carregando SQLite...</span>
+    <header class="p-4 bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors duration-200">
+        <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Gastos do Cartão</h1>
     </header>
 
     <!-- Barra de Navegação -->
-    <nav class="bg-slate-800/80 border-b border-slate-700 flex px-4 gap-2">
+    <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex px-4 gap-2 transition-colors duration-200">
         <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" 
-            class="py-3 px-4 text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 transition-all">
+            class="py-3 px-4 text-sm font-semibold border-b-2 border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 transition-all">
             📝 Lançamentos
         </button>
         <button onclick="mudarAba('resumo')" id="tab-resumo" 
-            class="py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all">
+            class="py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
             📊 Resumo por Cartão
         </button>
     </nav>
@@ -42,81 +42,100 @@
         
         <!-- SEÇÃO 1: Lançamentos -->
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
-            <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700 flex flex-col gap-3">
-                <h2 class="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200">
+                <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
                 
                 <div>
-                    <label for="input-data" class="block text-xs font-medium mb-1 text-slate-400">Data:</label>
+                    <label for="input-data" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Data:</label>
                     <input type="date" id="input-data" 
-                        class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 text-slate-100 text-sm">
+                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium mb-1.5 text-slate-400">Cartão:</label>
-                    <div class="grid grid-cols-2 gap-2 bg-slate-900 p-2 border border-slate-700 rounded-lg">
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-slate-800 text-slate-200 transition-colors">
-                            <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa - 10
+                    <label class="block text-xs font-medium mb-1.5 text-slate-500 dark:text-slate-400">Cartão:</label>
+                    <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900 p-2 border border-slate-300 dark:border-slate-700 rounded-lg">
+                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
+                            <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 10
                         </label>
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-slate-800 text-slate-200 transition-colors">
-                            <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa - 25
+                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
+                            <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 25
                         </label>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium mb-1.5 text-slate-400">Usuário:</label>
-                    <div class="grid grid-cols-3 gap-2 bg-slate-900 p-2 border border-slate-700 rounded-lg">
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-slate-800 text-slate-200 transition-colors">
-                            <input type="radio" name="usuario" value="Jairo" checked class="accent-emerald-500"> Jairo
+                    <label class="block text-xs font-medium mb-1.5 text-slate-500 dark:text-slate-400">Usuário:</label>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-900 p-2 border border-slate-300 dark:border-slate-700 rounded-lg">
+                        <label id="label-jairo" class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
+                            <input type="radio" id="radio-jairo" name="usuario" value="Jairo" checked class="accent-emerald-600 dark:accent-emerald-400"> Jairo
                         </label>
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-slate-800 text-slate-200 transition-colors">
-                            <input type="radio" name="usuario" value="Kátia" class="accent-emerald-500"> Kátia
+                        <label id="label-katia" class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
+                            <input type="radio" id="radio-katia" name="usuario" value="Kátia" class="accent-emerald-600 dark:accent-emerald-400"> Kátia
                         </label>
-                        <label id="label-juliana" class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-slate-800 text-slate-200 transition-colors">
-                            <input type="radio" id="radio-juliana" name="usuario" value="Juliana" class="accent-emerald-500"> Juliana
+                        <label id="label-juliana" class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
+                            <input type="radio" id="radio-juliana" name="usuario" value="Juliana" class="accent-emerald-600 dark:accent-emerald-400"> Juliana
                         </label>
                     </div>
                 </div>
 
                 <div>
-                    <label for="input-estabelecimento" class="block text-xs font-medium mb-1 text-slate-400">Estabelecimento:</label>
+                    <label for="input-estabelecimento" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Estabelecimento:</label>
                     <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto..."
-                        class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 text-slate-100 text-sm placeholder-slate-600">
+                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-sm placeholder-slate-400 dark:placeholder-slate-500">
                 </div>
 
                 <div>
-                    <label for="input-valor" class="block text-xs font-medium mb-1 text-slate-400">Valor (R$):</label>
+                    <label for="input-valor" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Valor (R$):</label>
                     <input type="number" step="0.01" id="input-valor" placeholder="0,00"
-                        class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 text-slate-100 text-sm placeholder-slate-600">
+                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-sm placeholder-slate-400 dark:placeholder-slate-500">
                 </div>
                 
-                <button id="btn-salvar" onclick="salvarRegistro()" disabled
-                    class="mt-1 w-full bg-slate-700 text-slate-400 font-semibold py-3 px-4 rounded-lg shadow-md flex items-center justify-center gap-2 cursor-not-allowed transition-all">
+                <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled
+                    class="mt-1 w-full bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-semibold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 cursor-not-allowed transition-all">
                     Salvar Lançamento
+                </button>
+
+                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none;"
+                    class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-all text-xs">
+                    Cancelar Edição
                 </button>
             </div>
 
             <!-- Tabela de Registros -->
-            <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700 flex-1 flex flex-col">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex-1 flex flex-col transition-colors duration-200">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-md font-semibold text-slate-300">Histórico de Gastos</h2>
-                    <span id="total-geral" class="text-xs font-mono text-emerald-400 font-bold bg-slate-900 px-2 py-1 rounded border border-slate-700">Total: R$ 0,00</span>
+                    <h2 class="text-md font-semibold text-slate-700 dark:text-slate-200">Histórico de Gastos</h2>
+                    <span id="total-geral" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded border border-emerald-200 dark:border-emerald-800/60">Total: R$ 0,00</span>
                 </div>
                 <div class="overflow-y-auto flex-1 max-h-[30vh]">
                     <ul id="lista-registros" class="space-y-2">
-                        <li class="text-slate-500 text-sm text-center py-4">Aguardando inicialização do banco...</li>
+                        <li class="text-slate-400 dark:text-slate-500 text-sm text-center py-4">Carregando dados...</li>
                     </ul>
+                </div>
+            </div>
+
+            <!-- Seção de Backup / Gerenciamento de Dados -->
+            <div class="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 shadow-sm transition-colors duration-200">
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Backup dos Dados:</span>
+                <div class="flex gap-2">
+                    <button onclick="exportarBackup()" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold py-1.5 px-3 rounded border border-slate-300 dark:border-slate-600 transition-all">
+                        💾 Exportar
+                    </button>
+                    <label class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold py-1.5 px-3 rounded border border-slate-300 dark:border-slate-600 transition-all cursor-pointer">
+                        📂 Importar
+                        <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
+                    </label>
                 </div>
             </div>
         </div>
 
         <!-- SEÇÃO 2: Resumo -->
         <div id="secao-resumo" class="hidden flex-col gap-4 flex-1">
-            <div class="bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700 flex-1 flex flex-col">
-                <h2 class="text-md font-semibold text-slate-300 mb-3">Totais e Subtotais por Usuário</h2>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex-1 flex flex-col transition-colors duration-200">
+                <h2 class="text-md font-semibold text-slate-700 dark:text-slate-200 mb-3">Totais e Subtotais por Usuário</h2>
                 <div class="overflow-y-auto flex-1 max-h-[60vh]">
                     <div id="conteudo-resumo" class="space-y-4">
-                        <p class="text-slate-500 text-sm text-center py-4">Carregando resumo...</p>
+                        <p class="text-slate-400 dark:text-slate-500 text-sm text-center py-4">Carregando resumo...</p>
                     </div>
                 </div>
             </div>
@@ -125,9 +144,11 @@
 
     <script>
         let db = null;
-        const STORAGE_KEY = "sqlite_cartao_backup_v6";
+        const STORAGE_KEY = "sqlite_cartao_backup_v9";
+        let idEmEdicao = null;
 
         function definirDataHoje() {
+            if (idEmEdicao !== null) return;
             const hoje = new Date();
             const ano = hoje.getFullYear();
             const mes = String(hoje.getMonth() + 1).padStart(2, '0');
@@ -138,16 +159,32 @@
 
         function gerenciarRestricoesCartao() {
             const cartaoSelecionado = document.querySelector('input[name="cartao"]:checked').value;
+            const radioJairo = document.getElementById("radio-jairo");
+            const radioKatia = document.getElementById("radio-katia");
             const radioJuliana = document.getElementById("radio-juliana");
+            
+            const labelJairo = document.getElementById("label-jairo");
+            const labelKatia = document.getElementById("label-katia");
             const labelJuliana = document.getElementById("label-juliana");
 
             if (cartaoSelecionado === "Visa - 10") {
-                if (radioJuliana.checked) {
-                    document.querySelector('input[name="usuario"][value="Jairo"]').checked = true;
-                }
+                radioJairo.checked = true;
+                
+                radioJairo.disabled = false;
+                labelJairo.classList.remove("opacity-40", "cursor-not-allowed");
+
+                radioKatia.disabled = true;
+                labelKatia.classList.add("opacity-40", "cursor-not-allowed");
+
                 radioJuliana.disabled = true;
                 labelJuliana.classList.add("opacity-40", "cursor-not-allowed");
             } else {
+                radioJairo.disabled = false;
+                labelJairo.classList.remove("opacity-40", "cursor-not-allowed");
+
+                radioKatia.disabled = false;
+                labelKatia.classList.remove("opacity-40", "cursor-not-allowed");
+
                 radioJuliana.disabled = false;
                 labelJuliana.classList.remove("opacity-40", "cursor-not-allowed");
             }
@@ -176,23 +213,79 @@
                 );
             `);
 
-            document.getElementById("status-db").className = "text-xs bg-emerald-900/50 px-2 py-1 rounded text-emerald-300";
-            document.getElementById("status-db").textContent = "SQLite Ativo (Offline Ready)";
-            
-            const btn = document.getElementById("btn-salvar");
-            btn.disabled = false;
-            btn.className = "mt-1 w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white font-semibold py-3 px-4 rounded-lg shadow-md flex items-center justify-center gap-2 cursor-pointer";
-
+            ativarBotaoSalvar();
             atualizarAplicacao();
         }).catch(err => {
             console.error("Erro ao carregar sql.js:", err);
-            document.getElementById("status-db").textContent = "Erro no SQLite / Offline";
         });
+
+        function ativarBotaoSalvar() {
+            const btn = document.getElementById("btn-salvar");
+            btn.disabled = false;
+            if (idEmEdicao !== null) {
+                btn.className = "mt-1 w-full bg-amber-500 hover:bg-amber-600 active:scale-95 transition-all text-white font-semibold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 cursor-pointer";
+                btn.textContent = "Atualizar Lançamento";
+            } else {
+                btn.className = "mt-1 w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all text-white font-semibold py-3 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 cursor-pointer";
+                btn.textContent = "Salvar Lançamento";
+            }
+        }
 
         function persistirBanco() {
             if (!db) return;
             const binaryArray = db.export();
             const hexString = Array.from(binaryArray).map(b => b.toString(16).padStart(2, '0')).join('');
+            localStorage.setItem(STORAGE_KEY, hexString);
+        }
+
+        function exportarBackup() {
+            if (!db) return;
+            const dataBinaria = db.export();
+            const blob = new Blob([dataBinaria], { type: "application/x-sqlite3" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const dataIso = new Date().toISOString().split('T')[0];
+            a.download = `backup_cartoes_${dataIso}.sqlite`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importarBackup(event) {
+            const arquivo = event.target.files[0];
+            if (!arquivo) return;
+
+            if (!confirm("A importação irá substituir todos os dados atuais pelos dados do arquivo. Deseja continuar?")) {
+                event.target.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const uInt8Array = new Uint8Array(e.target.result);
+                    initSqlJs({
+                        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                    }).then(SQL => {
+                        db = new SQL.Database(uInt8Array);
+                        persistirBackupDireto(uInt8Array);
+                        cancelarEdicao();
+                        atualizarAplicacao();
+                        alert("Banco de dados importado com sucesso!");
+                    });
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.");
+                }
+                event.target.value = "";
+            };
+            reader.readAsArrayBuffer(arquivo);
+        }
+
+        function persistirBackupDireto(uInt8Array) {
+            const hexString = Array.from(uInt8Array).map(b => b.toString(16).padStart(2, '0')).join('');
             localStorage.setItem(STORAGE_KEY, hexString);
         }
 
@@ -217,15 +310,15 @@
                 secLancamentos.classList.add("flex");
                 secResumo.classList.remove("flex");
                 secResumo.classList.add("hidden");
-                tabLanc.className = "py-3 px-4 text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 transition-all";
-                tabRes.className = "py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all";
+                tabLanc.className = "py-3 px-4 text-sm font-semibold border-b-2 border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 transition-all";
+                tabRes.className = "py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
             } else {
                 secResumo.classList.remove("hidden");
                 secResumo.classList.add("flex");
                 secLancamentos.classList.remove("flex");
                 secLancamentos.classList.add("hidden");
-                tabRes.className = "py-3 px-4 text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 transition-all";
-                tabLanc.className = "py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all";
+                tabRes.className = "py-3 px-4 text-sm font-semibold border-b-2 border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 transition-all";
+                tabLanc.className = "py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
                 gerarResumoPorCartao();
             }
         }
@@ -246,7 +339,7 @@
                 stmt.free();
 
                 if (registros.length === 0) {
-                    lista.innerHTML = '<li class="text-slate-500 text-sm text-center py-4">Nenhum lançamento encontrado.</li>';
+                    lista.innerHTML = '<li class="text-slate-400 dark:text-slate-500 text-sm text-center py-4">Nenhum lançamento encontrado.</li>';
                     document.getElementById("total-geral").textContent = "Total: R$ 0,00";
                     return;
                 }
@@ -255,18 +348,21 @@
                     const [id, data, cartao, dono, estabelecimento, valor] = reg;
                     somaTotal += valor;
                     const li = document.createElement("li");
-                    li.className = "bg-slate-900 p-3 rounded-lg border border-slate-700/50 flex justify-between items-center gap-2";
+                    li.className = "bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center gap-2";
                     
                     li.innerHTML = `
                         <div class="flex flex-col gap-0.5 flex-1">
-                            <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+                            <div class="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 font-mono">
                                 <span>📅 ${formatarDataBR(data)}</span> 
-                                <span class="text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
                             </div>
-                            <p class="text-slate-100 text-sm font-semibold mt-1">${estabelecimento}</p>
-                            <span class="text-[11px] text-slate-400">💳 ${cartao} • Usuário: ${dono}</span>
+                            <p class="text-slate-800 dark:text-slate-100 text-sm font-semibold mt-1">${estabelecimento}</p>
+                            <span class="text-[11px] text-slate-500 dark:text-slate-400">💳 ${cartao} • Usuário: ${dono}</span>
                         </div>
-                        <button onclick="excluirRegistro(${id}, '${estabelecimento}', ${valor})" class="text-slate-500 hover:text-red-400 p-2 transition-colors text-sm" title="Excluir">🗑️</button>
+                        <div class="flex items-center gap-1">
+                            <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 p-2 transition-colors text-sm" title="Editar">✏️</button>
+                            <button onclick="excluirRegistro(${id}, '${estabelecimento}', ${valor})" class="text-slate-400 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors text-sm" title="Excluir">🗑️</button>
+                        </div>
                     `;
                     lista.appendChild(li);
                 });
@@ -299,27 +395,27 @@
                     stmt.free();
 
                     const cardDiv = document.createElement("div");
-                    cardDiv.className = "bg-slate-900 p-3.5 rounded-lg border border-slate-700/70 flex flex-col gap-3";
+                    cardDiv.className = "bg-slate-50 dark:bg-slate-900 p-3.5 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col gap-3 shadow-2xs";
                     cardDiv.innerHTML = `
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                            <span class="font-bold text-emerald-400 text-sm">💳 Cartão: ${cartao}</span> 
-                            <span class="font-mono text-xs font-bold text-slate-200 bg-slate-800 px-2 py-1 rounded">Total: ${formatarMoeda(totalCartao)}</span>
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                            <span class="font-bold text-emerald-700 dark:text-emerald-400 text-sm">💳 Cartão: ${cartao}</span> 
+                            <span class="font-mono text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 px-2 py-1 rounded border border-slate-200 dark:border-slate-700">Total: ${formatarMoeda(totalCartao)}</span>
                         </div>
                     `;
 
                     if (registros.length === 0) {
-                        cardDiv.innerHTML += `<p class="text-xs text-slate-500 text-center py-2">Nenhum lançamento registrado neste cartão.</p>`;
+                        cardDiv.innerHTML += `<p class="text-xs text-slate-400 dark:text-slate-500 text-center py-2">Nenhum lançamento registrado neste cartão.</p>`;
                     } else {
-                        let subHtml = `<div class="bg-slate-800/60 p-2.5 rounded border border-slate-800 flex flex-col gap-1"><span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Subtotais por Usuário:</span>`;
+                        let subHtml = `<div class="bg-white dark:bg-slate-800 p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col gap-1"><span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Subtotais por Usuário:</span>`;
                         for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
-                            subHtml += `<div class="flex justify-between items-center text-xs text-slate-300 font-mono"><span>👤 ${dono}</span> <span class="text-emerald-300 font-bold">${formatarMoeda(subtotal)}</span></div>`;
+                            subHtml += `<div class="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 font-mono"><span>👤 ${dono}</span> <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(subtotal)}</span></div>`;
                         }
                         subHtml += `</div>`;
                         cardDiv.innerHTML += subHtml;
 
-                        let itensHtml = `<span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Lançamentos:</span><ul class="space-y-1.5">`;
+                        let itensHtml = `<span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">Lançamentos:</span><ul class="space-y-1.5">`;
                         registros.forEach(g => {
-                            itensHtml += `<li class="flex justify-between items-center text-xs text-slate-300 bg-slate-800/40 p-2 rounded"><span><strong class="text-slate-400">👤 ${g.dono}</strong> • ${formatarDataBR(g.data)} - ${g.estabelecimento}</span> <span class="font-mono text-emerald-300">${formatarMoeda(g.valor)}</span></li>`;
+                            itensHtml += `<li class="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700"><span><strong class="text-slate-500 dark:text-slate-400">👤 ${g.dono}</strong> • ${formatarDataBR(g.data)} - ${g.estabelecimento}</span> <span class="font-mono text-emerald-600 dark:text-emerald-400">${formatarMoeda(g.valor)}</span></li>`;
                         });
                         itensHtml += `</ul>`;
                         cardDiv.innerHTML += itensHtml;
@@ -331,7 +427,47 @@
             });
         }
 
-        function salvarRegistro() {
+        function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
+            idEmEdicao = id;
+            document.getElementById("input-data").value = data;
+            
+            const radiosCartao = document.querySelectorAll('input[name="cartao"]');
+            radiosCartao.forEach(r => {
+                if (r.value === cartao) r.checked = true;
+            });
+            
+            gerenciarRestricoesCartao();
+
+            const radiosUsuario = document.querySelectorAll('input[name="usuario"]');
+            radiosUsuario.forEach(r => {
+                if (r.value === dono && !r.disabled) r.checked = true;
+            });
+
+            document.getElementById("input-estabelecimento").value = estabelecimento;
+            document.getElementById("input-valor").value = valor;
+
+            document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
+            document.getElementById("titulo-formulario").className = "text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide";
+            document.getElementById("btn-cancelar").style.display = "block";
+            ativarBotaoSalvar();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicao() {
+            idEmEdicao = null;
+            document.getElementById("input-estabelecimento").value = "";
+            document.getElementById("input-valor").value = "";
+            definirDataHoje();
+            gerenciarRestricoesCartao();
+
+            document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
+            document.getElementById("titulo-formulario").className = "text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide";
+            document.getElementById("btn-cancelar").style.display = "none";
+            ativarBotaoSalvar();
+        }
+
+        function salvarOuAtualizarRegistro() {
             if (!db) return;
             const data = document.getElementById("input-data").value;
             const cartao = document.querySelector('input[name="cartao"]:checked')?.value;
@@ -350,14 +486,26 @@
                 return;
             }
 
-            const stmt = db.prepare("INSERT INTO cartao_gastos (data, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?)");
-            stmt.run([data, cartao, dono, estabelecimento, valor]);
-            stmt.free();
+            if (idEmEdicao === null) {
+                const stmt = db.prepare("INSERT INTO cartao_gastos (data, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?)");
+                stmt.run([data, cartao, dono, estabelecimento, valor]);
+                stmt.free();
+            } else {
+                const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
+                stmt.run([data, cartao, dono, estabelecimento, valor, idEmEdicao]);
+                stmt.free();
+                idEmEdicao = null;
+                document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
+                document.getElementById("titulo-formulario").className = "text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide";
+                document.getElementById("btn-cancelar").style.display = "none";
+            }
 
             persistirBanco();
             document.getElementById("input-estabelecimento").value = "";
             document.getElementById("input-valor").value = "";
             definirDataHoje();
+            gerenciarRestricoesCartao();
+            ativarBotaoSalvar();
             document.getElementById("input-estabelecimento").focus();
             atualizarAplicacao();
         }
@@ -366,6 +514,10 @@
             if (!db) return;
             if (!confirm(`Deseja excluir o lançamento de ${formatarMoeda(valor)} em "${estabelecimento}"?`)) return;
 
+            if (idEmEdicao === id) {
+                cancelarEdicao();
+            }
+
             const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
             stmt.run([id]);
             stmt.free();
@@ -373,14 +525,6 @@
             persistirBanco();
             atualizarAplicacao();
         }
-    </script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
-        });
-      }
     </script>
 </body>
 </html>
