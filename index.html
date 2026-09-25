@@ -238,15 +238,32 @@
             localStorage.setItem(STORAGE_KEY, hexString);
         }
 
-        function exportarBackup() {
+        async function exportarBackup() {
             if (!db) return;
             const dataBinaria = db.export();
+            const dataIso = new Date().toISOString().split('T')[0];
+            const nomeArquivo = `backup_cartoes_${dataIso}.sqlite`;
             const blob = new Blob([dataBinaria], { type: "application/x-sqlite3" });
+
+            // Se o celular suportar compartilhamento nativo (Android/iOS via PWA), usa ele para garantir que abra as opções de envio/salvar arquivo
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], nomeArquivo, { type: "application/x-sqlite3" });
+                const shareData = { files: [file], title: 'Backup de Gastos', text: 'Arquivo de backup do banco de dados SQLite.' };
+                if (navigator.canShare(shareData)) {
+                    try {
+                        await navigator.share(shareData);
+                        return;
+                    } catch (err) {
+                        if (err.name !== 'AbortError') console.log('Compartilhamento cancelado ou falhou, tentando fallback...');
+                    }
+                }
+            }
+
+            // Fallback clássico para PC ou navegadores que não usam share
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            const dataIso = new Date().toISOString().split('T')[0];
-            a.download = `backup_cartoes_${dataIso}.sqlite`;
+            a.download = nomeArquivo;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
