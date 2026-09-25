@@ -20,17 +20,13 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200">
 
-    <!-- Header com o Alerta Integrado logo abaixo para garantir visibilidade perfeita no celular -->
-    <header class="p-4 bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200">
-        <div class="flex justify-between items-center">
-            <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Gastos do Cartão</h1>
-        </div>
-        <!-- Caixa de Alerta posicionado logo abaixo do título -->
-        <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all shadow-md w-full"></div>
+    <!-- Header Simples -->
+    <header class="p-4 bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors duration-200">
+        <h1 class="text-xl font-bold text-emerald-600 dark:text-emerald-400">Gastos do Cartão</h1>
     </header>
 
     <!-- Barra de Navegação -->
-    <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex px-4 gap-2 transition-colors duration-200 mt-2">
+    <nav class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex px-4 gap-2 transition-colors duration-200">
         <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" 
             class="py-3 px-4 text-sm font-semibold border-b-2 border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 transition-all">
             📝 Lançamentos
@@ -107,6 +103,9 @@
                     class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg transition-all text-xs">
                     Cancelar Edição
                 </button>
+
+                <!-- Caixa de Alerta posicionado Logo Abaixo dos Botões do Formulário -->
+                <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all shadow-sm"></div>
             </div>
 
             <!-- Tabela de Registros -->
@@ -179,7 +178,6 @@
             
             if (tipo === 'sucesso') {
                 alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-sm w-full";
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60 shadow-sm w-full";
             }
@@ -517,8 +515,6 @@
             document.getElementById("titulo-formulario").className = "text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide";
             document.getElementById("btn-cancelar").style.display = "block";
             ativarBotaoSalvar();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function cancelarEdicao() {
