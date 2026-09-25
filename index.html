@@ -42,7 +42,11 @@
         
         <!-- SEÇÃO 1: Lançamentos -->
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200 relative">
+                
+                <!-- Caixa de Alerta Personalizada (Substitui o alert do navegador) -->
+                <div id="app-alerta" class="hidden p-3 rounded-lg text-xs font-medium border transition-all"></div>
+
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
                 
                 <!-- Linha unificada: Data e Cartão com alturas idênticas e alinhadas -->
@@ -54,7 +58,7 @@
                     </div>
 
                     <div class="col-span-5 flex flex-col">
-                        <label class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Cartão - Vencimento:</label>
+                        <label class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Cartão:</label>
                         <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-50 dark:bg-slate-900 p-1 border border-slate-300 dark:border-slate-700 rounded-lg box-border items-center">
                             <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] h-full rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
                                 <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> 10
@@ -158,6 +162,22 @@
         let db = null;
         const STORAGE_KEY = "sqlite_cartao_backup_v9";
         let idEmEdicao = null;
+
+        function mostrarAlerta(mensagem, tipo = 'erro') {
+            const alerta = document.getElementById("app-alerta");
+            alerta.textContent = mensagem;
+            alerta.classList.remove("hidden");
+            
+            if (tipo === 'erro') {
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60";
+            } else {
+                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60";
+            }
+
+            setTimeout(() => {
+                alerta.classList.add("hidden");
+            }, 4000);
+        }
 
         function definirDataHoje() {
             if (idEmEdicao !== null) return;
@@ -297,11 +317,11 @@
                         persistirBackupDireto(uInt8Array);
                         cancelarEdicao();
                         atualizarAplicacao();
-                        alert("Banco de dados importado com sucesso!");
+                        mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
                     });
                 } catch (err) {
                     console.error(err);
-                    alert("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.");
+                    mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
                 }
                 event.target.value = "";
             };
@@ -500,13 +520,13 @@
             const valorInput = document.getElementById("input-valor").value;
             
             if (!data || !cartao || !dono || !estabelecimento || !valorInput) {
-                alert("Por favor, preencha todos os campos!");
+                mostrarAlerta("Por favor, preencha todos os campos!", "erro");
                 return;
             }
 
             const valor = parseFloat(valorInput);
             if (isNaN(valor) || valor <= 0) {
-                alert("Insira um valor válido em reais!");
+                mostrarAlerta("Insira um valor válido em reais!", "erro");
                 return;
             }
 
