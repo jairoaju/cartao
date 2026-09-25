@@ -45,21 +45,24 @@
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col gap-3 transition-colors duration-200">
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
                 
-                <div>
-                    <label for="input-data" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Data:</label>
-                    <input type="date" id="input-data" 
-                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-sm">
-                </div>
+                <!-- Linha unificada: Data (menor) e Cartão ao lado -->
+                <div class="grid grid-cols-3 gap-2 items-end">
+                    <div class="col-span-1">
+                        <label for="input-data" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Data:</label>
+                        <input type="date" id="input-data" 
+                            class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-xs">
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-medium mb-1.5 text-slate-500 dark:text-slate-400">Cartão:</label>
-                    <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900 p-2 border border-slate-300 dark:border-slate-700 rounded-lg">
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
-                            <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 10
-                        </label>
-                        <label class="flex items-center justify-center gap-1.5 cursor-pointer text-xs p-2 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors shadow-2xs">
-                            <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 25
-                        </label>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Cartão:</label>
+                        <div class="grid grid-cols-2 gap-1.5 bg-slate-50 dark:bg-slate-900 p-1.5 border border-slate-300 dark:border-slate-700 rounded-lg">
+                            <label class="flex items-center justify-center gap-1 cursor-pointer text-xs py-2 px-1 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa-10
+                            </label>
+                            <label class="flex items-center justify-center gap-1 cursor-pointer text-xs py-2 px-1 rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa-25
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -144,7 +147,6 @@
     </main>
 
     <script>
-        // Registro do Service Worker para funcionamento Offline
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
