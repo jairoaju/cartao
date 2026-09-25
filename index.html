@@ -126,7 +126,6 @@
                         <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
                     </label>
                 </div>
-                <!-- Link gerado dinamicamente para garantir o download no mobile -->
                 <div id="container-link-download" class="hidden mt-1"></div>
             </div>
         </div>
@@ -145,6 +144,15 @@
     </main>
 
     <script>
+        // Registro do Service Worker para funcionamento Offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado com sucesso!', reg.scope))
+                    .catch(err => console.log('Falha ao registrar Service Worker:', err));
+            });
+        }
+
         let db = null;
         const STORAGE_KEY = "sqlite_cartao_backup_v9";
         let idEmEdicao = null;
@@ -246,7 +254,6 @@
             const dataIso = new Date().toISOString().split('T')[0];
             const nomeArquivo = `backup_cartoes_${dataIso}.sqlite`;
             
-            // Converte os bytes para Base64 para garantir suporte universal em navegadores móveis (PWA/Chrome Mobile)
             let binarios = "";
             const len = dataBinaria.byteLength;
             for (let i = 0; i < len; i++) {
@@ -257,7 +264,7 @@
 
             const container = document.getElementById("container-link-download");
             container.innerHTML = `
-                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 p-2.5 rounded-lg flex flex-col gap-1.5 text-center animate-pulse">
+                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 p-2.5 rounded-lg flex flex-col gap-1.5 text-center">
                     <span class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">Backup pronto! Toque no botão abaixo para baixar:</span>
                     <a href="${dataUri}" download="${nomeArquivo}" 
                        class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded shadow transition-all block">
