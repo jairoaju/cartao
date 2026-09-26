@@ -46,22 +46,22 @@
                 
                 <h2 id="titulo-formulario" class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Novo Lançamento</h2>
                 
-                <!-- Linha ajustada: Data menor (col-span-5) e Cartão maior (col-span-7) -->
+                <!-- Linha com Data e Cartões atualizados para Visa - 10 e Visa - 25 -->
                 <div class="grid grid-cols-12 gap-2 items-end">
-                    <div class="col-span-5 flex flex-col">
+                    <div class="col-span-4 flex flex-col">
                         <label for="input-data" class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Data:</label>
                         <input type="date" id="input-data" 
-                            class="w-full h-[38px] px-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-xs box-border">
+                            class="w-full h-[38px] px-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-600 dark:focus:border-emerald-400 text-slate-800 dark:text-slate-100 text-[11px] box-border">
                     </div>
 
-                    <div class="col-span-7 flex flex-col">
+                    <div class="col-span-8 flex flex-col">
                         <label class="block text-xs font-medium mb-1 text-slate-500 dark:text-slate-400">Cartão:</label>
                         <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-50 dark:bg-slate-900 p-1 border border-slate-300 dark:border-slate-700 rounded-lg box-border items-center">
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] h-full rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
-                                <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> 10
+                            <label class="flex items-center justify-center gap-1 cursor-pointer text-[11px] font-medium h-full rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 10
                             </label>
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] h-full rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
-                                <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> 25
+                            <label class="flex items-center justify-center gap-1 cursor-pointer text-[11px] font-medium h-full rounded hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-600 dark:accent-emerald-400"> Visa - 25
                             </label>
                         </div>
                     </div>
