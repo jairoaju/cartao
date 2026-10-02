@@ -6,8 +6,8 @@
     <title>PWA Controle de Cartão</title>
     
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -25,24 +25,24 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200 pb-8">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200 pb-8">
 
     <!-- Header Moderno com Efeito Glass -->
-    <header class="p-4 bg-slate-900/80 backdrop-blur-md shadow-lg border-b border-slate-800/80 flex justify-between items-center sticky top-0 z-20">
+    <header class="p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center sticky top-0 z-20">
         <div class="flex items-center gap-2">
             <span class="text-xl">💳</span>
-            <h1 class="text-lg font-bold tracking-tight text-emerald-400">Controle de Cartão</h1>
+            <h1 class="text-lg font-bold tracking-tight text-emerald-600 dark:text-emerald-400">Gastos do Cartão</h1>
         </div>
     </header>
 
     <!-- Barra de Navegação Estilo Pílula / Segmented Control -->
-    <nav class="bg-slate-900/60 backdrop-blur border-b border-slate-800/60 p-2 flex gap-2 justify-center">
+    <nav class="bg-white/60 dark:bg-slate-900/60 backdrop-blur border-b border-slate-200 dark:border-slate-800/60 p-2 flex gap-2 justify-center">
         <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" 
             class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white">
             📝 Lançamentos
         </button>
         <button onclick="mudarAba('resumo')" id="tab-resumo" 
-            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200">
+            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
             📊 Resumo por Cartão
         </button>
     </nav>
@@ -52,25 +52,25 @@
         
         <!-- SEÇÃO 1: Lançamentos -->
         <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
-            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex flex-col gap-3 relative">
+            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-3 relative">
                 
-                <h2 id="titulo-formulario" class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Novo Lançamento</h2>
+                <h2 id="titulo-formulario" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Novo Lançamento</h2>
                 
                 <!-- Data e Cartão -->
                 <div class="grid grid-cols-12 gap-2 items-end">
                     <div class="col-span-6 flex flex-col">
-                        <label for="input-data" class="block text-[11px] font-medium mb-1 text-slate-400">Data:</label>
+                        <label for="input-data" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Data:</label>
                         <input type="date" id="input-data" 
-                            class="w-full h-[38px] px-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs box-border shadow-inner">
+                            class="w-full h-[38px] px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs box-border shadow-inner">
                     </div>
 
                     <div class="col-span-6 flex flex-col">
-                        <label class="block text-[11px] font-medium mb-1 text-slate-400">Cartão:</label>
-                        <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-950 p-1 border border-slate-800 rounded-xl box-border items-center">
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-900 text-slate-300 transition-colors">
+                        <label class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Cartão:</label>
+                        <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-50 dark:bg-slate-950 p-1 border border-slate-300 dark:border-slate-800 rounded-xl box-border items-center">
+                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 transition-colors">
                                 <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 10
                             </label>
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-900 text-slate-300 transition-colors">
+                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 transition-colors">
                                 <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 25
                             </label>
                         </div>
@@ -79,15 +79,15 @@
 
                 <!-- Usuário -->
                 <div>
-                    <label class="block text-[11px] font-medium mb-1.5 text-slate-400">Usuário:</label>
-                    <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-1.5 border border-slate-800 rounded-xl shadow-inner">
-                        <label id="label-jairo" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                    <label class="block text-[11px] font-medium mb-1.5 text-slate-600 dark:text-slate-400">Usuário:</label>
+                    <div class="grid grid-cols-3 gap-1.5 bg-slate-50 dark:bg-slate-950 p-1.5 border border-slate-300 dark:border-slate-800 rounded-xl shadow-inner">
+                        <label id="label-jairo" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
                             <input type="radio" id="radio-jairo" name="usuario" value="Jairo" checked class="accent-emerald-500"> Jairo
                         </label>
-                        <label id="label-katia" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                        <label id="label-katia" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
                             <input type="radio" id="radio-katia" name="usuario" value="Kátia" class="accent-emerald-500"> Kátia
                         </label>
-                        <label id="label-juliana" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                        <label id="label-juliana" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
                             <input type="radio" id="radio-juliana" name="usuario" value="Juliana" class="accent-emerald-500"> Juliana
                         </label>
                     </div>
@@ -95,25 +95,25 @@
 
                 <!-- Estabelecimento -->
                 <div>
-                    <label for="input-estabelecimento" class="block text-[11px] font-medium mb-1 text-slate-400">Estabelecimento:</label>
+                    <label for="input-estabelecimento" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Estabelecimento:</label>
                     <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto..."
-                        class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs placeholder-slate-600 shadow-inner">
+                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs placeholder-slate-400 dark:placeholder-slate-600 shadow-inner">
                 </div>
 
                 <!-- Valor -->
                 <div>
-                    <label for="input-valor" class="block text-[11px] font-medium mb-1 text-slate-400">Valor (R$):</label>
+                    <label for="input-valor" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Valor (R$):</label>
                     <input type="number" step="0.01" id="input-valor" placeholder="0,00"
-                        class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs placeholder-slate-600 shadow-inner">
+                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs placeholder-slate-400 dark:placeholder-slate-600 shadow-inner">
                 </div>
                 
                 <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled
-                    class="mt-1 w-full bg-slate-800 text-slate-500 font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 cursor-not-allowed transition-all text-xs">
+                    class="mt-1 w-full bg-slate-300 dark:bg-slate-800 text-slate-500 font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 cursor-not-allowed transition-all text-xs">
                     Salvar Lançamento
                 </button>
 
                 <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none;"
-                    class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl transition-all text-xs">
+                    class="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-2 px-4 rounded-xl transition-all text-xs">
                     Cancelar Edição
                 </button>
 
@@ -121,10 +121,10 @@
             </div>
 
             <!-- Tabela de Registros -->
-            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex-1 flex flex-col">
+            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex-1 flex flex-col">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Histórico de Gastos</h2>
-                    <span id="total-geral" class="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-900/50 shadow-inner">Total: R$ 0,00</span>
+                    <h2 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Histórico de Gastos</h2>
+                    <span id="total-geral" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-900/50 shadow-inner">Total: R$ 0,00</span>
                 </div>
                 <div class="overflow-y-auto flex-1 max-h-[35vh]">
                     <ul id="lista-registros" class="space-y-2">
@@ -134,13 +134,13 @@
             </div>
 
             <!-- Backup / Gerenciamento -->
-            <div class="bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800/80 flex flex-col gap-2 shadow-xl">
-                <span class="text-[11px] text-slate-400 font-medium">Backup dos Dados:</span>
+            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-2 shadow-xl">
+                <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Backup dos Dados:</span>
                 <div class="flex gap-2">
-                    <button onclick="exportarBackup()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-700/50 transition-all text-center shadow-sm">
+                    <button onclick="exportarBackup()" class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700/50 transition-all text-center shadow-sm">
                         💾 Exportar
                     </button>
-                    <label class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-700/50 transition-all text-center cursor-pointer shadow-sm">
+                    <label class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700/50 transition-all text-center cursor-pointer shadow-sm">
                         📂 Importar
                         <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
                     </label>
@@ -149,10 +149,10 @@
             </div>
         </div>
 
-        <!-- SEÇÃO 2: Resumo (Compacto, Fontes Reduzidas, Coluna Única) -->
+        <!-- SEÇÃO 2: Resumo -->
         <div id="secao-resumo" class="hidden flex-col gap-4 flex-1">
-            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex-1 flex flex-col">
-                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Totais e Subtotais por Usuário</h2>
+            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex-1 flex flex-col">
+                <h2 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">Totais e Subtotais por Usuário</h2>
                 <div class="overflow-y-auto flex-1 max-h-[60vh]">
                     <div id="conteudo-resumo" class="space-y-3">
                         <p class="text-slate-500 text-xs text-center py-4">Carregando resumo...</p>
@@ -182,9 +182,9 @@
             alerta.classList.remove("hidden");
             
             if (tipo === 'sucesso') {
-                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-emerald-950/40 text-emerald-300 border-emerald-800/60 shadow-sm w-full";
+                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-sm w-full";
             } else {
-                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-red-950/40 text-red-300 border-red-800/60 shadow-sm w-full";
+                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60 shadow-sm w-full";
             }
             temporizadorAlerta = setTimeout(() => alerta.classList.add("hidden"), 3500);
         }
@@ -285,8 +285,8 @@
 
             const container = document.getElementById("container-link-download");
             container.innerHTML = `
-                <div class="bg-emerald-950/40 border border-emerald-800/60 p-2.5 rounded-xl flex flex-col gap-1.5 text-center">
-                    <span class="text-[11px] text-emerald-300 font-medium">Backup pronto para download:</span>
+                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 p-2.5 rounded-xl flex flex-col gap-1.5 text-center">
+                    <span class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">Backup pronto para download:</span>
                     <a href="${dataUri}" download="${nomeArquivo}" 
                        class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-xl shadow transition-all block">
                         ⬇️ Baixar Arquivo (.sqlite)
@@ -349,14 +349,14 @@
                 secResumo.classList.remove("flex");
                 secResumo.classList.add("hidden");
                 tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
-                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200";
+                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
             } else {
                 secResumo.classList.remove("hidden");
                 secResumo.classList.add("flex");
                 secLancamentos.classList.remove("flex");
                 secLancamentos.classList.add("hidden");
                 tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
-                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200";
+                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
                 gerarResumoPorCartao();
             }
         }
@@ -388,32 +388,32 @@
                     const li = document.createElement("li");
                     
                     if (idEmExclusaoPendente === id) {
-                        li.className = "bg-amber-950/40 p-3 rounded-xl border border-amber-800/60 flex flex-col gap-2 shadow-sm animate-pulse";
+                        li.className = "bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 flex flex-col gap-2 shadow-sm animate-pulse";
                         li.innerHTML = `
-                            <div class="text-[11px] font-semibold text-amber-300 flex justify-between items-center">
+                            <div class="text-[11px] font-semibold text-amber-700 dark:text-amber-300 flex justify-between items-center">
                                 <span>⚠️ Confirmar exclusão?</span>
-                                <span class="font-mono text-amber-200">${formatarMoeda(valor)}</span>
+                                <span class="font-mono text-amber-800 dark:text-amber-200">${formatarMoeda(valor)}</span>
                             </div>
-                            <div class="text-[11px] text-amber-400 truncate">${estabelecimento}</div>
+                            <div class="text-[11px] text-amber-600 dark:text-amber-400 truncate">${estabelecimento}</div>
                             <div class="flex gap-2 justify-end mt-1">
-                                <button onclick="cancelarExclusao()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Cancelar</button>
+                                <button onclick="cancelarExclusao()" class="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Cancelar</button>
                                 <button onclick="efetivarExclusao(${id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Sim, Excluir</button>
                             </div>
                         `;
                     } else {
-                        li.className = "bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 flex justify-between items-center gap-2";
+                        li.className = "bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800/80 flex justify-between items-center gap-2";
                         li.innerHTML = `
                             <div class="flex flex-col gap-0.5 flex-1">
                                 <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono">
                                     <span>📅 ${formatarDataBR(data)}</span> 
-                                    <span class="text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
                                 </div>
-                                <p class="text-slate-200 text-xs font-semibold mt-0.5">${estabelecimento}</p>
+                                <p class="text-slate-800 dark:text-slate-200 text-xs font-semibold mt-0.5">${estabelecimento}</p>
                                 <span class="text-[10px] text-slate-500">💳 ${cartao} • Usuário: ${dono}</span>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-500 hover:text-amber-400 p-1.5 transition-colors text-xs cursor-pointer" title="Editar">✏️</button>
-                                <button onclick="pedirConfirmacaoExclusao(${id})" class="text-slate-500 hover:text-red-400 p-1.5 transition-colors text-xs cursor-pointer" title="Excluir">🗑️</button>
+                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-500 hover:text-amber-500 dark:hover:text-amber-400 p-1.5 transition-colors text-xs cursor-pointer" title="Editar">✏️</button>
+                                <button onclick="pedirConfirmacaoExclusao(${id})" class="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 p-1.5 transition-colors text-xs cursor-pointer" title="Excluir">🗑️</button>
                             </div>
                         `;
                     }
@@ -448,39 +448,37 @@
                     stmt.free();
 
                     const cardDiv = document.createElement("div");
-                    cardDiv.className = "bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-2";
+                    cardDiv.className = "bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-2";
                     cardDiv.innerHTML = `
-                        <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
-                            <span class="font-bold text-emerald-400 text-xs">💳 Cartão: ${cartao}</span> 
-                            <span class="font-mono text-[11px] font-bold text-slate-200 bg-slate-900 px-2 py-0.5 rounded-lg border border-slate-800">${formatarMoeda(totalCartao)}</span>
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800/80 pb-1.5">
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400 text-xs">💳 Cartão: ${cartao}</span> 
+                            <span class="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-800">${formatarMoeda(totalCartao)}</span>
                         </div>
                     `;
 
                     if (registros.length === 0) {
                         cardDiv.innerHTML += `<p class="text-[11px] text-slate-500 text-center py-1">Nenhum lançamento registrado.</p>`;
                     } else {
-                        // Subtotais por usuário em coluna única
-                        let subHtml = `<div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800/60 flex flex-col gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Subtotais por Usuário:</span>`;
+                        let subHtml = `<div class="bg-white/80 dark:bg-slate-900/80 p-2 rounded-xl border border-slate-200 dark:border-slate-800/60 flex flex-col gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Subtotais por Usuário:</span>`;
                         for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
                             subHtml += `
-                                <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono">
-                                    <span class="text-slate-400">👤 ${dono}</span> 
-                                    <span class="text-emerald-400 font-semibold">${formatarMoeda(subtotal)}</span>
+                                <div class="flex justify-between items-center text-[11px] text-slate-700 dark:text-slate-300 font-mono">
+                                    <span class="text-slate-500 dark:text-slate-400">👤 ${dono}</span> 
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold">${formatarMoeda(subtotal)}</span>
                                 </div>`;
                         }
                         subHtml += `</div>`;
                         cardDiv.innerHTML += subHtml;
 
-                        // Lançamentos em coluna única
                         let itensHtml = `<span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Lançamentos:</span><ul class="space-y-1">`;
                         registros.forEach(g => {
                             itensHtml += `
-                                <li class="flex justify-between items-center text-[11px] text-slate-300 bg-slate-900/60 p-2 rounded-xl border border-slate-800/60">
+                                <li class="flex justify-between items-center text-[11px] text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800/60">
                                     <div class="flex flex-col gap-0.5">
-                                        <span class="font-semibold text-slate-200">${g.estabelecimento}</span>
+                                        <span class="font-semibold text-slate-800 dark:text-slate-200">${g.estabelecimento}</span>
                                         <span class="text-[10px] text-slate-500 font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
                                     </div>
-                                    <span class="font-mono text-emerald-400 font-semibold">${formatarMoeda(g.valor)}</span>
+                                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${formatarMoeda(g.valor)}</span>
                                 </li>`;
                         });
                         itensHtml += `</ul>`;
@@ -511,7 +509,7 @@
             document.getElementById("input-valor").value = valor;
 
             document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
-            document.getElementById("titulo-formulario").className = "text-xs font-bold text-amber-400 uppercase tracking-wider";
+            document.getElementById("titulo-formulario").className = "text-xs font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider";
             document.getElementById("btn-cancelar").style.display = "block";
             ativarBotaoSalvar();
         }
@@ -524,7 +522,7 @@
             gerenciarRestricoesCartao();
 
             document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-            document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-400 uppercase tracking-wider";
+            document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider";
             document.getElementById("btn-cancelar").style.display = "none";
             ativarBotaoSalvar();
         }
@@ -559,7 +557,7 @@
                 stmt.free();
                 idEmEdicao = null;
                 document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-                document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-400 uppercase tracking-wider";
+                document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider";
                 document.getElementById("btn-cancelar").style.display = "none";
                 mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
             }
