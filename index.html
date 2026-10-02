@@ -31,7 +31,7 @@
     <header class="p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center sticky top-0 z-20">
         <div class="flex items-center gap-2">
             <span class="text-xl">💳</span>
-            <h1 class="text-lg font-bold tracking-tight text-emerald-600 dark:text-emerald-400">Gastos do Cartão</h1>
+            <h1 class="text-lg font-bold tracking-tight text-emerald-600 dark:text-emerald-400">Controle de Cartão</h1>
         </div>
     </header>
 
@@ -66,30 +66,35 @@
 
                     <div class="col-span-6 flex flex-col">
                         <label class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Cartão:</label>
-                        <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-50 dark:bg-slate-950 p-1 border border-slate-300 dark:border-slate-800 rounded-xl box-border items-center">
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 transition-colors">
-                                <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 10
-                            </label>
-                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 transition-colors">
-                                <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 25
-                            </label>
+                        <div class="grid grid-cols-2 gap-1.5 h-[38px]">
+                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" 
+                                class="flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                                Visa 10
+                            </div>
+                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" 
+                                class="flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
+                                Visa 25
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Usuário -->
+                <!-- Usuário (Destaques) -->
                 <div>
                     <label class="block text-[11px] font-medium mb-1.5 text-slate-600 dark:text-slate-400">Usuário:</label>
-                    <div class="grid grid-cols-3 gap-1.5 bg-slate-50 dark:bg-slate-950 p-1.5 border border-slate-300 dark:border-slate-800 rounded-xl shadow-inner">
-                        <label id="label-jairo" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
-                            <input type="radio" id="radio-jairo" name="usuario" value="Jairo" checked class="accent-emerald-500"> Jairo
-                        </label>
-                        <label id="label-katia" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
-                            <input type="radio" id="radio-katia" name="usuario" value="Kátia" class="accent-emerald-500"> Kátia
-                        </label>
-                        <label id="label-juliana" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-200 transition-colors">
-                            <input type="radio" id="radio-juliana" name="usuario" value="Juliana" class="accent-emerald-500"> Juliana
-                        </label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div onclick="selecionarUsuario('Jairo')" id="card-usuario-jairo" 
+                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                            <span class="text-xs font-bold">Jairo</span>
+                        </div>
+                        <div onclick="selecionarUsuario('Kátia')" id="card-usuario-katia" 
+                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
+                            <span class="text-xs font-bold">Kátia</span>
+                        </div>
+                        <div onclick="selecionarUsuario('Juliana')" id="card-usuario-juliana" 
+                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
+                            <span class="text-xs font-bold">Juliana</span>
+                        </div>
                     </div>
                 </div>
 
@@ -175,6 +180,67 @@
         let idEmExclusaoPendente = null;
         let temporizadorAlerta = null;
 
+        let cartaoSelecionadoState = "Visa - 10";
+        let usuarioSelecionadoState = "Jairo";
+
+        function selecionarCartao(cartao) {
+            cartaoSelecionadoState = cartao;
+            const card10 = document.getElementById("card-cartao-visa10");
+            const card25 = document.getElementById("card-cartao-visa25");
+
+            const classeAtiva = "flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300";
+            const classeInativa = "flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400";
+
+            if (cartao === "Visa - 10") {
+                card10.className = classeAtiva;
+                card25.className = classeInativa;
+            } else {
+                card25.className = classeAtiva;
+                card10.className = classeInativa;
+            }
+            
+            // Regra: Visa 10 restringe o uso exclusivamente ao Jairo
+            selecionarUsuario("Jairo");
+        }
+
+        function selecionarUsuario(usuario) {
+            // Se o cartão for Visa 10, impede selecionar outro usuário além de Jairo
+            if (cartaoSelecionadoState === "Visa - 10" && usuario !== "Jairo") {
+                return;
+            }
+
+            usuarioSelecionadoState = usuario;
+
+            const usuarios = [
+                { nome: "Jairo", id: "jairo" },
+                { nome: "Kátia", id: "katia" },
+                { nome: "Juliana", id: "juliana" }
+            ];
+
+            usuarios.forEach(u => {
+                const card = document.getElementById(`card-usuario-${u.id}`);
+                if (!card) return;
+                
+                const isSelected = (u.nome === usuario);
+                const isVisa10 = (cartaoSelecionadoState === "Visa - 10");
+
+                if (isVisa10 && u.nome !== "Jairo") {
+                    // Desativa visualmente e bloqueia cliques para Kátia e Juliana no Visa 10
+                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border transition-all shadow-sm bg-slate-100 dark:bg-slate-900/30 border-slate-200 dark:border-slate-900 text-slate-300 dark:text-slate-700 cursor-not-allowed";
+                    card.style.opacity = "0.4";
+                    card.style.pointerEvents = "none";
+                } else if (isSelected) {
+                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300";
+                    card.style.opacity = "1";
+                    card.style.pointerEvents = "auto";
+                } else {
+                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400";
+                    card.style.opacity = "1";
+                    card.style.pointerEvents = "auto";
+                }
+            });
+        }
+
         function mostrarAlerta(mensagem, tipo = 'erro') {
             const alerta = document.getElementById("app-alerta");
             if (temporizadorAlerta) clearTimeout(temporizadorAlerta);
@@ -198,34 +264,6 @@
             document.getElementById('input-data').value = `${ano}-${mes}-${dia}`;
         }
         definirDataHoje();
-
-        function gerenciarRestricoesCartao() {
-            const cartaoSelecionado = document.querySelector('input[name="cartao"]:checked').value;
-            const radioJairo = document.getElementById("radio-jairo");
-            const radioKatia = document.getElementById("radio-katia");
-            const radioJuliana = document.getElementById("radio-juliana");
-            const labelJairo = document.getElementById("label-jairo");
-            const labelKatia = document.getElementById("label-katia");
-            const labelJuliana = document.getElementById("label-juliana");
-
-            if (cartaoSelecionado === "Visa - 10") {
-                radioJairo.checked = true;
-                radioJairo.disabled = false;
-                labelJairo.classList.remove("opacity-30", "cursor-not-allowed");
-                radioKatia.disabled = true;
-                labelKatia.classList.add("opacity-30", "cursor-not-allowed");
-                radioJuliana.disabled = true;
-                labelJuliana.classList.add("opacity-30", "cursor-not-allowed");
-            } else {
-                radioJairo.disabled = false;
-                labelJairo.classList.remove("opacity-30", "cursor-not-allowed");
-                radioKatia.disabled = false;
-                labelKatia.classList.remove("opacity-30", "cursor-not-allowed");
-                radioJuliana.disabled = false;
-                labelJuliana.classList.remove("opacity-30", "cursor-not-allowed");
-            }
-        }
-        gerenciarRestricoesCartao();
 
         initSqlJs({
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
@@ -496,14 +534,8 @@
             idEmExclusaoPendente = null;
             document.getElementById("input-data").value = data;
             
-            document.querySelectorAll('input[name="cartao"]').forEach(r => {
-                if (r.value === cartao) r.checked = true;
-            });
-            gerenciarRestricoesCartao();
-
-            document.querySelectorAll('input[name="usuario"]').forEach(r => {
-                if (r.value === dono && !r.disabled) r.checked = true;
-            });
+            selecionarCartao(cartao);
+            selecionarUsuario(dono);
 
             document.getElementById("input-estabelecimento").value = estabelecimento;
             document.getElementById("input-valor").value = valor;
@@ -519,7 +551,8 @@
             document.getElementById("input-estabelecimento").value = "";
             document.getElementById("input-valor").value = "";
             definirDataHoje();
-            gerenciarRestricoesCartao();
+            selecionarCartao("Visa - 10");
+            selecionarUsuario("Jairo");
 
             document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
             document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider";
@@ -530,8 +563,8 @@
         function salvarOuAtualizarRegistro() {
             if (!db) return;
             const data = document.getElementById("input-data").value;
-            const cartao = document.querySelector('input[name="cartao"]:checked')?.value;
-            const dono = document.querySelector('input[name="usuario"]:checked')?.value;
+            const cartao = cartaoSelecionadoState;
+            const dono = usuarioSelecionadoState;
             const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
             const valorInput = document.getElementById("input-valor").value;
             
@@ -566,7 +599,8 @@
             document.getElementById("input-estabelecimento").value = "";
             document.getElementById("input-valor").value = "";
             definirDataHoje();
-            gerenciarRestricoesCartao();
+            selecionarCartao("Visa - 10");
+            selecionarUsuario("Jairo");
             ativarBotaoSalvar();
             document.getElementById("input-estabelecimento").focus();
             atualizarAplicacao();
