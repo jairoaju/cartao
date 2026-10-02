@@ -3,618 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0b1220">
+    <title>PWA Controle de Cartão</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
-    <title>Gastos do Cartão</title>
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- sql.js (SQLite para WebAssembly) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-
+    
     <style>
-        :root {
-            color-scheme: light dark;
-            --bg: #f4f7fb;
-            --surface: rgba(255,255,255,.86);
-            --surface-solid: #ffffff;
-            --surface-2: #eef3f8;
-            --text: #172033;
-            --muted: #687386;
-            --line: #dce3ec;
-            --primary: #16a394;
-            --primary-strong: #0f897d;
-            --primary-soft: #dff6f1;
-            --danger: #dc4c64;
-            --warning: #d68a18;
-            --shadow: 0 10px 30px rgba(24,39,75,.08);
-            --radius: 20px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #0b1220;
-                --surface: rgba(20,29,45,.88);
-                --surface-solid: #141d2d;
-                --surface-2: #1b2639;
-                --text: #edf2f8;
-                --muted: #9aa7ba;
-                --line: #2b374b;
-                --primary: #39c5b3;
-                --primary-strong: #2db2a2;
-                --primary-soft: rgba(57,197,179,.14);
-                --shadow: 0 14px 35px rgba(0,0,0,.22);
-            }
-        }
-
-        * { box-sizing: border-box; }
-        .hidden { display: none !important; }
-
-        html, body {
-            margin: 0;
-            min-height: 100%;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-                         "Segoe UI", sans-serif;
-            background:
-                radial-gradient(circle at 0% 0%, rgba(22,163,148,.12), transparent 32rem),
-                var(--bg);
-            color: var(--text);
-        }
-
         body {
             min-height: 100dvh;
-            padding-bottom: max(24px, env(safe-area-inset-bottom));
-            user-select: none;
-        }
-
-        button, input { font: inherit; }
-
-        button { -webkit-tap-highlight-color: transparent; }
-
-        .app-shell {
-            width: min(100%, 760px);
-            margin: 0 auto;
-            padding: 18px 14px 30px;
-        }
-
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 15px;
-            display: grid;
-            place-items: center;
-            color: white;
-            background: linear-gradient(145deg, var(--primary), #087f74);
-            box-shadow: 0 8px 20px rgba(22,163,148,.25);
-            font-size: 21px;
-        }
-
-        .brand h1 {
-            margin: 0;
-            font-size: 20px;
-            letter-spacing: -.4px;
-        }
-
-        .brand p {
-            margin: 2px 0 0;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            padding: 5px;
-            background: var(--surface-2);
-            border: 1px solid var(--line);
-            border-radius: 15px;
-            margin-bottom: 16px;
-        }
-
-        .tab {
-            border: 0;
-            border-radius: 11px;
-            padding: 11px 8px;
-            background: transparent;
-            color: var(--muted);
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .2s ease;
-        }
-
-        .tab.active {
-            background: var(--surface-solid);
-            color: var(--primary);
-            box-shadow: 0 3px 12px rgba(20,35,55,.08);
-        }
-
-        .section {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        .form-card {
-            padding: 18px;
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .section-title h2 {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .section-title span {
-            color: var(--primary);
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        .fields {
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
-        }
-
-        .two-cols {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .field label {
-            display: block;
-            margin: 0 0 6px 2px;
-            color: var(--muted);
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .input {
-            width: 100%;
-            height: 44px;
-            padding: 0 12px;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            outline: none;
-            background: var(--surface-2);
-            color: var(--text);
-            transition: .2s ease;
-        }
-
-        .input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(22,163,148,.12);
-        }
-
-        .choice-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            padding: 5px;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            background: var(--surface-2);
-        }
-
-        .choice-grid.two {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .choice {
-            position: relative;
-            min-height: 34px;
-            display: grid;
-            place-items: center;
-            padding: 6px;
-            border-radius: 9px;
-            color: var(--muted);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .2s ease;
-        }
-
-        .choice input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .choice:has(input:checked) {
-            background: var(--surface-solid);
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(20,35,55,.07);
-        }
-
-        .choice:has(input:disabled) {
-            opacity: .38;
-            cursor: not-allowed;
-        }
-
-        .primary-btn {
-            width: 100%;
-            min-height: 46px;
-            border: 0;
-            border-radius: 13px;
-            color: white;
-            background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-            font-weight: 800;
-            font-size: 13px;
-            box-shadow: 0 8px 18px rgba(22,163,148,.22);
-            cursor: pointer;
-            transition: transform .15s ease, filter .15s ease;
-        }
-
-        .primary-btn:hover { filter: brightness(1.04); }
-        .primary-btn:active { transform: scale(.98); }
-        .primary-btn:disabled {
-            background: var(--surface-2);
-            color: var(--muted);
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .cancel-btn {
-            width: 100%;
-            border: 1px solid var(--line);
-            background: transparent;
-            color: var(--muted);
-            border-radius: 11px;
-            padding: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        #btn-salvar.editing {
-            background: linear-gradient(135deg, #e39a28, #c97910);
-        }
-
-        #app-alerta {
-            margin-top: 12px;
-            border-radius: 12px;
-            padding: 11px 12px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .history-card { padding: 17px; }
-
-        .history-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .history-head h2 {
-            margin: 0;
-            font-size: 14px;
-        }
-
-        #total-geral {
-            padding: 6px 9px;
-            border-radius: 9px;
-            background: var(--primary-soft);
-            color: var(--primary);
-            font-size: 11px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        #lista-registros {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-            max-height: 42vh;
-            overflow-y: auto;
-        }
-
-        .expense-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: var(--surface-2);
-        }
-
-        .expense-icon {
-            width: 36px;
-            height: 36px;
-            flex: 0 0 36px;
-            border-radius: 11px;
-            display: grid;
-            place-items: center;
-            background: var(--primary-soft);
-            color: var(--primary);
-            font-size: 15px;
-        }
-
-        .expense-main {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .expense-name {
-            margin: 0 0 3px;
-            font-size: 13px;
-            font-weight: 800;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .expense-meta {
-            color: var(--muted);
-            font-size: 10px;
-        }
-
-        .expense-value {
-            align-self: flex-start;
-            color: var(--primary);
-            font-size: 12px;
-            font-weight: 900;
-            white-space: nowrap;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 2px;
-        }
-
-        .icon-btn {
-            width: 31px;
-            height: 31px;
-            border: 0;
-            border-radius: 9px;
-            background: transparent;
-            color: var(--muted);
-            cursor: pointer;
-        }
-
-        .icon-btn:hover { background: var(--surface-solid); color: var(--primary); }
-
-        .backup-card { padding: 15px 17px; }
-
-        .backup-title {
-            margin-bottom: 9px;
-            color: var(--muted);
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        .backup-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .secondary-btn {
-            min-height: 40px;
-            border: 1px solid var(--line);
-            border-radius: 11px;
-            background: var(--surface-2);
-            color: var(--text);
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .summary-card { padding: 18px; }
-
-        .summary-card h2 {
-            margin: 0 0 14px;
-            font-size: 15px;
-        }
-
-        #conteudo-resumo {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .summary-card-inner {
-            padding: 14px;
-            border: 1px solid var(--line);
-            border-radius: 15px;
-            background: var(--surface-2);
-        }
-
-        .empty {
-            padding: 25px 10px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        @media (max-width: 480px) {
-            .app-shell { padding: 14px 10px 26px; }
-            .two-cols { grid-template-columns: 1fr; }
-            .brand h1 { font-size: 18px; }
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
         }
     </style>
 </head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200 pb-8">
 
-<body>
-    <div class="app-shell">
-        <header class="app-header">
-            <div class="brand">
-                <div class="brand-icon">▣</div>
+    <!-- Header Moderno com Efeito Glass -->
+    <header class="p-4 bg-slate-900/80 backdrop-blur-md shadow-lg border-b border-slate-800/80 flex justify-between items-center sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">💳</span>
+            <h1 class="text-lg font-bold tracking-tight text-emerald-400">Controle de Cartão</h1>
+        </div>
+    </header>
+
+    <!-- Barra de Navegação Estilo Pílula / Segmented Control -->
+    <nav class="bg-slate-900/60 backdrop-blur border-b border-slate-800/60 p-2 flex gap-2 justify-center">
+        <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" 
+            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white">
+            📝 Lançamentos
+        </button>
+        <button onclick="mudarAba('resumo')" id="tab-resumo" 
+            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200">
+            📊 Resumo por Cartão
+        </button>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 p-4 max-w-lg mx-auto w-full flex flex-col gap-4">
+        
+        <!-- SEÇÃO 1: Lançamentos -->
+        <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
+            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex flex-col gap-3 relative">
+                
+                <h2 id="titulo-formulario" class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Novo Lançamento</h2>
+                
+                <!-- Data e Cartão -->
+                <div class="grid grid-cols-12 gap-2 items-end">
+                    <div class="col-span-6 flex flex-col">
+                        <label for="input-data" class="block text-[11px] font-medium mb-1 text-slate-400">Data:</label>
+                        <input type="date" id="input-data" 
+                            class="w-full h-[38px] px-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs box-border shadow-inner">
+                    </div>
+
+                    <div class="col-span-6 flex flex-col">
+                        <label class="block text-[11px] font-medium mb-1 text-slate-400">Cartão:</label>
+                        <div class="grid grid-cols-2 gap-1 h-[38px] bg-slate-950 p-1 border border-slate-800 rounded-xl box-border items-center">
+                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-900 text-slate-300 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 10
+                            </label>
+                            <label class="flex items-center justify-center gap-0.5 cursor-pointer text-[11px] font-medium h-full rounded-lg hover:bg-slate-900 text-slate-300 transition-colors">
+                                <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()" class="accent-emerald-500"> Visa 25
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuário -->
                 <div>
-                    <h1>Gastos do Cartão</h1>
-                    <p>Controle simples das despesas</p>
-                </div>
-            </div>
-        </header>
-
-        <nav class="tabs">
-            <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" class="tab active">
-                Lançamentos
-            </button>
-            <button onclick="mudarAba('resumo')" id="tab-resumo" class="tab">
-                Resumo
-            </button>
-        </nav>
-
-        <main>
-            <section id="secao-lancamentos" class="section">
-
-                <div class="card form-card">
-                    <div class="section-title">
-                        <h2 id="titulo-formulario">Novo Lançamento</h2>
-                        <span>Despesa</span>
-                    </div>
-
-                    <div class="fields">
-                        <div class="two-cols">
-                            <div class="field">
-                                <label for="input-data">Data</label>
-                                <input type="date" id="input-data" class="input">
-                            </div>
-
-                            <div class="field">
-                                <label>Cartão</label>
-                                <div class="choice-grid two">
-                                    <label class="choice">
-                                        <input type="radio" name="cartao" value="Visa - 10" checked onchange="gerenciarRestricoesCartao()">
-                                        Visa 10
-                                    </label>
-                                    <label class="choice">
-                                        <input type="radio" name="cartao" value="Visa - 25" onchange="gerenciarRestricoesCartao()">
-                                        Visa 25
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label>Usuário</label>
-                            <div class="choice-grid">
-                                <label id="label-jairo" class="choice">
-                                    <input type="radio" id="radio-jairo" name="usuario" value="Jairo" checked>
-                                    Jairo
-                                </label>
-                                <label id="label-katia" class="choice">
-                                    <input type="radio" id="radio-katia" name="usuario" value="Kátia">
-                                    Kátia
-                                </label>
-                                <label id="label-juliana" class="choice">
-                                    <input type="radio" id="radio-juliana" name="usuario" value="Juliana">
-                                    Juliana
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label for="input-estabelecimento">Estabelecimento</label>
-                            <input type="text" id="input-estabelecimento" class="input"
-                                   placeholder="Ex.: supermercado, posto...">
-                        </div>
-
-                        <div class="field">
-                            <label for="input-valor">Valor</label>
-                            <input type="number" step="0.01" id="input-valor" class="input"
-                                   placeholder="0,00" inputmode="decimal">
-                        </div>
-
-                        <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled class="primary-btn">
-                            Salvar Lançamento
-                        </button>
-
-                        <button id="btn-cancelar" onclick="cancelarEdicao()" style="display:none" class="cancel-btn">
-                            Cancelar edição
-                        </button>
-
-                        <div id="app-alerta" class="hidden"></div>
-                    </div>
-                </div>
-
-                <div class="card history-card">
-                    <div class="history-head">
-                        <h2>Histórico</h2>
-                        <span id="total-geral">Total: R$ 0,00</span>
-                    </div>
-                    <ul id="lista-registros">
-                        <li class="empty">Carregando dados...</li>
-                    </ul>
-                </div>
-
-                <div class="card backup-card">
-                    <div class="backup-title">Dados e backup</div>
-                    <div class="backup-actions">
-                        <button onclick="exportarBackup()" class="secondary-btn">Exportar</button>
-                        <label class="secondary-btn" style="display:grid;place-items:center;cursor:pointer;">
-                            Importar
-                            <input type="file" id="input-importar" accept=".sqlite,.db"
-                                   onchange="importarBackup(event)" hidden>
+                    <label class="block text-[11px] font-medium mb-1.5 text-slate-400">Usuário:</label>
+                    <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-1.5 border border-slate-800 rounded-xl shadow-inner">
+                        <label id="label-jairo" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                            <input type="radio" id="radio-jairo" name="usuario" value="Jairo" checked class="accent-emerald-500"> Jairo
+                        </label>
+                        <label id="label-katia" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                            <input type="radio" id="radio-katia" name="usuario" value="Kátia" class="accent-emerald-500"> Kátia
+                        </label>
+                        <label id="label-juliana" class="flex items-center justify-center gap-1 cursor-pointer text-xs p-2 rounded-lg hover:bg-slate-900 text-slate-200 transition-colors">
+                            <input type="radio" id="radio-juliana" name="usuario" value="Juliana" class="accent-emerald-500"> Juliana
                         </label>
                     </div>
-                    <div id="container-link-download" class="hidden" style="margin-top:9px"></div>
                 </div>
-            </section>
 
-            <section id="secao-resumo" class="section hidden">
-                <div class="card summary-card">
-                    <h2>Totais por cartão e usuário</h2>
-                    <div id="conteudo-resumo">
-                        <p class="empty">Carregando resumo...</p>
+                <!-- Estabelecimento -->
+                <div>
+                    <label for="input-estabelecimento" class="block text-[11px] font-medium mb-1 text-slate-400">Estabelecimento:</label>
+                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto..."
+                        class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs placeholder-slate-600 shadow-inner">
+                </div>
+
+                <!-- Valor -->
+                <div>
+                    <label for="input-valor" class="block text-[11px] font-medium mb-1 text-slate-400">Valor (R$):</label>
+                    <input type="number" step="0.01" id="input-valor" placeholder="0,00"
+                        class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-100 text-xs placeholder-slate-600 shadow-inner">
+                </div>
+                
+                <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled
+                    class="mt-1 w-full bg-slate-800 text-slate-500 font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 cursor-not-allowed transition-all text-xs">
+                    Salvar Lançamento
+                </button>
+
+                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none;"
+                    class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl transition-all text-xs">
+                    Cancelar Edição
+                </button>
+
+                <div id="app-alerta" class="hidden p-3 rounded-xl text-xs font-medium border transition-all shadow-sm"></div>
+            </div>
+
+            <!-- Tabela de Registros -->
+            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Histórico de Gastos</h2>
+                    <span id="total-geral" class="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-900/50 shadow-inner">Total: R$ 0,00</span>
+                </div>
+                <div class="overflow-y-auto flex-1 max-h-[35vh]">
+                    <ul id="lista-registros" class="space-y-2">
+                        <li class="text-slate-500 text-xs text-center py-4">Carregando dados...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Backup / Gerenciamento -->
+            <div class="bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-800/80 flex flex-col gap-2 shadow-xl">
+                <span class="text-[11px] text-slate-400 font-medium">Backup dos Dados:</span>
+                <div class="flex gap-2">
+                    <button onclick="exportarBackup()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-700/50 transition-all text-center shadow-sm">
+                        💾 Exportar
+                    </button>
+                    <label class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-700/50 transition-all text-center cursor-pointer shadow-sm">
+                        📂 Importar
+                        <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
+                    </label>
+                </div>
+                <div id="container-link-download" class="hidden mt-1"></div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 2: Resumo (Compacto, Fontes Reduzidas, Coluna Única) -->
+        <div id="secao-resumo" class="hidden flex-col gap-4 flex-1">
+            <div class="bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-800/80 flex-1 flex flex-col">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Totais e Subtotais por Usuário</h2>
+                <div class="overflow-y-auto flex-1 max-h-[60vh]">
+                    <div id="conteudo-resumo" class="space-y-3">
+                        <p class="text-slate-500 text-xs text-center py-4">Carregando resumo...</p>
                     </div>
                 </div>
-            </section>
-        </main>
-    </div>
+            </div>
+        </div>
+    </main>
 
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrado com sucesso!', reg.scope))
-                    .catch(err => console.log('Falha ao registrar Service Worker:', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
             });
         }
 
@@ -626,24 +177,16 @@
 
         function mostrarAlerta(mensagem, tipo = 'erro') {
             const alerta = document.getElementById("app-alerta");
-            
-            if (temporizadorAlerta) {
-                clearTimeout(temporizadorAlerta);
-                temporizadorAlerta = null;
-            }
-
+            if (temporizadorAlerta) clearTimeout(temporizadorAlerta);
             alerta.textContent = mensagem;
             alerta.classList.remove("hidden");
             
             if (tipo === 'sucesso') {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-sm w-full";
+                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-emerald-950/40 text-emerald-300 border-emerald-800/60 shadow-sm w-full";
             } else {
-                alerta.className = "p-3 rounded-lg text-xs font-medium border bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60 shadow-sm w-full";
+                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-red-950/40 text-red-300 border-red-800/60 shadow-sm w-full";
             }
-
-            temporizadorAlerta = setTimeout(() => {
-                alerta.classList.add("hidden");
-            }, 3500);
+            temporizadorAlerta = setTimeout(() => alerta.classList.add("hidden"), 3500);
         }
 
         function definirDataHoje() {
@@ -661,31 +204,25 @@
             const radioJairo = document.getElementById("radio-jairo");
             const radioKatia = document.getElementById("radio-katia");
             const radioJuliana = document.getElementById("radio-juliana");
-            
             const labelJairo = document.getElementById("label-jairo");
             const labelKatia = document.getElementById("label-katia");
             const labelJuliana = document.getElementById("label-juliana");
 
             if (cartaoSelecionado === "Visa - 10") {
                 radioJairo.checked = true;
-                
                 radioJairo.disabled = false;
-                labelJairo.classList.remove("opacity-40", "cursor-not-allowed");
-
+                labelJairo.classList.remove("opacity-30", "cursor-not-allowed");
                 radioKatia.disabled = true;
-                labelKatia.classList.add("opacity-40", "cursor-not-allowed");
-
+                labelKatia.classList.add("opacity-30", "cursor-not-allowed");
                 radioJuliana.disabled = true;
-                labelJuliana.classList.add("opacity-40", "cursor-not-allowed");
+                labelJuliana.classList.add("opacity-30", "cursor-not-allowed");
             } else {
                 radioJairo.disabled = false;
-                labelJairo.classList.remove("opacity-40", "cursor-not-allowed");
-
+                labelJairo.classList.remove("opacity-30", "cursor-not-allowed");
                 radioKatia.disabled = false;
-                labelKatia.classList.remove("opacity-40", "cursor-not-allowed");
-
+                labelKatia.classList.remove("opacity-30", "cursor-not-allowed");
                 radioJuliana.disabled = false;
-                labelJuliana.classList.remove("opacity-40", "cursor-not-allowed");
+                labelJuliana.classList.remove("opacity-30", "cursor-not-allowed");
             }
         }
         gerenciarRestricoesCartao();
@@ -711,21 +248,18 @@
                     valor REAL NOT NULL
                 );
             `);
-
             ativarBotaoSalvar();
             atualizarAplicacao();
-        }).catch(err => {
-            console.error("Erro ao carregar sql.js:", err);
-        });
+        }).catch(err => console.error("Erro ao carregar sql.js:", err));
 
         function ativarBotaoSalvar() {
             const btn = document.getElementById("btn-salvar");
             btn.disabled = false;
             if (idEmEdicao !== null) {
-                btn.className = "primary-btn editing";
+                btn.className = "mt-1 w-full bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer text-xs";
                 btn.textContent = "Atualizar Lançamento";
             } else {
-                btn.className = "primary-btn";
+                btn.className = "mt-1 w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer text-xs";
                 btn.textContent = "Salvar Lançamento";
             }
         }
@@ -742,10 +276,8 @@
             const dataBinaria = db.export();
             const dataIso = new Date().toISOString().split('T')[0];
             const nomeArquivo = `backup_cartoes_${dataIso}.sqlite`;
-            
             let binarios = "";
-            const len = dataBinaria.byteLength;
-            for (let i = 0; i < len; i++) {
+            for (let i = 0; i < dataBinaria.byteLength; i++) {
                 binarios += String.fromCharCode(dataBinaria[i]);
             }
             const base64Data = window.btoa(binarios);
@@ -753,11 +285,11 @@
 
             const container = document.getElementById("container-link-download");
             container.innerHTML = `
-                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 p-2.5 rounded-lg flex flex-col gap-1.5 text-center">
-                    <span class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">Backup pronto! Toque no botão abaixo para baixar:</span>
+                <div class="bg-emerald-950/40 border border-emerald-800/60 p-2.5 rounded-xl flex flex-col gap-1.5 text-center">
+                    <span class="text-[11px] text-emerald-300 font-medium">Backup pronto para download:</span>
                     <a href="${dataUri}" download="${nomeArquivo}" 
-                       class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-4 rounded shadow transition-all block">
-                        ⬇️ Baixar Arquivo de Backup (.sqlite)
+                       class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-xl shadow transition-all block">
+                        ⬇️ Baixar Arquivo (.sqlite)
                     </a>
                 </div>
             `;
@@ -767,7 +299,6 @@
         function importarBackup(event) {
             const arquivo = event.target.files[0];
             if (!arquivo) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -782,8 +313,7 @@
                         mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
                     });
                 } catch (err) {
-                    console.error(err);
-                    mostrarAlerta("Erro ao importar o arquivo. Certifique-se de que é um arquivo SQLite válido.", "erro");
+                    mostrarAlerta("Erro ao importar o arquivo SQLite.", "erro");
                 }
                 event.target.value = "";
             };
@@ -818,15 +348,15 @@
                 secLancamentos.classList.add("flex");
                 secResumo.classList.remove("flex");
                 secResumo.classList.add("hidden");
-                tabLanc.className = "tab active";
-                tabRes.className = "tab";
+                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
+                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200";
             } else {
                 secResumo.classList.remove("hidden");
                 secResumo.classList.add("flex");
                 secLancamentos.classList.remove("flex");
                 secLancamentos.classList.add("hidden");
-                tabRes.className = "tab active";
-                tabLanc.className = "tab";
+                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
+                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-800 text-slate-400 hover:text-slate-200";
                 gerarResumoPorCartao();
             }
         }
@@ -847,7 +377,7 @@
                 stmt.free();
 
                 if (registros.length === 0) {
-                    lista.innerHTML = '<li class="text-slate-400 dark:text-slate-500 text-sm text-center py-4">Nenhum lançamento encontrado.</li>';
+                    lista.innerHTML = '<li class="text-slate-500 text-xs text-center py-4">Nenhum lançamento encontrado.</li>';
                     document.getElementById("total-geral").textContent = "Total: R$ 0,00";
                     return;
                 }
@@ -858,30 +388,32 @@
                     const li = document.createElement("li");
                     
                     if (idEmExclusaoPendente === id) {
-                        li.className = "bg-amber-50 dark:bg-amber-950/60 p-3 rounded-lg border border-amber-300 dark:border-amber-700/60 flex flex-col gap-2 shadow-sm animate-pulse";
+                        li.className = "bg-amber-950/40 p-3 rounded-xl border border-amber-800/60 flex flex-col gap-2 shadow-sm animate-pulse";
                         li.innerHTML = `
-                            <div class="text-xs font-semibold text-amber-800 dark:text-amber-200 flex justify-between items-center">
-                                <span>⚠️ Confirmar exclusão deste item?</span>
-                                <span class="font-mono text-amber-900 dark:text-amber-100">${formatarMoeda(valor)}</span>
+                            <div class="text-[11px] font-semibold text-amber-300 flex justify-between items-center">
+                                <span>⚠️ Confirmar exclusão?</span>
+                                <span class="font-mono text-amber-200">${formatarMoeda(valor)}</span>
                             </div>
-                            <div class="text-[11px] text-amber-700 dark:text-amber-300 truncate">${estabelecimento}</div>
+                            <div class="text-[11px] text-amber-400 truncate">${estabelecimento}</div>
                             <div class="flex gap-2 justify-end mt-1">
-                                <button onclick="cancelarExclusao()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded font-semibold text-xs transition-all cursor-pointer">Cancelar</button>
-                                <button onclick="efetivarExclusao(${id})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded font-semibold text-xs transition-all cursor-pointer">Sim, Excluir</button>
+                                <button onclick="cancelarExclusao()" class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Cancelar</button>
+                                <button onclick="efetivarExclusao(${id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Sim, Excluir</button>
                             </div>
                         `;
                     } else {
-                        li.className = "expense-item";
+                        li.className = "bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 flex justify-between items-center gap-2";
                         li.innerHTML = `
-                            <div class="expense-icon">▣</div>
-                            <div class="expense-main">
-                                <p class="expense-name">${estabelecimento}</p>
-                                <span class="expense-meta">${formatarDataBR(data)} • ${cartao} • ${dono}</span>
+                            <div class="flex flex-col gap-0.5 flex-1">
+                                <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                                    <span>📅 ${formatarDataBR(data)}</span> 
+                                    <span class="text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
+                                </div>
+                                <p class="text-slate-200 text-xs font-semibold mt-0.5">${estabelecimento}</p>
+                                <span class="text-[10px] text-slate-500">💳 ${cartao} • Usuário: ${dono}</span>
                             </div>
-                            <span class="expense-value">${formatarMoeda(valor)}</span>
                             <div class="flex items-center gap-1">
-                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="icon-btn" title="Editar">✏️</button>
-                                <button onclick="pedirConfirmacaoExclusao(${id})" class="icon-btn" title="Excluir">🗑️</button>
+                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-500 hover:text-amber-400 p-1.5 transition-colors text-xs cursor-pointer" title="Editar">✏️</button>
+                                <button onclick="pedirConfirmacaoExclusao(${id})" class="text-slate-500 hover:text-red-400 p-1.5 transition-colors text-xs cursor-pointer" title="Excluir">🗑️</button>
                             </div>
                         `;
                     }
@@ -889,7 +421,7 @@
                 });
                 document.getElementById("total-geral").textContent = `Total: ${formatarMoeda(somaTotal)}`;
             } catch (e) {
-                console.error("Erro ao consultar SQL:", e);
+                console.error("Erro:", e);
             }
         }
 
@@ -916,34 +448,47 @@
                     stmt.free();
 
                     const cardDiv = document.createElement("div");
-                    cardDiv.className = "bg-slate-50 dark:bg-slate-900 p-3.5 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col gap-3 shadow-2xs";
+                    cardDiv.className = "bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 flex flex-col gap-2";
                     cardDiv.innerHTML = `
-                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-                            <span class="font-bold text-emerald-700 dark:text-emerald-400 text-sm">💳 Cartão: ${cartao}</span> 
-                            <span class="font-mono text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 px-2 py-1 rounded border border-slate-200 dark:border-slate-700">Total: ${formatarMoeda(totalCartao)}</span>
+                        <div class="flex justify-between items-center border-b border-slate-800/80 pb-1.5">
+                            <span class="font-bold text-emerald-400 text-xs">💳 Cartão: ${cartao}</span> 
+                            <span class="font-mono text-[11px] font-bold text-slate-200 bg-slate-900 px-2 py-0.5 rounded-lg border border-slate-800">${formatarMoeda(totalCartao)}</span>
                         </div>
                     `;
 
                     if (registros.length === 0) {
-                        cardDiv.innerHTML += `<p class="text-xs text-slate-400 dark:text-slate-500 text-center py-2">Nenhum lançamento registrado neste cartão.</p>`;
+                        cardDiv.innerHTML += `<p class="text-[11px] text-slate-500 text-center py-1">Nenhum lançamento registrado.</p>`;
                     } else {
-                        let subHtml = `<div class="bg-white dark:bg-slate-800 p-2.5 rounded border border-slate-200 dark:border-slate-700 flex flex-col gap-1"><span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Subtotais por Usuário:</span>`;
+                        // Subtotais por usuário em coluna única
+                        let subHtml = `<div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800/60 flex flex-col gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Subtotais por Usuário:</span>`;
                         for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
-                            subHtml += `<div class="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 font-mono"><span>👤 ${dono}</span> <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(subtotal)}</span></div>`;
+                            subHtml += `
+                                <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono">
+                                    <span class="text-slate-400">👤 ${dono}</span> 
+                                    <span class="text-emerald-400 font-semibold">${formatarMoeda(subtotal)}</span>
+                                </div>`;
                         }
                         subHtml += `</div>`;
                         cardDiv.innerHTML += subHtml;
 
-                        let itensHtml = `<span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">Lançamentos:</span><ul class="space-y-1.5">`;
+                        // Lançamentos em coluna única
+                        let itensHtml = `<span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Lançamentos:</span><ul class="space-y-1">`;
                         registros.forEach(g => {
-                            itensHtml += `<li class="flex justify-between items-center text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-2 rounded border border-slate-200 dark:border-slate-700"><span><strong class="text-slate-500 dark:text-slate-400">👤 ${g.dono}</strong> • ${formatarDataBR(g.data)} - ${g.estabelecimento}</span> <span class="font-mono text-emerald-600 dark:text-emerald-400">${formatarMoeda(g.valor)}</span></li>`;
+                            itensHtml += `
+                                <li class="flex justify-between items-center text-[11px] text-slate-300 bg-slate-900/60 p-2 rounded-xl border border-slate-800/60">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="font-semibold text-slate-200">${g.estabelecimento}</span>
+                                        <span class="text-[10px] text-slate-500 font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
+                                    </div>
+                                    <span class="font-mono text-emerald-400 font-semibold">${formatarMoeda(g.valor)}</span>
+                                </li>`;
                         });
                         itensHtml += `</ul>`;
                         cardDiv.innerHTML += itensHtml;
                     }
                     container.appendChild(cardDiv);
                 } catch (e) {
-                    console.error("Erro ao gerar resumo:", e);
+                    console.error("Erro no resumo:", e);
                 }
             });
         }
@@ -953,15 +498,12 @@
             idEmExclusaoPendente = null;
             document.getElementById("input-data").value = data;
             
-            const radiosCartao = document.querySelectorAll('input[name="cartao"]');
-            radiosCartao.forEach(r => {
+            document.querySelectorAll('input[name="cartao"]').forEach(r => {
                 if (r.value === cartao) r.checked = true;
             });
-            
             gerenciarRestricoesCartao();
 
-            const radiosUsuario = document.querySelectorAll('input[name="usuario"]');
-            radiosUsuario.forEach(r => {
+            document.querySelectorAll('input[name="usuario"]').forEach(r => {
                 if (r.value === dono && !r.disabled) r.checked = true;
             });
 
@@ -969,7 +511,7 @@
             document.getElementById("input-valor").value = valor;
 
             document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
-            document.getElementById("titulo-formulario").className = "text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide";
+            document.getElementById("titulo-formulario").className = "text-xs font-bold text-amber-400 uppercase tracking-wider";
             document.getElementById("btn-cancelar").style.display = "block";
             ativarBotaoSalvar();
         }
@@ -982,7 +524,7 @@
             gerenciarRestricoesCartao();
 
             document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-            document.getElementById("titulo-formulario").className = "text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide";
+            document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-400 uppercase tracking-wider";
             document.getElementById("btn-cancelar").style.display = "none";
             ativarBotaoSalvar();
         }
@@ -1017,7 +559,7 @@
                 stmt.free();
                 idEmEdicao = null;
                 document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-                document.getElementById("titulo-formulario").className = "text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide";
+                document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-400 uppercase tracking-wider";
                 document.getElementById("btn-cancelar").style.display = "none";
                 mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
             }
@@ -1044,10 +586,7 @@
 
         function efetivarExclusao(id) {
             if (!db) return;
-            
-            if (idEmEdicao === id) {
-                cancelarEdicao();
-            }
+            if (idEmEdicao === id) cancelarEdicao();
 
             const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
             stmt.run([id]);
@@ -1059,6 +598,5 @@
             mostrarAlerta("Lançamento excluído com sucesso!", "sucesso");
         }
     </script>
-
 </body>
 </html>
