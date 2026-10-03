@@ -2,155 +2,122 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PWA Controle de Cartão</title>
-    
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff" id="meta-theme-color">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- sql.js (SQLite para WebAssembly) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    
-    <!-- Estilos Externos -->
+    <title>Controle de Gastos do Cartão</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
-    <!-- Header Moderno com Efeito Glass -->
     <header>
-        <div class="flex items-center gap-2">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span class="header-icon">💳</span>
-            <h1 class="header-title">Controle de Cartão1</h1>
+            <h1 class="header-title">Cartões</h1>
         </div>
-        <button onclick="alternarTema()" id="btn-tema" class="btn-tema" title="Alternar Tema">
-            🌙
-        </button>
+        <button id="btn-tema" class="btn-tema" onclick="alternarTema()" title="Alternar Tema">🌙</button>
     </header>
 
-    <!-- Barra de Navegação Estilo Pílula / Segmented Control -->
     <nav>
-        <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" class="tab-btn tab-ativa">
-            📝 Lançamentos
-        </button>
-        <button onclick="mudarAba('resumo')" id="tab-resumo" class="tab-btn tab-inativa">
-            📊 Resumo por Cartão
-        </button>
+        <button id="tab-lancamentos" class="tab-btn tab-ativa" onclick="mudarAba('lancamentos')">Lançamentos</button>
+        <button id="tab-resumo" class="tab-btn tab-inativa" onclick="mudarAba('resumo')">Resumo por Cartão</button>
     </nav>
 
-    <!-- Conteúdo Principal -->
     <main>
-        
-        <!-- SEÇÃO 1: Lançamentos -->
-        <div id="secao-lancamentos" class="flex flex-col gap-3 secao-flex-1">
+        <div id="app-alerta" class="app-alerta-box hidden"></div>
+
+        <!-- SEÇÃO: LANÇAMENTOS -->
+        <section id="secao-lancamentos" class="flex flex-col gap-3">
+            
+            <!-- Formulário -->
             <div class="glass-card card-formulario">
-                
-                <h2 id="titulo-formulario" class="form-title">Novo Lançamento</h2>
-                
-                <!-- Data e Cartão -->
+                <div class="flex justify-between items-center">
+                    <p id="titulo-formulario" class="form-title">Novo Lançamento</p>
+                    <button id="btn-cancelar" class="btn-cancelar-edicao" onclick="cancelarEdicao()">Cancelar Edição</button>
+                </div>
+
                 <div class="grid-data-cartao">
-                    <div class="col-span-6 flex flex-col">
-                        <label for="input-data">Data:</label>
+                    <div class="col-span-6">
+                        <label for="input-data">Data</label>
                         <input type="date" id="input-data">
                     </div>
-
-                    <div class="col-span-6 flex flex-col">
-                        <label>Cartão:</label>
+                    <div class="col-span-6">
+                        <label>Cartão</label>
                         <div class="selecao-grid">
-                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" class="pill-card ativo card-center">
-                                Visa 10
-                            </div>
-                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" class="pill-card card-center">
-                                Visa 25
-                            </div>
+                            <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">Visa 10</div>
+                            <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">Visa 25</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Usuário -->
                 <div>
-                    <label class="label-usuario-margin">Usuário:</label>
+                    <label class="label-usuario-margin">Usuário do Cartão</label>
                     <div class="usuarios-grid">
-                        <div onclick="selecionarUsuario('Jairo')" id="card-usuario-jairo" class="pill-card ativo">
+                        <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')">
                             <span class="usuario-texto">Jairo</span>
                         </div>
-                        <div onclick="selecionarUsuario('Kátia')" id="card-usuario-katia" class="pill-card">
+                        <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')">
                             <span class="usuario-texto">Kátia</span>
                         </div>
-                        <div onclick="selecionarUsuario('Juliana')" id="card-usuario-juliana" class="pill-card">
+                        <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')">
                             <span class="usuario-texto">Juliana</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estabelecimento -->
                 <div>
-                    <label for="input-estabelecimento">Estabelecimento:</label>
+                    <label for="input-estabelecimento">Estabelecimento</label>
                     <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto...">
                 </div>
 
-                <!-- Valor -->
                 <div>
-                    <label for="input-valor">Valor (R$):</label>
-                    <input type="number" step="0.01" id="input-valor" placeholder="0,00">
+                    <label for="input-valor">Valor (R$)</label>
+                    <input type="number" id="input-valor" step="0.01" placeholder="0,00">
                 </div>
-                
-                <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled class="btn-acao btn-desativado">
-                    Salvar Lançamento
-                </button>
 
-                <button id="btn-cancelar" onclick="cancelarEdicao()" class="btn-cancelar-edicao">
-                    Cancelar Edição
-                </button>
-
-                <div id="app-alerta" class="hidden app-alerta-box"></div>
+                <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
             </div>
 
-            <!-- Tabela de Registros -->
-            <div class="glass-card secao-flex-1">
+            <!-- Histórico -->
+            <div class="glass-card">
                 <div class="flex justify-between items-center historico-header">
-                    <h2 class="historico-title">Histórico de Gastos</h2>
+                    <p class="historico-title">Histórico de Lançamentos</p>
                     <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
                 </div>
-                <div class="overflow-y-auto max-h-registros secao-flex-1">
+                <div class="overflow-y-auto max-h-registros">
                     <ul id="lista-registros" class="lista-vazia-ul">
-                        <li class="lista-carregando-li">Carregando dados...</li>
+                        <li class="lista-carregando-li">Carregando registros...</li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Backup / Gerenciamento -->
+            <!-- Backup / Importação -->
             <div class="glass-card backup-card-padding">
-                <span class="backup-label">Backup dos Dados:</span>
-                <div class="flex gap-2">
-                    <button onclick="exportarBackup()" class="btn-backup">
-                        💾 Exportar
-                    </button>
+                <div class="flex gap-2 items-center">
+                    <button class="btn-backup" onclick="exportarBackup()">💾 Exportar Backup</button>
                     <label class="btn-backup btn-importar-label">
-                        📂 Importar
-                        <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
+                        📂 Importar Backup
+                        <input type="file" id="input-importar" accept=".sqlite" style="display: none;" onchange="importarBackup(event)">
                     </label>
                 </div>
-                <div id="container-link-download" class="hidden container-download-margin"></div>
+                <div id="container-link-download" class="container-download-margin hidden"></div>
             </div>
-        </div>
 
-        <!-- SEÇÃO 2: Resumo -->
-        <div id="secao-resumo" class="hidden flex-col gap-3 secao-flex-1">
-            <div class="glass-card secao-flex-1">
-                <h2 class="resumo-main-title">Totais e Subtotais por Usuário</h2>
-                <div class="overflow-y-auto max-h-resumo secao-flex-1">
-                    <div id="conteudo-resumo" class="conteudo-resumo-flex">
-                        <p class="resumo-carregando-p">Carregando resumo...</p>
-                    </div>
+        </section>
+
+        <!-- SEÇÃO: RESUMO -->
+        <section id="secao-resumo" class="hidden flex-col gap-3">
+            <div class="glass-card">
+                <p class="resumo-main-title">Resumo Consolidado por Cartão</p>
+                <div id="conteudo-resumo" class="conteudo-resumo-flex overflow-y-auto max-h-resumo">
+                    <p class="resumo-carregando-p">Calculando resumo...</p>
                 </div>
             </div>
-        </div>
+        </section>
+
     </main>
 
-    <!-- Script Externo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
