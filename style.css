@@ -16,39 +16,56 @@
     --emerald-text-dark: #6ee7b7;
     --emerald-border-light: #a7f3d0;
     --emerald-border-dark: #065f46;
+    
+    --input-bg-light: #f8fafc;
+    --input-bg-dark: #030712;
+    --btn-secondary-bg-light: #e2e8f0;
+    --btn-secondary-bg-dark: #1e293b;
+    --btn-secondary-text-light: #334155;
+    --btn-secondary-text-dark: #f8fafc;
+    --item-bg-light: rgba(248, 250, 252, 0.6);
+    --item-bg-dark: rgba(30, 41, 59, 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: var(--bg-dark);
-        color: var(--text-dark);
+    html, body {
+        background-color: var(--bg-dark) !important;
+        color: var(--text-dark) !important;
     }
     header, nav, .glass-card {
         background-color: var(--card-dark) !important;
         border-color: var(--border-dark) !important;
     }
     input, select {
-        background-color: #030712 !important;
+        background-color: var(--input-bg-dark) !important;
         color: var(--text-dark) !important;
         border-color: var(--border-dark) !important;
     }
     input::placeholder {
         color: #475569 !important;
     }
+    .inner-item-box, .subtotais-box {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        border-color: var(--border-dark) !important;
+    }
 }
 
-body {
+html, body {
     min-height: 100dvh;
-    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+    margin: 0;
+    padding: 0;
     background-color: var(--bg-light);
     color: var(--text-light);
-    margin: 0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     user-select: none;
     -webkit-user-select: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+body {
     display: flex;
     flex-direction: column;
-    transition: background-color 0.2s, color 0.2s;
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
 
 header {
@@ -124,7 +141,7 @@ input[type="date"], input[type="text"], input[type="number"] {
     width: 100%;
     height: 38px;
     padding: 0.55rem;
-    background-color: #f8fafc;
+    background-color: var(--input-bg-light);
     border: 1px solid #cbd5e1;
     border-radius: 0.75rem;
     outline: none;
@@ -132,6 +149,12 @@ input[type="date"], input[type="text"], input[type="number"] {
     box-sizing: border-box;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     color: var(--text-light);
+}
+@media (prefers-color-scheme: dark) {
+    input[type="date"], input[type="text"], input[type="number"] {
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
 }
 input:focus {
     border-color: var(--emerald-main);
@@ -176,6 +199,25 @@ input:focus {
     .btn-desativado {
         background-color: #1e293b;
         color: #475569;
+    }
+}
+
+.btn-backup {
+    flex: 1;
+    background-color: var(--btn-secondary-bg-light);
+    color: var(--btn-secondary-text-light);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+    .btn-backup {
+        background-color: var(--btn-secondary-bg-dark);
+        color: var(--btn-secondary-text-dark);
+        border-color: var(--border-dark);
     }
 }
 

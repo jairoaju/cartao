@@ -99,7 +99,7 @@
                     Salvar Lançamento
                 </button>
 
-                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none; background-color: #e2e8f0; color: #334155; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.75rem; border: none; cursor: pointer; font-size: 12px; width: 100%;">
+                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none; background-color: var(--btn-cancel-bg); color: var(--btn-cancel-text); font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.75rem; border: 1px solid var(--border-light); cursor: pointer; font-size: 12px; width: 100%;">
                     Cancelar Edição
                 </button>
 
@@ -123,10 +123,10 @@
             <div class="glass-card" style="padding: 0.75rem;">
                 <span style="font-size: 11px; color: var(--text-muted-light); font-weight: 500;">Backup dos Dados:</span>
                 <div class="flex gap-2">
-                    <button onclick="exportarBackup()" style="flex: 1; background-color: #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #cbd5e1; cursor: pointer;">
+                    <button onclick="exportarBackup()" class="btn-backup">
                         💾 Exportar
                     </button>
-                    <label style="flex: 1; background-color: #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #cbd5e1; text-align: center; cursor: pointer; margin: 0;">
+                    <label class="btn-backup" style="text-align: center; cursor: pointer; margin: 0; display: flex; align-items: center; justify-content: center;">
                         📂 Importar
                         <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
                     </label>
