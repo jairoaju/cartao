@@ -23,40 +23,45 @@
     --btn-secondary-bg-dark: #1e293b;
     --btn-secondary-text-light: #334155;
     --btn-secondary-text-dark: #f8fafc;
-    --item-bg-light: rgba(248, 250, 252, 0.6);
-    --item-bg-dark: rgba(30, 41, 59, 0.6);
-    --inner-card-light: rgba(255, 255, 255, 0.8);
-    --inner-card-dark: rgba(15, 23, 42, 0.7);
+    --inner-card-light: rgba(248, 250, 252, 0.6);
+    --inner-card-dark: rgba(30, 41, 59, 0.6);
 }
 
+/* Modo Escuro Global */
 body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
 }
+
 body.dark-mode header, 
 body.dark-mode nav, 
 body.dark-mode .glass-card {
     background-color: var(--card-dark) !important;
     border-color: var(--border-dark) !important;
 }
+
 body.dark-mode input, 
 body.dark-mode select {
     background-color: var(--input-bg-dark) !important;
     color: var(--text-dark) !important;
     border-color: var(--border-dark) !important;
 }
+
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
     color: var(--text-muted-dark) !important;
     opacity: 1 !important;
 }
+
 body.dark-mode label { 
     color: var(--text-muted-dark) !important; 
 }
+
 body.dark-mode nav {
     background-color: rgba(15, 23, 42, 0.6) !important;
     border-color: rgba(30, 41, 59, 0.6) !important;
 }
+
 body.dark-mode .inner-item-box, 
 body.dark-mode .subtotais-box,
 body.dark-mode #lista-registros li {
@@ -64,50 +69,63 @@ body.dark-mode #lista-registros li {
     border-color: var(--border-dark) !important;
     color: var(--text-dark) !important;
 }
-body.dark-mode #lista-registros li * {
-    color: inherit;
-}
+
 body.dark-mode .pill-card {
     background-color: rgba(3, 7, 18, 0.6);
     border-color: var(--border-dark);
     color: var(--text-muted-dark);
 }
+
 body.dark-mode .pill-card.ativo {
     background-color: var(--emerald-dark-bg);
     color: var(--emerald-text-dark);
     border-color: var(--emerald-main);
 }
+
 body.dark-mode .pill-card.bloqueado {
     background-color: rgba(15, 23, 42, 0.3);
     border-color: #090d16;
     color: #334155;
 }
+
 body.dark-mode .btn-desativado {
     background-color: #1e293b;
     color: #475569;
 }
+
 body.dark-mode .btn-backup {
     background-color: var(--btn-secondary-bg-dark);
     color: var(--btn-secondary-text-dark);
     border-color: var(--border-dark);
 }
+
 body.dark-mode .tab-inativa {
     background-color: #1e293b;
     color: #94a3b8;
 }
+
 body.dark-mode .tab-inativa:hover {
     color: #f8fafc;
 }
+
 body.dark-mode .badge-total,
 body.dark-mode .badge-cartao-resumo {
     background-color: var(--emerald-dark-bg) !important;
     color: var(--emerald-text-dark) !important;
     border-color: var(--emerald-border-dark) !important;
 }
+
 body.dark-mode .estabelecimento-nome {
     color: var(--text-dark) !important;
 }
 
+body.dark-mode .btn-cancelar-edicao {
+    background-color: var(--btn-secondary-bg-dark);
+    color: var(--btn-secondary-text-dark);
+    border-color: var(--border-dark);
+}
+
+/* Reset e Estrutura Base */
 html, body {
     min-height: 100dvh;
     margin: 0;
@@ -146,11 +164,11 @@ header {
 }
 
 .header-title {
-    font-size: 1.125rem;
+    font-size: 1.125rem !important;
     margin: 0;
     font-weight: bold;
     letter-spacing: -0.025em;
-    color: var(--emerald-main);
+    color: var(--emerald-main) !important;
 }
 
 .btn-tema {
@@ -206,10 +224,13 @@ main {
     position: relative;
 }
 
-.form-title {
-    font-size: 11px;
+/* Títulos Padronizados (Verde Esmeralda) */
+.form-title,
+.historico-title,
+.resumo-main-title {
+    font-size: 11px !important;
     font-weight: bold;
-    color: var(--emerald-main);
+    color: var(--emerald-main) !important;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: 0;
@@ -226,10 +247,6 @@ main {
     grid-column: span 6 / span 6;
 }
 
-.card-center {
-    justify-content: center;
-}
-
 .label-usuario-margin {
     margin-bottom: 0.375rem;
 }
@@ -239,17 +256,26 @@ main {
     font-weight: bold;
 }
 
+/* Botão Cancelar Edição Compacto e Alinhado */
+.card-formulario .flex.justify-between.items-center {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .btn-cancelar-edicao {
     display: none;
-    background-color: var(--btn-cancel-bg);
-    color: var(--btn-cancel-text);
+    background-color: #f1f5f9;
+    color: #334155;
     font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
     border: 1px solid var(--border-light);
     cursor: pointer;
-    font-size: 12px;
-    width: 100%;
+    font-size: 10px;
+    width: auto;
+    white-space: nowrap;
 }
 
 .app-alerta-box {
@@ -264,15 +290,6 @@ main {
     margin-bottom: 0.75rem;
 }
 
-.historico-title {
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--text-muted-light);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0;
-}
-
 .lista-vazia-ul {
     list-style: none;
     padding: 0;
@@ -282,21 +299,8 @@ main {
     gap: 0.5rem;
 }
 
-.lista-carregando-li {
-    color: var(--text-muted-light);
-    font-size: 12px;
-    text-align: center;
-    padding: 1rem 0;
-}
-
 .backup-card-padding {
     padding: 0.75rem;
-}
-
-.backup-label {
-    font-size: 11px;
-    color: var(--text-muted-light);
-    font-weight: 500;
 }
 
 .btn-importar-label {
@@ -312,30 +316,10 @@ main {
     margin-top: 0.25rem;
 }
 
-.resumo-main-title {
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--text-muted-light);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0 0 0.75rem 0;
-}
-
 .conteudo-resumo-flex {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-}
-
-.resumo-carregando-p {
-    color: var(--text-muted-light);
-    font-size: 12px;
-    text-align: center;
-    padding: 1rem 0;
-}
-
-.secao-flex-1 {
-    flex: 1;
 }
 
 label {
@@ -359,6 +343,7 @@ input[type="date"], input[type="text"], input[type="number"] {
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     color: var(--text-light);
 }
+
 input:focus {
     border-color: var(--emerald-main);
 }
@@ -467,15 +452,18 @@ input:focus {
     border: none;
     cursor: pointer;
 }
+
 .tab-ativa {
     background-color: var(--emerald-main);
     color: white;
 }
+
 .tab-inativa {
     background-color: #e2e8f0;
     color: #475569;
 }
 
+/* Utilitários Flex e Layouters */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .justify-between { justify-content: space-between; }
@@ -487,12 +475,8 @@ input:focus {
 .max-h-registros { max-height: 35vh; }
 .max-h-resumo { max-height: 60vh; }
 .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-.text-xs { font-size: 12px; }
-.text-sm { font-size: 14px; }
-.font-bold { font-weight: 700; }
-.text-center { text-align: center; }
-.w-full { width: 100%; }
 
+/* Badges e Caixas Internas */
 .badge-total {
     font-size: 12px;
     font-family: ui-monospace, monospace;
