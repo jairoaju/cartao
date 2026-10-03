@@ -24,30 +24,79 @@
     --btn-secondary-text-light: #334155;
     --btn-secondary-text-dark: #f8fafc;
     --item-bg-light: rgba(248, 250, 252, 0.6);
-    --item-bg-dark: rgba(30, 41, 59, 0.4);
+    --item-bg-dark: rgba(30, 41, 59, 0.6);
+    --inner-card-light: rgba(255, 255, 255, 0.8);
+    --inner-card-dark: rgba(15, 23, 42, 0.7);
 }
 
-@media (prefers-color-scheme: dark) {
-    html, body {
-        background-color: var(--bg-dark) !important;
-        color: var(--text-dark) !important;
-    }
-    header, nav, .glass-card {
-        background-color: var(--card-dark) !important;
-        border-color: var(--border-dark) !important;
-    }
-    input, select {
-        background-color: var(--input-bg-dark) !important;
-        color: var(--text-dark) !important;
-        border-color: var(--border-dark) !important;
-    }
-    input::placeholder {
-        color: #475569 !important;
-    }
-    .inner-item-box, .subtotais-box {
-        background-color: rgba(15, 23, 42, 0.6) !important;
-        border-color: var(--border-dark) !important;
-    }
+body.dark-mode {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-dark) !important;
+}
+body.dark-mode header, 
+body.dark-mode nav, 
+body.dark-mode .glass-card {
+    background-color: var(--card-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+body.dark-mode input, 
+body.dark-mode select {
+    background-color: var(--input-bg-dark) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+body.dark-mode input::placeholder {
+    color: #475569 !important;
+}
+body.dark-mode label { 
+    color: var(--text-muted-dark) !important; 
+}
+body.dark-mode nav {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(30, 41, 59, 0.6) !important;
+}
+body.dark-mode .inner-item-box, 
+body.dark-mode .subtotais-box {
+    background-color: var(--inner-card-dark) !important;
+    border-color: var(--border-dark) !important;
+    color: var(--text-dark) !important;
+}
+body.dark-mode .pill-card {
+    background-color: rgba(3, 7, 18, 0.6);
+    border-color: var(--border-dark);
+    color: var(--text-muted-dark);
+}
+body.dark-mode .pill-card.ativo {
+    background-color: var(--emerald-dark-bg);
+    color: var(--emerald-text-dark);
+    border-color: var(--emerald-main);
+}
+body.dark-mode .pill-card.bloqueado {
+    background-color: rgba(15, 23, 42, 0.3);
+    border-color: #090d16;
+    color: #334155;
+}
+body.dark-mode .btn-desativado {
+    background-color: #1e293b;
+    color: #475569;
+}
+body.dark-mode .btn-backup {
+    background-color: var(--btn-secondary-bg-dark);
+    color: var(--btn-secondary-text-dark);
+    border-color: var(--border-dark);
+}
+body.dark-mode .tab-inativa {
+    background-color: #1e293b;
+    color: #94a3b8;
+}
+body.dark-mode .tab-inativa:hover {
+    color: #f8fafc;
+}
+body.dark-mode .badge-total,
+body.dark-mode .badge-cartao-resumo {
+    background-color: var(--emerald-dark-bg) !important;
+    color: var(--emerald-text-dark) !important;
+    border-color: var(--emerald-border-dark) !important;
 }
 
 html, body {
@@ -94,13 +143,6 @@ nav {
     justify-content: center;
 }
 
-@media (prefers-color-scheme: dark) {
-    nav {
-        background-color: rgba(15, 23, 42, 0.6);
-        border-color: rgba(30, 41, 59, 0.6);
-    }
-}
-
 main {
     flex: 1;
     padding: 1rem;
@@ -133,9 +175,6 @@ label {
     margin-bottom: 0.25rem;
     color: var(--text-muted-light);
 }
-@media (prefers-color-scheme: dark) {
-    label { color: var(--text-muted-dark); }
-}
 
 input[type="date"], input[type="text"], input[type="number"] {
     width: 100%;
@@ -149,12 +188,6 @@ input[type="date"], input[type="text"], input[type="number"] {
     box-sizing: border-box;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     color: var(--text-light);
-}
-@media (prefers-color-scheme: dark) {
-    input[type="date"], input[type="text"], input[type="number"] {
-        border-color: var(--border-dark);
-        color: var(--text-dark);
-    }
 }
 input:focus {
     border-color: var(--emerald-main);
@@ -195,12 +228,6 @@ input:focus {
     cursor: not-allowed;
     box-shadow: none;
 }
-@media (prefers-color-scheme: dark) {
-    .btn-desativado {
-        background-color: #1e293b;
-        color: #475569;
-    }
-}
 
 .btn-backup {
     flex: 1;
@@ -212,13 +239,6 @@ input:focus {
     border-radius: 0.75rem;
     border: 1px solid #cbd5e1;
     cursor: pointer;
-}
-@media (prefers-color-scheme: dark) {
-    .btn-backup {
-        background-color: var(--btn-secondary-bg-dark);
-        color: var(--btn-secondary-text-dark);
-        border-color: var(--border-dark);
-    }
 }
 
 .selecao-grid {
@@ -249,24 +269,11 @@ input:focus {
     background-color: #f8fafc;
     color: var(--text-muted-light);
 }
-@media (prefers-color-scheme: dark) {
-    .pill-card {
-        background-color: rgba(3, 7, 18, 0.6);
-        border-color: var(--border-dark);
-        color: var(--text-muted-dark);
-    }
-}
 
 .pill-card.ativo {
     background-color: var(--emerald-light-bg);
     border-color: var(--emerald-main);
     color: var(--emerald-text-light);
-}
-@media (prefers-color-scheme: dark) {
-    .pill-card.ativo {
-        background-color: var(--emerald-dark-bg);
-        color: var(--emerald-text-dark);
-    }
 }
 
 .pill-card.bloqueado {
@@ -276,13 +283,6 @@ input:focus {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
-}
-@media (prefers-color-scheme: dark) {
-    .pill-card.bloqueado {
-        background-color: rgba(15, 23, 42, 0.3);
-        border-color: #090d16;
-        color: #334155;
-    }
 }
 
 .tab-btn {
@@ -304,15 +304,6 @@ input:focus {
 .tab-inativa {
     background-color: #e2e8f0;
     color: #475569;
-}
-@media (prefers-color-scheme: dark) {
-    .tab-inativa {
-        background-color: #1e293b;
-        color: #94a3b8;
-    }
-    .tab-inativa:hover {
-        color: #f8fafc;
-    }
 }
 
 .flex { display: flex; }
@@ -342,10 +333,28 @@ input:focus {
     border-radius: 0.5rem;
     border: 1px solid var(--emerald-border-light);
 }
-@media (prefers-color-scheme: dark) {
-    .badge-total {
-        background-color: var(--emerald-dark-bg);
-        color: var(--emerald-text-dark);
-        border-color: var(--emerald-border-dark);
-    }
+
+.badge-cartao-resumo {
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: bold;
+    background-color: var(--inner-card-light);
+    color: var(--emerald-text-light);
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-light);
+}
+
+.inner-item-box {
+    background-color: var(--inner-card-light);
+    padding: 0.625rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-light);
+}
+
+.subtotais-box {
+    background-color: var(--inner-card-light);
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-light);
 }

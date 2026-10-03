@@ -6,8 +6,7 @@
     <title>PWA Controle de Cartão</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#090d16" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ffffff" id="meta-theme-color">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,6 +25,9 @@
             <span style="font-size: 1.25rem;">💳</span>
             <h1 style="font-size: 1.125rem; margin: 0; font-weight: bold; letter-spacing: -0.025em; color: var(--emerald-main);">Controle de Cartão</h1>
         </div>
+        <button onclick="alternarTema()" id="btn-tema" style="background: none; border: 1px solid var(--border-light); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;" title="Alternar Tema">
+            🌙
+        </button>
     </header>
 
     <!-- Barra de Navegação Estilo Pílula / Segmented Control -->

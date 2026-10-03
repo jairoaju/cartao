@@ -6,12 +6,44 @@ if ('serviceWorker' in navigator) {
 
 let db = null;
 const STORAGE_KEY = "sqlite_cartao_backup_v9";
+const THEME_KEY = "app_theme_mode";
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
 let temporizadorAlerta = null;
 
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
+
+// Gerenciamento de Tema
+function inicializarTema() {
+    const temaSalvo = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('btn-tema').textContent = '☀️';
+        document.getElementById('meta-theme-color').setAttribute('content', '#090d16');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.getElementById('btn-tema').textContent = '🌙';
+        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+    }
+}
+
+function alternarTema() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    if (isDark) {
+        localStorage.setItem(THEME_KEY, 'dark');
+        document.getElementById('btn-tema').textContent = '☀️';
+        document.getElementById('meta-theme-color').setAttribute('content', '#090d16');
+    } else {
+        localStorage.setItem(THEME_KEY, 'light');
+        document.getElementById('btn-tema').textContent = '🌙';
+        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+    }
+}
+
+inicializarTema();
 
 function selecionarCartao(cartao) {
     cartaoSelecionadoState = cartao;
@@ -26,7 +58,6 @@ function selecionarCartao(cartao) {
         card10.className = "pill-card";
     }
     
-    // Regra: Visa 10 restringe o uso exclusivamente ao Jairo
     selecionarUsuario("Jairo");
 }
 
@@ -88,7 +119,6 @@ function definirDataHoje() {
 }
 definirDataHoje();
 
-// Inicializa o estado visual padrão logo na carga para refletir o Visa 10 selecionado
 selecionarCartao("Visa - 10");
 
 initSqlJs({
@@ -265,19 +295,19 @@ function carregarRegistros() {
                 `;
             } else {
                 li.className = "inner-item-box";
-                li.style.cssText = "background-color: var(--item-bg-light); padding: 0.625rem; border-radius: 0.75rem; border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;";
+                li.style.cssText = "display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;";
                 li.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 0.125rem; flex: 1; min-width: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted-light);" class="font-mono">
-                            <span>📅 ${formatarDataBR(data)}</span> 
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
+                            <span style="color: var(--text-muted-light);">📅 ${formatarDataBR(data)}</span> 
                             <span style="color: var(--emerald-main); font-weight: bold;">${formatarMoeda(valor)}</span>
                         </div>
                         <p style="color: var(--text-light); font-size: 12px; font-weight: 600; margin: 0.125rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${estabelecimento}</p>
                         <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Usuário: ${dono}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.25rem;">
-                        <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
-                        <button onclick="pedirConfirmacaoExclusao(${id})" style="background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Excluir">🗑</button>
+                        <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
+                        <button onclick="pedirConfirmacaoExclusao(${id})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Excluir">🗑</button>
                     </div>
                 `;
             }
@@ -312,18 +342,19 @@ function gerarResumoPorCartao() {
             stmt.free();
 
             const cardDiv = document.createElement("div");
-            cardDiv.style.cssText = "background-color: var(--item-bg-light); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.5rem;";
+            cardDiv.className = "inner-item-box";
+            cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem;";
             cardDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;">
                     <span style="font-weight: bold; color: var(--emerald-main); font-size: 12px;">💳 Cartão: ${cartao}</span> 
-                    <span class="font-mono" style="font-size: 11px; font-weight: bold; background-color: var(--card-light); padding: 0.125rem 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border-light);">${formatarMoeda(totalCartao)}</span>
+                    <span class="badge-cartao-resumo">${formatarMoeda(totalCartao)}</span>
                 </div>
             `;
 
             if (registros.length === 0) {
                 cardDiv.innerHTML += `<p style="font-size: 11px; color: var(--text-muted-light); text-align: center; margin: 0.25rem 0;">Nenhum lançamento registrado.</p>`;
             } else {
-                let subHtml = `<div class="subtotais-box" style="background-color: rgba(255, 255, 255, 0.8); padding: 0.5rem; border-radius: 0.75rem; border: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.25rem;"><span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;">Subtotais por Usuário:</span>`;
+                let subHtml = `<div class="subtotais-box" style="display: flex; flex-direction: column; gap: 0.25rem;"><span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;">Subtotais por Usuário:</span>`;
                 for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
                     subHtml += `
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="font-mono">
@@ -337,7 +368,7 @@ function gerarResumoPorCartao() {
                 let itensHtml = `<span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;">Lançamentos:</span><ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem;">`;
                 registros.forEach(g => {
                     itensHtml += `
-                        <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; background-color: rgba(255, 255, 255, 0.6); padding: 0.5rem; border-radius: 0.75rem; border: 1px solid var(--border-light);" class="inner-item-box">
+                        <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="inner-item-box">
                             <div style="display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1;">
                                 <span style="font-weight: 600; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${g.estabelecimento}</span>
                                 <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
