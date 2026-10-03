@@ -22,7 +22,7 @@
     --btn-secondary-bg-light: #e2e8f0;
     --btn-secondary-bg-dark: #1e293b;
     --btn-secondary-text-light: #334155;
-    --btn-secondary-text-dark: #f8fafc;
+    --btn-secondary-text-dark: #94a3b8; /* Ajustado para o tom azul claro/acinzentado */
     --inner-card-light: rgba(248, 250, 252, 0.6);
     --inner-card-dark: rgba(30, 41, 59, 0.6);
 }
@@ -93,10 +93,11 @@ body.dark-mode .btn-desativado {
     color: #475569;
 }
 
+/* Botões de Backup com o tom azul claro desejado */
 body.dark-mode .btn-backup {
-    background-color: var(--btn-secondary-bg-dark);
-    color: var(--btn-secondary-text-dark);
-    border-color: var(--border-dark);
+    background-color: var(--btn-secondary-bg-dark) !important;
+    color: var(--btn-secondary-text-dark) !important;
+    border-color: var(--border-dark) !important;
 }
 
 body.dark-mode .tab-inativa {
@@ -115,8 +116,9 @@ body.dark-mode .badge-cartao-resumo {
     border-color: var(--emerald-border-dark) !important;
 }
 
+/* Nomes dos estabelecimentos no modo escuro com o tom azul claro */
 body.dark-mode .estabelecimento-nome {
-    color: var(--text-dark) !important;
+    color: var(--text-muted-dark) !important;
 }
 
 body.dark-mode .btn-cancelar-edicao {
@@ -224,7 +226,6 @@ main {
     position: relative;
 }
 
-/* Títulos Padronizados (Verde Esmeralda) */
 .form-title,
 .historico-title,
 .resumo-main-title {
@@ -256,7 +257,6 @@ main {
     font-weight: bold;
 }
 
-/* Botão Cancelar Edição Compacto e Alinhado */
 .card-formulario .flex.justify-between.items-center {
     display: flex;
     justify-content: space-between;
@@ -463,7 +463,6 @@ input:focus {
     color: #475569;
 }
 
-/* Utilitários Flex e Layouters */
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .justify-between { justify-content: space-between; }
@@ -476,7 +475,6 @@ input:focus {
 .max-h-resumo { max-height: 60vh; }
 .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 
-/* Badges e Caixas Internas */
 .badge-total {
     font-size: 12px;
     font-family: ui-monospace, monospace;
