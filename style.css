@@ -45,8 +45,10 @@ body.dark-mode select {
     color: var(--text-dark) !important;
     border-color: var(--border-dark) !important;
 }
-body.dark-mode input::placeholder {
-    color: #475569 !important;
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--text-muted-dark) !important;
+    opacity: 1 !important;
 }
 body.dark-mode label { 
     color: var(--text-muted-dark) !important; 
@@ -56,10 +58,14 @@ body.dark-mode nav {
     border-color: rgba(30, 41, 59, 0.6) !important;
 }
 body.dark-mode .inner-item-box, 
-body.dark-mode .subtotais-box {
+body.dark-mode .subtotais-box,
+body.dark-mode #lista-registros li {
     background-color: var(--inner-card-dark) !important;
     border-color: var(--border-dark) !important;
     color: var(--text-dark) !important;
+}
+body.dark-mode #lista-registros li * {
+    color: inherit;
 }
 body.dark-mode .pill-card {
     background-color: rgba(3, 7, 18, 0.6);
@@ -98,6 +104,9 @@ body.dark-mode .badge-cartao-resumo {
     color: var(--emerald-text-dark) !important;
     border-color: var(--emerald-border-dark) !important;
 }
+body.dark-mode .estabelecimento-nome {
+    color: var(--text-dark) !important;
+}
 
 html, body {
     min-height: 100dvh;
@@ -130,6 +139,31 @@ header {
     position: sticky;
     top: 0;
     z-index: 20;
+}
+
+.header-icon {
+    font-size: 1.25rem;
+}
+
+.header-title {
+    font-size: 1.125rem;
+    margin: 0;
+    font-weight: bold;
+    letter-spacing: -0.025em;
+    color: var(--emerald-main);
+}
+
+.btn-tema {
+    background: none;
+    border: 1px solid var(--border-light);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
 nav {
@@ -166,6 +200,142 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+}
+
+.card-formulario {
+    position: relative;
+}
+
+.form-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--emerald-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.grid-data-cartao {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: end;
+}
+
+.col-span-6 {
+    grid-column: span 6 / span 6;
+}
+
+.card-center {
+    justify-content: center;
+}
+
+.label-usuario-margin {
+    margin-bottom: 0.375rem;
+}
+
+.usuario-texto {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-cancelar-edicao {
+    display: none;
+    background-color: var(--btn-cancel-bg);
+    color: var(--btn-cancel-text);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    font-size: 12px;
+    width: 100%;
+}
+
+.app-alerta-box {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.historico-header {
+    margin-bottom: 0.75rem;
+}
+
+.historico-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-muted-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.lista-vazia-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lista-carregando-li {
+    color: var(--text-muted-light);
+    font-size: 12px;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.backup-card-padding {
+    padding: 0.75rem;
+}
+
+.backup-label {
+    font-size: 11px;
+    color: var(--text-muted-light);
+    font-weight: 500;
+}
+
+.btn-importar-label {
+    text-align: center;
+    cursor: pointer;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-download-margin {
+    margin-top: 0.25rem;
+}
+
+.resumo-main-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-muted-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.75rem 0;
+}
+
+.conteudo-resumo-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.resumo-carregando-p {
+    color: var(--text-muted-light);
+    font-size: 12px;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.secao-flex-1 {
+    flex: 1;
 }
 
 label {
@@ -357,4 +527,14 @@ input:focus {
     padding: 0.5rem;
     border-radius: 0.75rem;
     border: 1px solid var(--border-light);
+}
+
+.estabelecimento-nome {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 0.125rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

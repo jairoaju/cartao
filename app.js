@@ -302,7 +302,7 @@ function carregarRegistros() {
                             <span style="color: var(--text-muted-light);">📅 ${formatarDataBR(data)}</span> 
                             <span style="color: var(--emerald-main); font-weight: bold;">${formatarMoeda(valor)}</span>
                         </div>
-                        <p style="color: var(--text-light); font-size: 12px; font-weight: 600; margin: 0.125rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${estabelecimento}</p>
+                        <p class="estabelecimento-nome">${estabelecimento}</p>
                         <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Usuário: ${dono}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.25rem;">
@@ -370,7 +370,7 @@ function gerarResumoPorCartao() {
                     itensHtml += `
                         <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="inner-item-box">
                             <div style="display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1;">
-                                <span style="font-weight: 600; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${g.estabelecimento}</span>
+                                <span class="estabelecimento-nome">${g.estabelecimento}</span>
                                 <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
                             </div>
                             <span class="font-mono" style="color: var(--emerald-main); font-weight: 600; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>

@@ -22,10 +22,10 @@
     <!-- Header Moderno com Efeito Glass -->
     <header>
         <div class="flex items-center gap-2">
-            <span style="font-size: 1.25rem;">💳</span>
-            <h1 style="font-size: 1.125rem; margin: 0; font-weight: bold; letter-spacing: -0.025em; color: var(--emerald-main);">Controle de Cartão</h1>
+            <span class="header-icon">💳</span>
+            <h1 class="header-title">Controle de Cartão1</h1>
         </div>
-        <button onclick="alternarTema()" id="btn-tema" style="background: none; border: 1px solid var(--border-light); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;" title="Alternar Tema">
+        <button onclick="alternarTema()" id="btn-tema" class="btn-tema" title="Alternar Tema">
             🌙
         </button>
     </header>
@@ -44,25 +44,25 @@
     <main>
         
         <!-- SEÇÃO 1: Lançamentos -->
-        <div id="secao-lancamentos" class="flex flex-col gap-3" style="flex: 1;">
-            <div class="glass-card" style="position: relative;">
+        <div id="secao-lancamentos" class="flex flex-col gap-3 secao-flex-1">
+            <div class="glass-card card-formulario">
                 
-                <h2 id="titulo-formulario" style="font-size: 11px; font-weight: bold; color: var(--emerald-main); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Novo Lançamento</h2>
+                <h2 id="titulo-formulario" class="form-title">Novo Lançamento</h2>
                 
                 <!-- Data e Cartão -->
-                <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0.5rem; align-items: end;">
-                    <div style="grid-column: span 6 / span 6; display: flex; flex-direction: column;">
+                <div class="grid-data-cartao">
+                    <div class="col-span-6 flex flex-col">
                         <label for="input-data">Data:</label>
                         <input type="date" id="input-data">
                     </div>
 
-                    <div style="grid-column: span 6 / span 6; display: flex; flex-direction: column;">
+                    <div class="col-span-6 flex flex-col">
                         <label>Cartão:</label>
                         <div class="selecao-grid">
-                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" class="pill-card ativo" style="justify-content: center;">
+                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" class="pill-card ativo card-center">
                                 Visa 10
                             </div>
-                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" class="pill-card" style="justify-content: center;">
+                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" class="pill-card card-center">
                                 Visa 25
                             </div>
                         </div>
@@ -71,16 +71,16 @@
 
                 <!-- Usuário -->
                 <div>
-                    <label style="margin-bottom: 0.375rem;">Usuário:</label>
+                    <label class="label-usuario-margin">Usuário:</label>
                     <div class="usuarios-grid">
                         <div onclick="selecionarUsuario('Jairo')" id="card-usuario-jairo" class="pill-card ativo">
-                            <span style="font-size: 12px; font-weight: bold;">Jairo</span>
+                            <span class="usuario-texto">Jairo</span>
                         </div>
                         <div onclick="selecionarUsuario('Kátia')" id="card-usuario-katia" class="pill-card">
-                            <span style="font-size: 12px; font-weight: bold;">Kátia</span>
+                            <span class="usuario-texto">Kátia</span>
                         </div>
                         <div onclick="selecionarUsuario('Juliana')" id="card-usuario-juliana" class="pill-card">
-                            <span style="font-size: 12px; font-weight: bold;">Juliana</span>
+                            <span class="usuario-texto">Juliana</span>
                         </div>
                     </div>
                 </div>
@@ -101,49 +101,49 @@
                     Salvar Lançamento
                 </button>
 
-                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none; background-color: var(--btn-cancel-bg); color: var(--btn-cancel-text); font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.75rem; border: 1px solid var(--border-light); cursor: pointer; font-size: 12px; width: 100%;">
+                <button id="btn-cancelar" onclick="cancelarEdicao()" class="btn-cancelar-edicao">
                     Cancelar Edição
                 </button>
 
-                <div id="app-alerta" class="hidden" style="padding: 0.75rem; border-radius: 0.75rem; font-size: 12px; font-weight: 500; border: 1px solid transparent;"></div>
+                <div id="app-alerta" class="hidden app-alerta-box"></div>
             </div>
 
             <!-- Tabela de Registros -->
-            <div class="glass-card" style="flex: 1;">
-                <div class="flex justify-between items-center" style="margin-bottom: 0.75rem;">
-                    <h2 style="font-size: 11px; font-weight: bold; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Histórico de Gastos</h2>
+            <div class="glass-card secao-flex-1">
+                <div class="flex justify-between items-center historico-header">
+                    <h2 class="historico-title">Histórico de Gastos</h2>
                     <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
                 </div>
-                <div class="overflow-y-auto max-h-registros" style="flex: 1;">
-                    <ul id="lista-registros" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <li style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Carregando dados...</li>
+                <div class="overflow-y-auto max-h-registros secao-flex-1">
+                    <ul id="lista-registros" class="lista-vazia-ul">
+                        <li class="lista-carregando-li">Carregando dados...</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Backup / Gerenciamento -->
-            <div class="glass-card" style="padding: 0.75rem;">
-                <span style="font-size: 11px; color: var(--text-muted-light); font-weight: 500;">Backup dos Dados:</span>
+            <div class="glass-card backup-card-padding">
+                <span class="backup-label">Backup dos Dados:</span>
                 <div class="flex gap-2">
                     <button onclick="exportarBackup()" class="btn-backup">
                         💾 Exportar
                     </button>
-                    <label class="btn-backup" style="text-align: center; cursor: pointer; margin: 0; display: flex; align-items: center; justify-content: center;">
+                    <label class="btn-backup btn-importar-label">
                         📂 Importar
                         <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
                     </label>
                 </div>
-                <div id="container-link-download" class="hidden" style="margin-top: 0.25rem;"></div>
+                <div id="container-link-download" class="hidden container-download-margin"></div>
             </div>
         </div>
 
         <!-- SEÇÃO 2: Resumo -->
-        <div id="secao-resumo" class="hidden flex-col gap-3" style="flex: 1;">
-            <div class="glass-card" style="flex: 1;">
-                <h2 style="font-size: 11px; font-weight: bold; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0;">Totais e Subtotais por Usuário</h2>
-                <div class="overflow-y-auto max-h-resumo" style="flex: 1;">
-                    <div id="conteudo-resumo" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <p style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Carregando resumo...</p>
+        <div id="secao-resumo" class="hidden flex-col gap-3 secao-flex-1">
+            <div class="glass-card secao-flex-1">
+                <h2 class="resumo-main-title">Totais e Subtotais por Usuário</h2>
+                <div class="overflow-y-auto max-h-resumo secao-flex-1">
+                    <div id="conteudo-resumo" class="conteudo-resumo-flex">
+                        <p class="resumo-carregando-p">Carregando resumo...</p>
                     </div>
                 </div>
             </div>
