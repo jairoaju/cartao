@@ -12,623 +12,143 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- sql.js (SQLite para WebAssembly) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     
-    <style>
-        body {
-            min-height: 100dvh;
-            padding-bottom: max(2rem, env(safe-area-inset-bottom));
-        }
-    </style>
+    <!-- Estilos Externos -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans select-none transition-colors duration-200 pb-8">
+<body>
 
     <!-- Header Moderno com Efeito Glass -->
-    <header class="p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg border-b border-slate-200 dark:border-slate-800/80 flex justify-between items-center sticky top-0 z-20">
+    <header>
         <div class="flex items-center gap-2">
-            <span class="text-xl">💳</span>
-            <h1 class="text-lg font-bold tracking-tight text-emerald-600 dark:text-emerald-400">Controle de Cartão</h1>
+            <span style="font-size: 1.25rem;">💳</span>
+            <h1 style="font-size: 1.125rem; margin: 0; font-weight: bold; letter-spacing: -0.025em; color: var(--emerald-main);">Controle de Cartão</h1>
         </div>
     </header>
 
     <!-- Barra de Navegação Estilo Pílula / Segmented Control -->
-    <nav class="bg-white/60 dark:bg-slate-900/60 backdrop-blur border-b border-slate-200 dark:border-slate-800/60 p-2 flex gap-2 justify-center">
-        <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" 
-            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white">
+    <nav>
+        <button onclick="mudarAba('lancamentos')" id="tab-lancamentos" class="tab-btn tab-ativa">
             📝 Lançamentos
         </button>
-        <button onclick="mudarAba('resumo')" id="tab-resumo" 
-            class="flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">
+        <button onclick="mudarAba('resumo')" id="tab-resumo" class="tab-btn tab-inativa">
             📊 Resumo por Cartão
         </button>
     </nav>
 
     <!-- Conteúdo Principal -->
-    <main class="flex-1 p-4 max-w-lg mx-auto w-full flex flex-col gap-4">
+    <main>
         
         <!-- SEÇÃO 1: Lançamentos -->
-        <div id="secao-lancamentos" class="flex flex-col gap-4 flex-1">
-            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-3 relative">
+        <div id="secao-lancamentos" class="flex flex-col gap-3" style="flex: 1;">
+            <div class="glass-card" style="position: relative;">
                 
-                <h2 id="titulo-formulario" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Novo Lançamento</h2>
+                <h2 id="titulo-formulario" style="font-size: 11px; font-weight: bold; color: var(--emerald-main); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Novo Lançamento</h2>
                 
                 <!-- Data e Cartão -->
-                <div class="grid grid-cols-12 gap-2 items-end">
-                    <div class="col-span-6 flex flex-col">
-                        <label for="input-data" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Data:</label>
-                        <input type="date" id="input-data" 
-                            class="w-full h-[38px] px-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs box-border shadow-inner">
+                <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0.5rem; align-items: end;">
+                    <div style="grid-column: span 6 / span 6; display: flex; flex-direction: column;">
+                        <label for="input-data">Data:</label>
+                        <input type="date" id="input-data">
                     </div>
 
-                    <div class="col-span-6 flex flex-col">
-                        <label class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Cartão:</label>
-                        <div class="grid grid-cols-2 gap-1.5 h-[38px]">
-                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" 
-                                class="flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                    <div style="grid-column: span 6 / span 6; display: flex; flex-direction: column;">
+                        <label>Cartão:</label>
+                        <div class="selecao-grid">
+                            <div onclick="selecionarCartao('Visa - 10')" id="card-cartao-visa10" class="pill-card ativo" style="justify-content: center;">
                                 Visa 10
                             </div>
-                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" 
-                                class="flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
+                            <div onclick="selecionarCartao('Visa - 25')" id="card-cartao-visa25" class="pill-card" style="justify-content: center;">
                                 Visa 25
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Usuário (Destaques) -->
+                <!-- Usuário -->
                 <div>
-                    <label class="block text-[11px] font-medium mb-1.5 text-slate-600 dark:text-slate-400">Usuário:</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div onclick="selecionarUsuario('Jairo')" id="card-usuario-jairo" 
-                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300">
-                            <span class="text-xs font-bold">Jairo</span>
+                    <label style="margin-bottom: 0.375rem;">Usuário:</label>
+                    <div class="usuarios-grid">
+                        <div onclick="selecionarUsuario('Jairo')" id="card-usuario-jairo" class="pill-card ativo">
+                            <span style="font-size: 12px; font-weight: bold;">Jairo</span>
                         </div>
-                        <div onclick="selecionarUsuario('Kátia')" id="card-usuario-katia" 
-                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
-                            <span class="text-xs font-bold">Kátia</span>
+                        <div onclick="selecionarUsuario('Kátia')" id="card-usuario-katia" class="pill-card">
+                            <span style="font-size: 12px; font-weight: bold;">Kátia</span>
                         </div>
-                        <div onclick="selecionarUsuario('Juliana')" id="card-usuario-juliana" 
-                            class="flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400">
-                            <span class="text-xs font-bold">Juliana</span>
+                        <div onclick="selecionarUsuario('Juliana')" id="card-usuario-juliana" class="pill-card">
+                            <span style="font-size: 12px; font-weight: bold;">Juliana</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Estabelecimento -->
                 <div>
-                    <label for="input-estabelecimento" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Estabelecimento:</label>
-                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto..."
-                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs placeholder-slate-400 dark:placeholder-slate-600 shadow-inner">
+                    <label for="input-estabelecimento">Estabelecimento:</label>
+                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto...">
                 </div>
 
                 <!-- Valor -->
                 <div>
-                    <label for="input-valor" class="block text-[11px] font-medium mb-1 text-slate-600 dark:text-slate-400">Valor (R$):</label>
-                    <input type="number" step="0.01" id="input-valor" placeholder="0,00"
-                        class="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100 text-xs placeholder-slate-400 dark:placeholder-slate-600 shadow-inner">
+                    <label for="input-valor">Valor (R$):</label>
+                    <input type="number" step="0.01" id="input-valor" placeholder="0,00">
                 </div>
                 
-                <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled
-                    class="mt-1 w-full bg-slate-300 dark:bg-slate-800 text-slate-500 font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 cursor-not-allowed transition-all text-xs">
+                <button id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled class="btn-acao btn-desativado">
                     Salvar Lançamento
                 </button>
 
-                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none;"
-                    class="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-2 px-4 rounded-xl transition-all text-xs">
+                <button id="btn-cancelar" onclick="cancelarEdicao()" style="display: none; background-color: #e2e8f0; color: #334155; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.75rem; border: none; cursor: pointer; font-size: 12px; width: 100%;">
                     Cancelar Edição
                 </button>
 
-                <div id="app-alerta" class="hidden p-3 rounded-xl text-xs font-medium border transition-all shadow-sm"></div>
+                <div id="app-alerta" class="hidden" style="padding: 0.75rem; border-radius: 0.75rem; font-size: 12px; font-weight: 500; border: 1px solid transparent;"></div>
             </div>
 
             <!-- Tabela de Registros -->
-            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex-1 flex flex-col">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Histórico de Gastos</h2>
-                    <span id="total-geral" class="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-900/50 shadow-inner">Total: R$ 0,00</span>
+            <div class="glass-card" style="flex: 1;">
+                <div class="flex justify-between items-center" style="margin-bottom: 0.75rem;">
+                    <h2 style="font-size: 11px; font-weight: bold; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Histórico de Gastos</h2>
+                    <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
                 </div>
-                <div class="overflow-y-auto flex-1 max-h-[35vh]">
-                    <ul id="lista-registros" class="space-y-2">
-                        <li class="text-slate-500 text-xs text-center py-4">Carregando dados...</li>
+                <div class="overflow-y-auto max-h-registros" style="flex: 1;">
+                    <ul id="lista-registros" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Carregando dados...</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Backup / Gerenciamento -->
-            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-3 rounded-2xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-2 shadow-xl">
-                <span class="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Backup dos Dados:</span>
+            <div class="glass-card" style="padding: 0.75rem;">
+                <span style="font-size: 11px; color: var(--text-muted-light); font-weight: 500;">Backup dos Dados:</span>
                 <div class="flex gap-2">
-                    <button onclick="exportarBackup()" class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700/50 transition-all text-center shadow-sm">
+                    <button onclick="exportarBackup()" style="flex: 1; background-color: #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #cbd5e1; cursor: pointer;">
                         💾 Exportar
                     </button>
-                    <label class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700/50 transition-all text-center cursor-pointer shadow-sm">
+                    <label style="flex: 1; background-color: #e2e8f0; color: #334155; font-size: 12px; font-weight: 600; padding: 0.5rem; border-radius: 0.75rem; border: 1px solid #cbd5e1; text-align: center; cursor: pointer; margin: 0;">
                         📂 Importar
                         <input type="file" id="input-importar" accept=".sqlite,.db" onchange="importarBackup(event)" class="hidden">
                     </label>
                 </div>
-                <div id="container-link-download" class="hidden mt-1"></div>
+                <div id="container-link-download" class="hidden" style="margin-top: 0.25rem;"></div>
             </div>
         </div>
 
         <!-- SEÇÃO 2: Resumo -->
-        <div id="secao-resumo" class="hidden flex-col gap-4 flex-1">
-            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800/80 flex-1 flex flex-col">
-                <h2 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">Totais e Subtotais por Usuário</h2>
-                <div class="overflow-y-auto flex-1 max-h-[60vh]">
-                    <div id="conteudo-resumo" class="space-y-3">
-                        <p class="text-slate-500 text-xs text-center py-4">Carregando resumo...</p>
+        <div id="secao-resumo" class="hidden flex-col gap-3" style="flex: 1;">
+            <div class="glass-card" style="flex: 1;">
+                <h2 style="font-size: 11px; font-weight: bold; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.75rem 0;">Totais e Subtotais por Usuário</h2>
+                <div class="overflow-y-auto max-h-resumo" style="flex: 1;">
+                    <div id="conteudo-resumo" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <p style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Carregando resumo...</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW error:', err));
-            });
-        }
-
-        let db = null;
-        const STORAGE_KEY = "sqlite_cartao_backup_v9";
-        let idEmEdicao = null;
-        let idEmExclusaoPendente = null;
-        let temporizadorAlerta = null;
-
-        let cartaoSelecionadoState = "Visa - 10";
-        let usuarioSelecionadoState = "Jairo";
-
-        function selecionarCartao(cartao) {
-            cartaoSelecionadoState = cartao;
-            const card10 = document.getElementById("card-cartao-visa10");
-            const card25 = document.getElementById("card-cartao-visa25");
-
-            const classeAtiva = "flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300";
-            const classeInativa = "flex items-center justify-center cursor-pointer text-[11px] font-bold rounded-xl border transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400";
-
-            if (cartao === "Visa - 10") {
-                card10.className = classeAtiva;
-                card25.className = classeInativa;
-            } else {
-                card25.className = classeAtiva;
-                card10.className = classeInativa;
-            }
-            
-            // Regra: Visa 10 restringe o uso exclusivamente ao Jairo
-            selecionarUsuario("Jairo");
-        }
-
-        function selecionarUsuario(usuario) {
-            // Se o cartão for Visa 10, impede selecionar outro usuário além de Jairo
-            if (cartaoSelecionadoState === "Visa - 10" && usuario !== "Jairo") {
-                return;
-            }
-
-            usuarioSelecionadoState = usuario;
-
-            const usuarios = [
-                { nome: "Jairo", id: "jairo" },
-                { nome: "Kátia", id: "katia" },
-                { nome: "Juliana", id: "juliana" }
-            ];
-
-            usuarios.forEach(u => {
-                const card = document.getElementById(`card-usuario-${u.id}`);
-                if (!card) return;
-                
-                const isSelected = (u.nome === usuario);
-                const isVisa10 = (cartaoSelecionadoState === "Visa - 10");
-
-                if (isVisa10 && u.nome !== "Jairo") {
-                    // Desativa visualmente e bloqueia cliques para Kátia e Juliana no Visa 10
-                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border transition-all shadow-sm bg-slate-100 dark:bg-slate-900/30 border-slate-200 dark:border-slate-900 text-slate-300 dark:text-slate-700 cursor-not-allowed";
-                    card.style.opacity = "0.4";
-                    card.style.pointerEvents = "none";
-                } else if (isSelected) {
-                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300";
-                    card.style.opacity = "1";
-                    card.style.pointerEvents = "auto";
-                } else {
-                    card.className = "flex flex-col items-center justify-center p-2 rounded-xl border cursor-pointer transition-all shadow-sm bg-slate-50 dark:bg-slate-950/60 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400";
-                    card.style.opacity = "1";
-                    card.style.pointerEvents = "auto";
-                }
-            });
-        }
-
-        function mostrarAlerta(mensagem, tipo = 'erro') {
-            const alerta = document.getElementById("app-alerta");
-            if (temporizadorAlerta) clearTimeout(temporizadorAlerta);
-            alerta.textContent = mensagem;
-            alerta.classList.remove("hidden");
-            
-            if (tipo === 'sucesso') {
-                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 shadow-sm w-full";
-            } else {
-                alerta.className = "p-3 rounded-xl text-xs font-medium border bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/60 shadow-sm w-full";
-            }
-            temporizadorAlerta = setTimeout(() => alerta.classList.add("hidden"), 3500);
-        }
-
-        function definirDataHoje() {
-            if (idEmEdicao !== null) return;
-            const hoje = new Date();
-            const ano = hoje.getFullYear();
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            document.getElementById('input-data').value = `${ano}-${mes}-${dia}`;
-        }
-        definirDataHoje();
-
-        initSqlJs({
-            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-        }).then(SQL => {
-            const savedDbHex = localStorage.getItem(STORAGE_KEY);
-            if (savedDbHex) {
-                const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-                db = new SQL.Database(binaryData);
-            } else {
-                db = new SQL.Database();
-            }
-
-            db.run(`
-                CREATE TABLE IF NOT EXISTS cartao_gastos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    data TEXT NOT NULL,
-                    cartao TEXT NOT NULL,
-                    dono_do_cartao TEXT NOT NULL,
-                    estabelecimento TEXT NOT NULL,
-                    valor REAL NOT NULL
-                );
-            `);
-            ativarBotaoSalvar();
-            atualizarAplicacao();
-        }).catch(err => console.error("Erro ao carregar sql.js:", err));
-
-        function ativarBotaoSalvar() {
-            const btn = document.getElementById("btn-salvar");
-            btn.disabled = false;
-            if (idEmEdicao !== null) {
-                btn.className = "mt-1 w-full bg-amber-600 hover:bg-amber-500 active:scale-95 transition-all text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer text-xs";
-                btn.textContent = "Atualizar Lançamento";
-            } else {
-                btn.className = "mt-1 w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer text-xs";
-                btn.textContent = "Salvar Lançamento";
-            }
-        }
-
-        function persistirBanco() {
-            if (!db) return;
-            const binaryArray = db.export();
-            const hexString = Array.from(binaryArray).map(b => b.toString(16).padStart(2, '0')).join('');
-            localStorage.setItem(STORAGE_KEY, hexString);
-        }
-
-        function exportarBackup() {
-            if (!db) return;
-            const dataBinaria = db.export();
-            const dataIso = new Date().toISOString().split('T')[0];
-            const nomeArquivo = `backup_cartoes_${dataIso}.sqlite`;
-            let binarios = "";
-            for (let i = 0; i < dataBinaria.byteLength; i++) {
-                binarios += String.fromCharCode(dataBinaria[i]);
-            }
-            const base64Data = window.btoa(binarios);
-            const dataUri = `data:application/x-sqlite3;base64,${base64Data}`;
-
-            const container = document.getElementById("container-link-download");
-            container.innerHTML = `
-                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 p-2.5 rounded-xl flex flex-col gap-1.5 text-center">
-                    <span class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium">Backup pronto para download:</span>
-                    <a href="${dataUri}" download="${nomeArquivo}" 
-                       class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-xl shadow transition-all block">
-                        ⬇️ Baixar Arquivo (.sqlite)
-                    </a>
-                </div>
-            `;
-            container.classList.remove("hidden");
-        }
-
-        function importarBackup(event) {
-            const arquivo = event.target.files[0];
-            if (!arquivo) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const uInt8Array = new Uint8Array(e.target.result);
-                    initSqlJs({
-                        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-                    }).then(SQL => {
-                        db = new SQL.Database(uInt8Array);
-                        persistirBackupDireto(uInt8Array);
-                        cancelarEdicao();
-                        atualizarAplicacao();
-                        mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
-                    });
-                } catch (err) {
-                    mostrarAlerta("Erro ao importar o arquivo SQLite.", "erro");
-                }
-                event.target.value = "";
-            };
-            reader.readAsArrayBuffer(arquivo);
-        }
-
-        function persistirBackupDireto(uInt8Array) {
-            const hexString = Array.from(uInt8Array).map(b => b.toString(16).padStart(2, '0')).join('');
-            localStorage.setItem(STORAGE_KEY, hexString);
-        }
-
-        function formatarMoeda(valor) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-        }
-
-        function formatarDataBR(dataIso) {
-            if (!dataIso) return '';
-            const partes = dataIso.split('-');
-            return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataIso;
-        }
-
-        function mudarAba(aba) {
-            const secLancamentos = document.getElementById("secao-lancamentos");
-            const secResumo = document.getElementById("secao-resumo");
-            const tabLanc = document.getElementById("tab-lancamentos");
-            const tabRes = document.getElementById("tab-resumo");
-
-            idEmExclusaoPendente = null;
-
-            if (aba === 'lancamentos') {
-                secLancamentos.classList.remove("hidden");
-                secLancamentos.classList.add("flex");
-                secResumo.classList.remove("flex");
-                secResumo.classList.add("hidden");
-                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
-                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
-            } else {
-                secResumo.classList.remove("hidden");
-                secResumo.classList.add("flex");
-                secLancamentos.classList.remove("flex");
-                secLancamentos.classList.add("hidden");
-                tabRes.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-emerald-600 text-white";
-                tabLanc.className = "flex-1 max-w-[200px] py-2 px-4 text-xs font-bold rounded-lg transition-all shadow-sm bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200";
-                gerarResumoPorCartao();
-            }
-        }
-
-        function atualizarAplicacao() {
-            carregarRegistros();
-        }
-
-        function carregarRegistros() {
-            if (!db) return;
-            const lista = document.getElementById("lista-registros");
-            lista.innerHTML = "";
-            try {
-                const stmt = db.prepare("SELECT id, data, cartao, dono_do_cartao, estabelecimento, valor FROM cartao_gastos ORDER BY data DESC, id DESC");
-                const registros = [];
-                let somaTotal = 0;
-                while (stmt.step()) { registros.push(stmt.get()); }
-                stmt.free();
-
-                if (registros.length === 0) {
-                    lista.innerHTML = '<li class="text-slate-500 text-xs text-center py-4">Nenhum lançamento encontrado.</li>';
-                    document.getElementById("total-geral").textContent = "Total: R$ 0,00";
-                    return;
-                }
-
-                registros.forEach(reg => {
-                    const [id, data, cartao, dono, estabelecimento, valor] = reg;
-                    somaTotal += valor;
-                    const li = document.createElement("li");
-                    
-                    if (idEmExclusaoPendente === id) {
-                        li.className = "bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 flex flex-col gap-2 shadow-sm animate-pulse";
-                        li.innerHTML = `
-                            <div class="text-[11px] font-semibold text-amber-700 dark:text-amber-300 flex justify-between items-center">
-                                <span>⚠️ Confirmar exclusão?</span>
-                                <span class="font-mono text-amber-800 dark:text-amber-200">${formatarMoeda(valor)}</span>
-                            </div>
-                            <div class="text-[11px] text-amber-600 dark:text-amber-400 truncate">${estabelecimento}</div>
-                            <div class="flex gap-2 justify-end mt-1">
-                                <button onclick="cancelarExclusao()" class="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Cancelar</button>
-                                <button onclick="efetivarExclusao(${id})" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg font-semibold text-[11px] transition-all cursor-pointer">Sim, Excluir</button>
-                            </div>
-                        `;
-                    } else {
-                        li.className = "bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800/80 flex justify-between items-center gap-2";
-                        li.innerHTML = `
-                            <div class="flex flex-col gap-0.5 flex-1">
-                                <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono">
-                                    <span>📅 ${formatarDataBR(data)}</span> 
-                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">${formatarMoeda(valor)}</span>
-                                </div>
-                                <p class="text-slate-800 dark:text-slate-200 text-xs font-semibold mt-0.5">${estabelecimento}</p>
-                                <span class="text-[10px] text-slate-500">💳 ${cartao} • Usuário: ${dono}</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" class="text-slate-400 dark:text-slate-500 hover:text-amber-500 dark:hover:text-amber-400 p-1.5 transition-colors text-xs cursor-pointer" title="Editar">✏️</button>
-                                <button onclick="pedirConfirmacaoExclusao(${id})" class="text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 p-1.5 transition-colors text-xs cursor-pointer" title="Excluir">🗑️</button>
-                            </div>
-                        `;
-                    }
-                    lista.appendChild(li);
-                });
-                document.getElementById("total-geral").textContent = `Total: ${formatarMoeda(somaTotal)}`;
-            } catch (e) {
-                console.error("Erro:", e);
-            }
-        }
-
-        function gerarResumoPorCartao() {
-            if (!db) return;
-            const container = document.getElementById("conteudo-resumo");
-            container.innerHTML = "";
-            const cartoesFixos = ["Visa - 10", "Visa - 25"];
-
-            cartoesFixos.forEach(cartao => {
-                try {
-                    const stmt = db.prepare("SELECT data, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? ORDER BY dono_do_cartao ASC, data DESC");
-                    stmt.bind([cartao]);
-                    const registros = [];
-                    let totalCartao = 0;
-                    const subtotaisPorDono = {};
-
-                    while (stmt.step()) {
-                        const [data, dono, estabelecimento, valor] = stmt.get();
-                        registros.push({ data, dono, estabelecimento, valor });
-                        totalCartao += valor;
-                        subtotaisPorDono[dono] = (subtotaisPorDono[dono] || 0) + valor;
-                    }
-                    stmt.free();
-
-                    const cardDiv = document.createElement("div");
-                    cardDiv.className = "bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 flex flex-col gap-2";
-                    cardDiv.innerHTML = `
-                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800/80 pb-1.5">
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400 text-xs">💳 Cartão: ${cartao}</span> 
-                            <span class="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-800">${formatarMoeda(totalCartao)}</span>
-                        </div>
-                    `;
-
-                    if (registros.length === 0) {
-                        cardDiv.innerHTML += `<p class="text-[11px] text-slate-500 text-center py-1">Nenhum lançamento registrado.</p>`;
-                    } else {
-                        let subHtml = `<div class="bg-white/80 dark:bg-slate-900/80 p-2 rounded-xl border border-slate-200 dark:border-slate-800/60 flex flex-col gap-1"><span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Subtotais por Usuário:</span>`;
-                        for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
-                            subHtml += `
-                                <div class="flex justify-between items-center text-[11px] text-slate-700 dark:text-slate-300 font-mono">
-                                    <span class="text-slate-500 dark:text-slate-400">👤 ${dono}</span> 
-                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold">${formatarMoeda(subtotal)}</span>
-                                </div>`;
-                        }
-                        subHtml += `</div>`;
-                        cardDiv.innerHTML += subHtml;
-
-                        let itensHtml = `<span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Lançamentos:</span><ul class="space-y-1">`;
-                        registros.forEach(g => {
-                            itensHtml += `
-                                <li class="flex justify-between items-center text-[11px] text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800/60">
-                                    <div class="flex flex-col gap-0.5">
-                                        <span class="font-semibold text-slate-800 dark:text-slate-200">${g.estabelecimento}</span>
-                                        <span class="text-[10px] text-slate-500 font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
-                                    </div>
-                                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">${formatarMoeda(g.valor)}</span>
-                                </li>`;
-                        });
-                        itensHtml += `</ul>`;
-                        cardDiv.innerHTML += itensHtml;
-                    }
-                    container.appendChild(cardDiv);
-                } catch (e) {
-                    console.error("Erro no resumo:", e);
-                }
-            });
-        }
-
-        function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
-            idEmEdicao = id;
-            idEmExclusaoPendente = null;
-            document.getElementById("input-data").value = data;
-            
-            selecionarCartao(cartao);
-            selecionarUsuario(dono);
-
-            document.getElementById("input-estabelecimento").value = estabelecimento;
-            document.getElementById("input-valor").value = valor;
-
-            document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
-            document.getElementById("titulo-formulario").className = "text-xs font-bold text-amber-500 dark:text-amber-400 uppercase tracking-wider";
-            document.getElementById("btn-cancelar").style.display = "block";
-            ativarBotaoSalvar();
-        }
-
-        function cancelarEdicao() {
-            idEmEdicao = null;
-            document.getElementById("input-estabelecimento").value = "";
-            document.getElementById("input-valor").value = "";
-            definirDataHoje();
-            selecionarCartao("Visa - 10");
-            selecionarUsuario("Jairo");
-
-            document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-            document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider";
-            document.getElementById("btn-cancelar").style.display = "none";
-            ativarBotaoSalvar();
-        }
-
-        function salvarOuAtualizarRegistro() {
-            if (!db) return;
-            const data = document.getElementById("input-data").value;
-            const cartao = cartaoSelecionadoState;
-            const dono = usuarioSelecionadoState;
-            const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
-            const valorInput = document.getElementById("input-valor").value;
-            
-            if (!data || !cartao || !dono || !estabelecimento || !valorInput) {
-                mostrarAlerta("Por favor, preencha todos os campos!", "erro");
-                return;
-            }
-
-            const valor = parseFloat(valorInput);
-            if (isNaN(valor) || valor <= 0) {
-                mostrarAlerta("Insira um valor válido em reais!", "erro");
-                return;
-            }
-
-            if (idEmEdicao === null) {
-                const stmt = db.prepare("INSERT INTO cartao_gastos (data, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?)");
-                stmt.run([data, cartao, dono, estabelecimento, valor]);
-                stmt.free();
-                mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
-            } else {
-                const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
-                stmt.run([data, cartao, dono, estabelecimento, valor, idEmEdicao]);
-                stmt.free();
-                idEmEdicao = null;
-                document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-                document.getElementById("titulo-formulario").className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider";
-                document.getElementById("btn-cancelar").style.display = "none";
-                mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
-            }
-
-            persistirBanco();
-            document.getElementById("input-estabelecimento").value = "";
-            document.getElementById("input-valor").value = "";
-            definirDataHoje();
-            selecionarCartao("Visa - 10");
-            selecionarUsuario("Jairo");
-            ativarBotaoSalvar();
-            document.getElementById("input-estabelecimento").focus();
-            atualizarAplicacao();
-        }
-
-        function pedirConfirmacaoExclusao(id) {
-            idEmExclusaoPendente = id;
-            carregarRegistros();
-        }
-
-        function cancelarExclusao() {
-            idEmExclusaoPendente = null;
-            carregarRegistros();
-        }
-
-        function efetivarExclusao(id) {
-            if (!db) return;
-            if (idEmEdicao === id) cancelarEdicao();
-
-            const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
-            stmt.run([id]);
-            stmt.free();
-
-            idEmExclusaoPendente = null;
-            persistirBanco();
-            atualizarAplicacao();
-            mostrarAlerta("Lançamento excluído com sucesso!", "sucesso");
-        }
-    </script>
+    <!-- Script Externo -->
+    <script src="app.js"></script>
 </body>
 </html>
