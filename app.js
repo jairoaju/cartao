@@ -307,7 +307,7 @@ function carregarRegistros() {
                     <div style="display: flex; flex-direction: column; gap: 0.125rem; flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
                             <span style="color: var(--text-muted-light);">📅 ${formatarDataBR(data)}</span> 
-                            <span style="color: var(--emerald-main); font-weight: bold;">${formatarMoeda(valor)}</span>
+                            <span style="color: var(--emerald-main); font-weight: 800; font-size: 12px;">${formatarMoeda(valor)}</span>
                         </div>
                         <p class="estabelecimento-nome">${estabelecimento}</p>
                         <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Usuário: ${dono}</span>
@@ -380,7 +380,7 @@ function gerarResumoPorCartao() {
                                 <span class="estabelecimento-nome">${g.estabelecimento}</span>
                                 <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
                             </div>
-                            <span class="font-mono" style="color: var(--emerald-main); font-weight: 600; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
+                            <span class="font-mono" style="color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
                         </li>`;
                 });
                 itensHtml += `</ul>`;

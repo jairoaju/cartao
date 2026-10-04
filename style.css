@@ -25,11 +25,16 @@
     --btn-secondary-text-dark: #94a3b8;
     --inner-card-light: rgba(248, 250, 252, 0.6);
     --inner-card-dark: rgba(30, 41, 59, 0.6);
+
+    /* Nova variável para o destaque de valores no modo claro */
+    --valor-destaque: #059669;
 }
 
 body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
+    /* Verde mais brilhante e forte para os valores no modo escuro */
+    --valor-destaque: #34d399;
 }
 
 body.dark-mode header, 
@@ -511,4 +516,23 @@ input:focus {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* ==========================================
+   FORÇAR DESTAQUE E NEGRITO NOS VALORES
+   ========================================== */
+#lista-registros .font-mono span,
+#conteudo-resumo .font-mono span,
+#lista-registros span[style*="color"],
+#conteudo-resumo span[style*="color"] {
+    color: var(--valor-destaque) !important;
+    font-weight: 800 !important;
+}
+
+body.dark-mode #lista-registros .font-mono span,
+body.dark-mode #conteudo-resumo .font-mono span,
+body.dark-mode #lista-registros span[style*="color"],
+body.dark-mode #conteudo-resumo span[style*="color"] {
+    color: var(--valor-destaque) !important;
+    font-weight: 800 !important;
 }
