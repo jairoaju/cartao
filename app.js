@@ -153,12 +153,12 @@ function ativarBotaoSalvar() {
 
     if (idEmEdicao !== null) {
         btnSalvar.classList.add("hidden");
-        containerEdicao.style.display = "grid";
+        containerEdicao.style.setProperty('display', 'grid', 'important');
         btnConfirma.disabled = false;
         btnConfirma.className = "btn-acao btn-confirma-edicao";
     } else {
         btnSalvar.classList.remove("hidden");
-        containerEdicao.style.display = "none";
+        containerEdicao.style.setProperty('display', 'none', 'important');
         btnSalvar.disabled = false;
         btnSalvar.className = "btn-acao btn-salvar-ativo";
         btnSalvar.textContent = "Salvar Lançamento";

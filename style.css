@@ -27,7 +27,6 @@
     --inner-card-dark: rgba(30, 41, 59, 0.6);
 }
 
-/* Modo Escuro Global */
 body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
@@ -93,7 +92,6 @@ body.dark-mode .btn-desativado {
     color: #475569;
 }
 
-/* Botões de Backup com o tom escuro adequado */
 body.dark-mode .btn-backup {
     background-color: var(--btn-secondary-bg-dark) !important;
     color: var(--btn-secondary-text-dark) !important;
@@ -120,9 +118,9 @@ body.dark-mode .estabelecimento-nome {
     color: var(--text-muted-dark) !important;
 }
 
-/* Estilos dos Botões de Edição Divididos */
+/* Estilos dos Botões de Edição Divididos com ocultação forçada */
 .botoes-edicao-container {
-    display: none; /* Controlado via JS */
+    display: none !important;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
     margin-top: 0.25rem;
@@ -149,7 +147,6 @@ body.dark-mode .btn-cancela-edicao {
     border-color: var(--border-dark) !important;
 }
 
-/* Reset e Estrutura Base */
 html, body {
     min-height: 100dvh;
     margin: 0;
