@@ -31,9 +31,8 @@
             
             <!-- Formulário -->
             <div class="glass-card card-formulario">
-                <div class="flex justify-between items-center">
+                <div>
                     <p id="titulo-formulario" class="form-title">Novo Lançamento</p>
-                    <button id="btn-cancelar" class="btn-cancelar-edicao" onclick="cancelarEdicao()">Cancelar Edição</button>
                 </div>
 
                 <div class="grid-data-cartao">
@@ -75,7 +74,14 @@
                     <input type="number" id="input-valor" step="0.01" placeholder="0,00">
                 </div>
 
+                <!-- Botão Padrão (Novo Lançamento) -->
                 <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
+
+                <!-- Botões de Edição Divididos (Ocultos por padrão) -->
+                <div id="botoes-edicao-container" class="botoes-edicao-container">
+                    <button type="button" id="btn-confirma" class="btn-acao btn-confirma-edicao" onclick="salvarOuAtualizarRegistro()">Confirma</button>
+                    <button type="button" id="btn-cancela" class="btn-acao btn-cancela-edicao" onclick="cancelarEdicao()">Cancela</button>
+                </div>
             </div>
 
             <!-- Histórico -->

@@ -147,14 +147,21 @@ initSqlJs({
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
 
 function ativarBotaoSalvar() {
-    const btn = document.getElementById("btn-salvar");
-    btn.disabled = false;
+    const btnSalvar = document.getElementById("btn-salvar");
+    const containerEdicao = document.getElementById("botoes-edicao-container");
+    const btnConfirma = document.getElementById("btn-confirma");
+
     if (idEmEdicao !== null) {
-        btn.className = "btn-acao btn-editar-ativo";
-        btn.textContent = "Atualizar Lançamento";
+        btnSalvar.classList.add("hidden");
+        containerEdicao.style.display = "grid";
+        btnConfirma.disabled = false;
+        btnConfirma.className = "btn-acao btn-confirma-edicao";
     } else {
-        btn.className = "btn-acao btn-salvar-ativo";
-        btn.textContent = "Salvar Lançamento";
+        btnSalvar.classList.remove("hidden");
+        containerEdicao.style.display = "none";
+        btnSalvar.disabled = false;
+        btnSalvar.className = "btn-acao btn-salvar-ativo";
+        btnSalvar.textContent = "Salvar Lançamento";
     }
 }
 
@@ -399,7 +406,6 @@ function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
 
     document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
     document.getElementById("titulo-formulario").style.color = "#d97706";
-    document.getElementById("btn-cancelar").style.display = "block";
     ativarBotaoSalvar();
 }
 
@@ -413,7 +419,6 @@ function cancelarEdicao() {
 
     document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
     document.getElementById("titulo-formulario").style.color = "var(--emerald-main)";
-    document.getElementById("btn-cancelar").style.display = "none";
     ativarBotaoSalvar();
 }
 
@@ -448,7 +453,6 @@ function salvarOuAtualizarRegistro() {
         idEmEdicao = null;
         document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
         document.getElementById("titulo-formulario").style.color = "var(--emerald-main)";
-        document.getElementById("btn-cancelar").style.display = "none";
         mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
     }
 

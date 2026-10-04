@@ -93,7 +93,7 @@ body.dark-mode .btn-desativado {
     color: #475569;
 }
 
-/* Botões de Backup com o tom azul claro desejado */
+/* Botões de Backup com o tom escuro adequado */
 body.dark-mode .btn-backup {
     background-color: var(--btn-secondary-bg-dark) !important;
     color: var(--btn-secondary-text-dark) !important;
@@ -116,15 +116,37 @@ body.dark-mode .badge-cartao-resumo {
     border-color: var(--emerald-border-dark) !important;
 }
 
-/* Nomes dos estabelecimentos no modo escuro com o tom azul claro */
 body.dark-mode .estabelecimento-nome {
     color: var(--text-muted-dark) !important;
 }
 
-body.dark-mode .btn-cancelar-edicao {
-    background-color: var(--btn-secondary-bg-dark);
-    color: var(--btn-secondary-text-dark);
-    border-color: var(--border-dark);
+/* Estilos dos Botões de Edição Divididos */
+.botoes-edicao-container {
+    display: none; /* Controlado via JS */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    width: 100%;
+}
+
+.btn-confirma-edicao {
+    background-color: #d97706 !important;
+    color: white !important;
+}
+.btn-confirma-edicao:hover {
+    background-color: #b45309 !important;
+}
+
+.btn-cancela-edicao {
+    background-color: var(--btn-secondary-bg-light);
+    color: var(--btn-secondary-text-light);
+    border: 1px solid #cbd5e1;
+}
+
+body.dark-mode .btn-cancela-edicao {
+    background-color: var(--btn-secondary-bg-dark) !important;
+    color: var(--btn-secondary-text-dark) !important;
+    border-color: var(--border-dark) !important;
 }
 
 /* Reset e Estrutura Base */
@@ -257,29 +279,6 @@ main {
     font-weight: bold;
 }
 
-.card-formulario .flex.justify-between.items-center {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-cancelar-edicao {
-    display: none;
-    background-color: #f1f5f9;
-    color: #334155;
-    font-weight: 600;
-    padding: 0.15rem 0.4rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-light);
-    cursor: pointer;
-    font-size: 10px;
-    width: auto;
-    white-space: nowrap;
-    line-height: 1.2;
-    transform: translateY(1px);
-}
-
 .app-alerta-box {
     padding: 0.75rem;
     border-radius: 0.75rem;
@@ -372,12 +371,6 @@ input:focus {
     color: white;
 }
 .btn-salvar-ativo:hover { background-color: #047857; }
-
-.btn-editar-ativo {
-    background-color: #d97706;
-    color: white;
-}
-.btn-editar-ativo:hover { background-color: #b45309; }
 
 .btn-desativado {
     background-color: #cbd5e1;
