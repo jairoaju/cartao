@@ -9,13 +9,15 @@
     --text-muted-dark: #94a3b8;
     --border-light: #e2e8f0;
     --border-dark: #1e293b;
-    --emerald-main: #059669;
-    --emerald-light-bg: #ecfdf5;
-    --emerald-dark-bg: rgba(6, 78, 59, 0.4);
-    --emerald-text-light: #047857;
-    --emerald-text-dark: #6ee7b7;
-    --emerald-border-light: #a7f3d0;
-    --emerald-border-dark: #065f46;
+    
+    /* Azul Principal do Material Design / Flutter */
+    --emerald-main: #2196F3;
+    --emerald-light-bg: #e3f2fd;
+    --emerald-dark-bg: rgba(30, 58, 138, 0.4);
+    --emerald-text-light: #1565C0;
+    --emerald-text-dark: #90CAF9;
+    --emerald-border-light: #bbdefb;
+    --emerald-border-dark: #1d4ed8;
     
     --input-bg-light: #f8fafc;
     --input-bg-dark: #030712;
@@ -26,15 +28,14 @@
     --inner-card-light: rgba(248, 250, 252, 0.6);
     --inner-card-dark: rgba(30, 41, 59, 0.6);
 
-    /* Nova variável para o destaque de valores no modo claro */
-    --valor-destaque: #059669;
+    /* Destaque de valores em Azul */
+    --valor-destaque: #1976D2;
 }
 
 body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
-    /* Verde mais brilhante e forte para os valores no modo escuro */
-    --valor-destaque: #34d399;
+    --valor-destaque: #64B5F6;
 }
 
 body.dark-mode header, 
@@ -372,7 +373,7 @@ input:focus {
     background-color: var(--emerald-main);
     color: white;
 }
-.btn-salvar-ativo:hover { background-color: #047857; }
+.btn-salvar-ativo:hover { background-color: #1976D2; }
 
 .btn-desativado {
     background-color: #cbd5e1;
@@ -519,7 +520,7 @@ input:focus {
 }
 
 /* ==========================================
-   FORÇAR DESTAQUE E NEGRITO NOS VALORES
+   FORÇAR DESTAQUE E NEGRITO EM TODOS OS VALORES (AZUL)
    ========================================== */
 #lista-registros .font-mono span,
 #conteudo-resumo .font-mono span,
