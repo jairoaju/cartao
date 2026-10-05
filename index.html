@@ -24,8 +24,6 @@
     </nav>
 
     <main>
-        <div id="app-alerta" class="app-alerta-box hidden"></div>
-
         <!-- SEÇÃO: LANÇAMENTOS -->
         <section id="secao-lancamentos" class="flex flex-col gap-3">
             
@@ -73,6 +71,9 @@
                     <label for="input-valor">Valor (R$)</label>
                     <input type="number" id="input-valor" step="0.01" placeholder="0,00">
                 </div>
+
+                <!-- ALERTA POSICIONADO LOGO ACIMA DOS BOTÕES DE AÇÃO -->
+                <div id="app-alerta" class="app-alerta-box hidden"></div>
 
                 <!-- Botão Padrão (Novo Lançamento) -->
                 <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
