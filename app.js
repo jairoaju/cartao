@@ -194,12 +194,15 @@ function exportarBackup() {
         // Limpa o elemento e a URL após o download
         document.body.removeChild(linkTemp);
         URL.revokeObjectURL(url);
+
+        // Exibe a mensagem de sucesso na caixa de alerta do app
+        mostrarAlerta("Backup exportado com sucesso!", "sucesso");
+
     } catch (error) {
         console.error("Erro ao exportar backup:", error);
-        alert("Erro ao gerar o arquivo de backup.");
+        mostrarAlerta("Erro ao gerar o arquivo de backup.", "erro");
     }
 }
-
 function importarBackup(event) {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
