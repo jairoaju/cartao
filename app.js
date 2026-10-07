@@ -91,22 +91,28 @@ function selecionarUsuario(usuario) {
     });
 }
 
-function mostrarAlerta(mensagem, tipo = 'erro') {
-    const alerta = document.getElementById("app-alerta");
-    if (temporizadorAlerta) clearTimeout(temporizadorAlerta);
-    alerta.textContent = mensagem;
-    alerta.classList.remove("hidden");
-    
+function mostrarAlerta(mensagem, tipo = 'sucesso') {
+    const alertaBox = document.getElementById('app-alerta');
+    if (!alertaBox) return;
+
+    alertaBox.textContent = mensagem;
+    alertaBox.classList.remove('hidden');
+
+    // Define as cores baseadas no tipo (sucesso ou erro)
     if (tipo === 'sucesso') {
-        alerta.style.backgroundColor = "var(--emerald-light-bg)";
-        alerta.style.color = "var(--emerald-text-light)";
-        alerta.style.borderColor = "var(--emerald-border-light)";
+        alertaBox.style.backgroundColor = 'var(--emerald-light-bg)';
+        alertaBox.style.color = 'var(--emerald-text-light)';
+        alertaBox.style.borderColor = 'var(--emerald-border-light)';
     } else {
-        alerta.style.backgroundColor = "#fef2f2";
-        alerta.style.color = "#b91c1c";
-        alerta.style.borderColor = "#fecaca";
+        alertaBox.style.backgroundColor = '#fee2e2';
+        alertaBox.style.color = '#991b1b';
+        alertaBox.style.borderColor = '#fecaca';
     }
-    temporizadorAlerta = setTimeout(() => alerta.classList.add("hidden"), 3500);
+
+    // Oculta o alerta automaticamente após 4 segundos
+    setTimeout(() => {
+        alertaBox.classList.add('hidden');
+    }, 4000);
 }
 
 function definirDataHoje() {
@@ -183,7 +189,7 @@ function exportarBackup() {
         const dataHoje = new Date().toISOString().split('T')[0];
         const nomeArquivo = `backup_gastos_${dataHoje}.sqlite`;
 
-        // Cria um elemento <a> temporário para forçar o download automático
+        // Dispara o download usando o método padrão e universal do navegador
         const linkTemp = document.createElement('a');
         linkTemp.href = url;
         linkTemp.download = nomeArquivo;
@@ -191,18 +197,15 @@ function exportarBackup() {
         document.body.appendChild(linkTemp);
         linkTemp.click();
         
-        // Limpa o elemento e a URL após o download
+        // Limpa o elemento e a URL após o disparo
         document.body.removeChild(linkTemp);
         URL.revokeObjectURL(url);
-
-        // Exibe a mensagem de sucesso na caixa de alerta do app
-        mostrarAlerta("Backup exportado com sucesso!", "sucesso");
-
     } catch (error) {
         console.error("Erro ao exportar backup:", error);
-        mostrarAlerta("Erro ao gerar o arquivo de backup.", "erro");
+        alert("Erro ao gerar o arquivo de backup.");
     }
 }
+
 function importarBackup(event) {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
