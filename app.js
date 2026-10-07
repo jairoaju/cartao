@@ -173,27 +173,31 @@ function persistirBanco() {
 }
 
 function exportarBackup() {
-    if (!db) return;
-    const dataBinaria = db.export();
-    const dataIso = new Date().toISOString().split('T')[0];
-    const nomeArquivo = `backup_cartoes_${dataIso}.sqlite`;
-    let binarios = "";
-    for (let i = 0; i < dataBinaria.byteLength; i++) {
-        binarios += String.fromCharCode(dataBinaria[i]);
-    }
-    const base64Data = window.btoa(binarios);
-    const dataUri = `data:application/x-sqlite3;base64,${base64Data}`;
+    try {
+        // Gera o binário do banco de dados SQLite
+        const binaryArray = db.export();
+        const blob = new Blob([binaryArray], { type: 'application/x-sqlite3' });
+        const url = URL.createObjectURL(blob);
+        
+        // Data atual formatada para o nome do arquivo (ex: backup_gastos_2026-10-07.sqlite)
+        const dataHoje = new Date().toISOString().split('T')[0];
+        const nomeArquivo = `backup_gastos_${dataHoje}.sqlite`;
 
-    const container = document.getElementById("container-link-download");
-    container.innerHTML = `
-        <div style="background-color: var(--emerald-light-bg); border: 1px solid var(--emerald-border-light); padding: 0.5rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.375rem; text-align: center;">
-            <span style="font-size: 11px; color: var(--emerald-text-light); font-weight: 500;">Backup pronto para download:</span>
-            <a href="${dataUri}" download="${nomeArquivo}" style="background-color: var(--emerald-main); color: white; font-size: 12px; font-weight: bold; padding: 0.5rem 1rem; border-radius: 0.75rem; text-decoration: none; display: block;">
-                ⬇️ Baixar Arquivo (.sqlite)
-            </a>
-        </div>
-    `;
-    container.classList.remove("hidden");
+        // Cria um elemento <a> temporário para forçar o download automático
+        const linkTemp = document.createElement('a');
+        linkTemp.href = url;
+        linkTemp.download = nomeArquivo;
+        
+        document.body.appendChild(linkTemp);
+        linkTemp.click();
+        
+        // Limpa o elemento e a URL após o download
+        document.body.removeChild(linkTemp);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Erro ao exportar backup:", error);
+        alert("Erro ao gerar o arquivo de backup.");
+    }
 }
 
 function importarBackup(event) {
