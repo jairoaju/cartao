@@ -412,8 +412,8 @@ function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
     selecionarUsuario(dono);
 
     document.getElementById("input-estabelecimento").value = estabelecimento;
-    document.getElementById("input-valor").value = valor;
-
+    document.getElementById("input-valor").value = Number(valor).toFixed(2);
+    
     document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
     document.getElementById("titulo-formulario").style.color = "#d97706";
     ativarBotaoSalvar();
