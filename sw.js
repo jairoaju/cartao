@@ -1,10 +1,10 @@
-const CACHE_NAME = 'pwa-cartao-v1';
+const CACHE_NAME = 'cartao-gastos-v10';
 const urlsToCache = [
+    './',
     './index.html',
-    './manifest.json',
-    'https://cdn.tailwindcss.com',
-    'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.wasm'
+    './style.css',
+    './app.js',
+    './manifest.json'
 ];
 
 self.addEventListener('install', event => {
@@ -33,12 +33,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(response => {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).catch(() => {
-                    // Fallback opcional caso falhe e esteja offline
-                });
+                return response || fetch(event.request);
             })
     );
 });
