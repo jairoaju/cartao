@@ -628,9 +628,10 @@ function salvarOuAtualizarRegistro() {
 
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
-            const valorParcelaBase = Math.floor((valorTotal / totalParcelas) * 100) / 100;
-            const totalBaseAcumulado = valorParcelaBase * totalParcelas;
-            const diferencaCentavos = Math.round((valorTotal - totalBaseAcumulado) * 100) / 100;
+            // Aritmética de centavos inteiros blindada contra erros de ponto flutuante
+            const valorTotalCentavos = Math.round(valorTotal * 100);
+            const valorBaseCentavos = Math.floor(valorTotalCentavos / totalParcelas);
+            const restoCentavos = valorTotalCentavos % totalParcelas;
 
             const [fatAno, fatMes] = faturaBaseStr.split('-');
             let anoFatura = parseInt(fatAno);
@@ -644,21 +645,20 @@ function salvarOuAtualizarRegistro() {
                 const mf = String(dataFaturaObj.getMonth() + 1).padStart(2, '0');
                 const faturaFormatada = `${af}-${mf}`;
 
-                let valorAtualParcela = valorParcelaBase;
-                if (i === 1) {
-                    valorAtualParcela = Math.round((valorParcelaBase + diferencaCentavos) * 100) / 100;
-                }
+                let centavosDaParcela = valorBaseCentavos + (i <= restoCentavos ? 1 : 0);
+                let valorAtualParcela = centavosDaParcela / 100;
 
                 const nomeEstabelecimento = `${estabelecimentoBase} - Parcela ${i}/${totalParcelas}`;
                 stmt.run([dataStr, faturaFormatada, cartao, dono, nomeEstabelecimento, valorAtualParcela]);
             }
             stmt.free();
+            mostrarAlerta(`${totalParcelas} parcelas geradas com sucesso!`, "sucesso");
         } else {
             const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
             stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal]);
             stmt.free();
+            mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
         }
-        mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
     } else {
         const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, fatura = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
         stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, idEmEdicao]);
@@ -668,7 +668,7 @@ function salvarOuAtualizarRegistro() {
 
     persistirBanco();
 
-    // Limpa os campos e reseta o estado do formulário após salvar/atualizar
+    // Limpa os campos e reseta o formulário após salvar/atualizar
     idEmEdicao = null;
     document.getElementById("input-estabelecimento").value = "";
     document.getElementById("input-valor").value = "";
