@@ -10,10 +10,10 @@ const THEME_KEY = "app_theme_mode";
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
 
-let cartaoSelecionadoState = "Visa - 10";
+// Alterado para iniciar com o Cartão 25 como padrão
+let cartaoSelecionadoState = "Visa - 25";
 let usuarioSelecionadoState = "Jairo";
 
-// Inicialização dinâmica baseada no último registro ou data atual
 let dataFiltroHistorico = new Date();
 let dataFiltroResumo = new Date();
 
@@ -152,7 +152,8 @@ function definirValoresPadrao() {
 }
 
 definirValoresPadrao();
-selecionarCartao("Visa - 10");
+// Inicializa selecionando o Cartão 25 por padrão
+selecionarCartao("Visa - 25");
 
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
@@ -204,7 +205,6 @@ initSqlJs({
         db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
     } catch (e) {}
 
-    // Detecta automaticamente a fatura do último registro cadastrado
     try {
         const res = db.exec("SELECT fatura FROM cartao_gastos ORDER BY data DESC, id DESC LIMIT 1");
         if (res.length > 0 && res[0].values.length > 0) {
@@ -581,7 +581,7 @@ function cancelarEdicao() {
     document.getElementById("input-valor").value = "";
     document.getElementById("input-parcelas-total").value = "1";
     definirValoresPadrao();
-    selecionarCartao("Visa - 10");
+    selecionarCartao("Visa - 25");
     selecionarUsuario("Jairo");
 
     const tituloEl = document.getElementById("titulo-formulario");
