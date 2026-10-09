@@ -189,19 +189,16 @@ initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
     const savedDbHex = localStorage.getItem(STORAGE_KEY);
-    console.log("Conteúdo bruto no localStorage:", savedDbHex ? savedDbHex.substring(0, 30) + "..." : "Vazio");
-
+    
     if (savedDbHex && savedDbHex.length > 10) {
         try {
             const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
             db = new SQL.Database(binaryData);
-            console.log("Banco de dados carregado com sucesso do localStorage!");
         } catch (e) {
-            console.error("Erro ao converter hex do localStorage para banco:", e);
+            console.error("Erro ao carregar banco salvo, criando novo:", e);
             db = new SQL.Database();
         }
     } else {
-        console.warn("Nenhum dado válido encontrado no localStorage. Criando novo banco.");
         db = new SQL.Database();
     }
 
@@ -656,28 +653,35 @@ function salvarOuAtualizarRegistro() {
                 stmt.run([dataStr, faturaFormatada, cartao, dono, nomeEstabelecimento, valorAtualParcela]);
             }
             stmt.free();
-            mostrarAlerta(`${totalParcelas} parcelas geradas com sucesso!`, "sucesso");
         } else {
             const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
             stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal]);
             stmt.free();
-            mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
         }
+        mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
     } else {
         const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, fatura = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
         stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, idEmEdicao]);
         stmt.free();
-        idEmEdicao = null;
-        const tituloEl = document.getElementById("titulo-formulario");
-        if (tituloEl) {
-            tituloEl.textContent = "Novo Lançamento";
-            tituloEl.style.color = "var(--emerald-main)";
-        }
         mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
     }
 
     persistirBanco();
+
+    // Limpa os campos e reseta o estado do formulário após salvar/atualizar
+    idEmEdicao = null;
+    document.getElementById("input-estabelecimento").value = "";
+    document.getElementById("input-valor").value = "";
     document.getElementById("input-parcelas-total").value = "1";
+    definirValoresPadrao();
+    selecionarCartao("Visa - 10");
+
+    const tituloEl = document.getElementById("titulo-formulario");
+    if (tituloEl) {
+        tituloEl.textContent = "Novo Lançamento";
+        tituloEl.style.color = "var(--emerald-main)";
+    }
+
     ativarBotaoSalvar();
     atualizarAplicacao();
 }
