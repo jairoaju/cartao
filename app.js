@@ -13,7 +13,7 @@ let idEmExclusaoPendente = null;
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
-let dataFiltroHistorico = new Date(2026, 9, 1);
+let dataFiltroHistorico = new Date(2026, 9, 1); // Outubro de 2026
 let dataFiltroResumo = new Date(2026, 9, 1);
 
 function inicializarTema() {
@@ -142,15 +142,18 @@ function definirValoresPadrao() {
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
     
-    document.getElementById('input-data').value = `${ano}-${mes}-${dia}`;
-    document.getElementById('input-fatura').value = "2026-10";
+    const inputData = document.getElementById('input-data');
+    const inputFatura = document.getElementById('input-fatura');
+
+    if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
+    if (inputFatura) inputFatura.value = `${ano}-${mes}`;
     atualizarTextoFaturaVisual();
 }
 
 definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
-// Configuração robusta do evento de foco no campo de valor para ir para parcelas
+// Tecla Enter no campo valor para ir para parcelas
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
     if (inputValor) {
@@ -163,20 +166,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         inputParcelas.value = "1";
                     }
                     inputParcelas.focus();
-                    inputParcelas.select();
                 }
             }
         });
     }
 });
 
+// Inicialização do Banco de Dados SQLite via sql.js
 initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
     const savedDbHex = localStorage.getItem(STORAGE_KEY);
     if (savedDbHex) {
-        const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-        db = new SQL.Database(binaryData);
+        try {
+            const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            db = new SQL.Database(binaryData);
+        } catch (e) {
+            console.error("Erro ao carregar dados salvos, criando novo banco:", e);
+            db = new SQL.Database();
+        }
     } else {
         db = new SQL.Database();
     }
@@ -196,9 +204,8 @@ initSqlJs({
     try {
         db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
     } catch (e) {}
-    db.run("UPDATE cartao_gastos SET fatura = '2026-10' WHERE fatura IS NULL OR fatura = '' OR fatura = '2025-10'");
-    persistirBanco();
 
+    persistirBanco();
     ativarBotaoSalvar();
     atualizarAplicacao();
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
@@ -209,7 +216,7 @@ function verificarPreenchimentoFormulario() {
     const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
     const inputFaturaEl = document.getElementById("input-fatura");
     
-    const faturaInput = inputFaturaEl ? (inputFaturaEl.value || "2026-10") : "2026-10";
+    const faturaInput = inputFaturaEl ? inputFaturaEl.value.trim() : "";
     const btnSalvar = document.getElementById("btn-salvar");
     const btnConfirma = document.getElementById("btn-confirma");
 
@@ -456,7 +463,7 @@ function carregarRegistros() {
         });
         if (totalGeralEl) totalGeralEl.textContent = `Total: ${formatarMoeda(somaTotal)}`;
     } catch (e) {
-        console.error("Erro:", e);
+        console.error("Erro ao carregar registros:", e);
     }
 }
 
