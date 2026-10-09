@@ -10,7 +10,6 @@
     --border-light: #e2e8f0;
     --border-dark: #1e293b;
     
-    /* Azul Principal do Material Design / Flutter */
     --emerald-main: #2196F3;
     --emerald-light-bg: #e3f2fd;
     --emerald-dark-bg: rgba(30, 58, 138, 0.4);
@@ -28,7 +27,6 @@
     --inner-card-light: rgba(248, 250, 252, 0.6);
     --inner-card-dark: rgba(30, 41, 59, 0.6);
 
-    /* Destaque de valores em Azul */
     --valor-destaque: #1976D2;
 }
 
@@ -124,7 +122,6 @@ body.dark-mode .estabelecimento-nome {
     color: var(--text-muted-dark) !important;
 }
 
-/* Estilos dos Botões de Edição Divididos com ocultação forçada */
 .botoes-edicao-container {
     display: none !important;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -269,16 +266,24 @@ main {
     align-items: end;
 }
 
+.col-span-9 {
+    grid-column: span 9 / span 9;
+}
+
+.col-span-3 {
+    grid-column: span 3 / span 3;
+}
+
 .col-span-6 {
     grid-column: span 6 / span 6;
 }
 
 .label-usuario-margin {
-    margin-bottom: 0.375rem;
+    margin-bottom: 0.25rem;
 }
 
 .usuario-texto {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
 }
 
@@ -348,6 +353,10 @@ input[type="date"], input[type="text"], input[type="number"] {
     color: var(--text-light);
 }
 
+#input-parcelas-total {
+    text-align: center;
+}
+
 input:focus {
     border-color: var(--emerald-main);
 }
@@ -401,18 +410,12 @@ input:focus {
     height: 38px;
 }
 
-.usuarios-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-}
-
 .pill-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
+    padding: 0.5rem 0.125rem;
     border-radius: 0.75rem;
     border: 1px solid #cbd5e1;
     cursor: pointer;
@@ -421,6 +424,11 @@ input:focus {
     font-weight: bold;
     background-color: #f8fafc;
     color: var(--text-muted-light);
+    height: 38px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .pill-card.ativo {
@@ -519,9 +527,6 @@ input:focus {
     text-overflow: ellipsis;
 }
 
-/* ==========================================
-   FORÇAR DESTAQUE E NEGRITO EM TODOS OS VALORES (AZUL)
-   ========================================== */
 #lista-registros .font-mono span,
 #conteudo-resumo .font-mono span,
 #lista-registros span[style*="color"],

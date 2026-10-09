@@ -31,16 +31,9 @@
             <div class="glass-card card-formulario">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <p id="titulo-formulario" class="form-title" style="margin: 0;">Novo Lançamento</p>
-                    <div style="display: flex; align-items: center; gap: 0.375rem;">
-                        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted-light);">Fatura:</span>
-                        <!-- Container unificado com a pílula ativa idêntica aos cartões e usuários -->
-                        <div style="position: relative; display: inline-block; height: 28px;">
-                            <span id="fatura-visual" class="pill-card ativo" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.2rem 0.6rem; font-size: 11px; height: 100%; min-width: 65px; box-sizing: border-box; pointer-events: none;">Out/26</span>
-                            <input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
-                        </div>
-                    </div>
                 </div>
 
+                <!-- Linha unificada: Data da Compra e Cartão lado a lado -->
                 <div class="grid-data-cartao">
                     <div class="col-span-6">
                         <label for="input-data">Data da Compra</label>
@@ -55,17 +48,27 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="label-usuario-margin">Usuário</label>
-                    <div class="usuarios-grid">
-                        <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')">
-                            <span class="usuario-texto">Jairo</span>
+                <!-- Linha unificada: Usuário (9 colunas) e Fatura (3 colunas, menor) -->
+                <div class="grid-data-cartao" style="align-items: start;">
+                    <div class="col-span-9">
+                        <label class="label-usuario-margin">Usuário</label>
+                        <div class="usuarios-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.25rem;">
+                            <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')">
+                                <span class="usuario-texto">Jairo</span>
+                            </div>
+                            <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')">
+                                <span class="usuario-texto">Kátia</span>
+                            </div>
+                            <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')">
+                                <span class="usuario-texto">Juliana</span>
+                            </div>
                         </div>
-                        <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')">
-                            <span class="usuario-texto">Kátia</span>
-                        </div>
-                        <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')">
-                            <span class="usuario-texto">Juliana</span>
+                    </div>
+                    <div class="col-span-3">
+                        <label style="margin-bottom: 0.25rem;">Fatura</label>
+                        <div style="position: relative; width: 100%; height: 38px; margin-top: 0.125rem;">
+                            <span id="fatura-visual" class="pill-card ativo" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box; pointer-events: none; font-size: 11px; padding: 0 0.1rem;">Out/26</span>
+                            <input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
                         </div>
                     </div>
                 </div>
@@ -82,7 +85,7 @@
                     </div>
                     <div class="col-span-6">
                         <label for="input-parcelas-total">Nº de Parcelas</label>
-                        <input type="number" id="input-parcelas-total" min="1" value="1" placeholder="Ex: 10" style="text-align: center;" oninput="verificarPreenchimentoFormulario()">
+                        <input type="number" id="input-parcelas-total" min="1" value="1" placeholder="Ex: 1" style="text-align: center;" oninput="verificarPreenchimentoFormulario()">
                     </div>
                 </div>
 

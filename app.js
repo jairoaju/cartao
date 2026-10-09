@@ -13,11 +13,9 @@ let idEmExclusaoPendente = null;
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
-// Inicializa os filtros de data apontando para Outubro de 2026
 let dataFiltroHistorico = new Date(2026, 9, 1);
 let dataFiltroResumo = new Date(2026, 9, 1);
 
-// Gerenciamento de Tema
 function inicializarTema() {
     const temaSalvo = localStorage.getItem(THEME_KEY);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -151,6 +149,26 @@ function definirValoresPadrao() {
 
 definirValoresPadrao();
 selecionarCartao("Visa - 10");
+
+// Configura o evento de foco/seleção ao pressionar Enter/Próximo no campo de Valor
+document.addEventListener("DOMContentLoaded", () => {
+    const inputValor = document.getElementById("input-valor");
+    if (inputValor) {
+        inputValor.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const inputParcelas = document.getElementById("input-parcelas-total");
+                if (inputParcelas) {
+                    if (!inputParcelas.value) {
+                        inputParcelas.value = "1";
+                    }
+                    inputParcelas.focus();
+                    inputParcelas.select();
+                }
+            }
+        });
+    }
+});
 
 initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
