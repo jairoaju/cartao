@@ -186,7 +186,11 @@ function verificarPreenchimentoFormulario() {
     const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
     const valorInput = document.getElementById("input-valor").value.trim();
     const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
-    const faturaInput = document.getElementById("input-fatura").value;
+    const inputFaturaEl = document.getElementById("input-fatura");
+    
+    // Garante que pega a fatura do input ou usa a padrão caso esteja vazio
+    const faturaInput = inputFaturaEl ? (inputFaturaEl.value || "2026-10") : "2026-10";
+    
     const btnSalvar = document.getElementById("btn-salvar");
     const btnConfirma = document.getElementById("btn-confirma");
 
@@ -208,7 +212,6 @@ function verificarPreenchimentoFormulario() {
         }
     }
 }
-
 function ativarBotaoSalvar() {
     const btnSalvar = document.getElementById("btn-salvar");
     const containerEdicao = document.getElementById("botoes-edicao-container");
