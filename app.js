@@ -53,11 +53,11 @@ function selecionarCartao(cartao) {
     const card25 = document.getElementById("card-cartao-visa25");
 
     if (cartao === "Visa - 10") {
-        card10.className = "pill-card ativo";
-        card25.className = "pill-card";
+        if (card10) card10.className = "pill-card ativo";
+        if (card25) card25.className = "pill-card";
     } else {
-        card25.className = "pill-card ativo";
-        card10.className = "pill-card";
+        if (card25) card25.className = "pill-card ativo";
+        if (card10) card10.className = "pill-card";
     }
     
     if (cartao === "Visa - 10") {
@@ -216,15 +216,17 @@ function ativarBotaoSalvar() {
     const inputParcelas = document.getElementById("input-parcelas-total");
 
     if (idEmEdicao !== null) {
-        btnSalvar.classList.add("hidden");
-        containerEdicao.style.setProperty('display', 'grid', 'important');
-        btnConfirma.className = "btn-acao btn-confirma-edicao";
+        if (btnSalvar) btnSalvar.classList.add("hidden");
+        if (containerEdicao) containerEdicao.style.setProperty('display', 'grid', 'important');
+        if (btnConfirma) btnConfirma.className = "btn-acao btn-confirma-edicao";
         if (inputParcelas) inputParcelas.disabled = true;
     } else {
-        btnSalvar.classList.remove("hidden");
-        containerEdicao.style.setProperty('display', 'none', 'important');
-        btnSalvar.className = "btn-acao btn-salvar-ativo";
-        btnSalvar.textContent = "Salvar Lançamento";
+        if (btnSalvar) btnSalvar.classList.remove("hidden");
+        if (containerEdicao) containerEdicao.style.setProperty('display', 'none', 'important');
+        if (btnSalvar) {
+            btnSalvar.className = "btn-acao btn-salvar-ativo";
+            btnSalvar.textContent = "Salvar Lançamento";
+        }
         if (inputParcelas) inputParcelas.disabled = false;
     }
     verificarPreenchimentoFormulario();
@@ -317,7 +319,8 @@ function atualizarLabelMesFiltro() {
     const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const nomeMes = meses[dataFiltroHistorico.getMonth()];
     const ano = dataFiltroHistorico.getFullYear();
-    document.getElementById("label-mes-filtro").textContent = `Fatura: ${nomeMes} de ${ano}`;
+    const labelEl = document.getElementById("label-mes-filtro");
+    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes} de ${ano}`;
 }
 
 function mudarAba(aba) {
@@ -329,19 +332,15 @@ function mudarAba(aba) {
     idEmExclusaoPendente = null;
 
     if (aba === 'lancamentos') {
-        secLancamentos.classList.remove("hidden");
-        secLancamentos.classList.add("flex");
-        secResumo.classList.remove("flex");
-        secResumo.classList.add("hidden");
-        tabLanc.className = "tab-btn tab-ativa";
-        tabRes.className = "tab-btn tab-inativa";
+        if (secLancamentos) { secLancamentos.classList.remove("hidden"); secLancamentos.classList.add("flex"); }
+        if (secResumo) { secResumo.classList.remove("flex"); secResumo.classList.add("hidden"); }
+        if (tabLanc) tabLanc.className = "tab-btn tab-ativa";
+        if (tabRes) tabRes.className = "tab-btn tab-inativa";
     } else {
-        secResumo.classList.remove("hidden");
-        secResumo.classList.add("flex");
-        secLancamentos.classList.remove("flex");
-        secLancamentos.classList.add("hidden");
-        tabRes.className = "tab-btn tab-ativa";
-        tabLanc.className = "tab-btn tab-inativa";
+        if (secResumo) { secResumo.classList.remove("hidden"); secResumo.classList.add("flex"); }
+        if (secLancamentos) { secLancamentos.classList.remove("flex"); secLancamentos.classList.add("hidden"); }
+        if (tabRes) tabRes.className = "tab-btn tab-ativa";
+        if (tabLanc) tabLanc.className = "tab-btn tab-inativa";
         gerarResumoPorCartao();
     }
 }
@@ -355,6 +354,7 @@ function carregarRegistros() {
     if (!db) return;
     atualizarLabelMesFiltro();
     const lista = document.getElementById("lista-registros");
+    if (!lista) return;
     lista.innerHTML = "";
 
     try {
@@ -370,9 +370,11 @@ function carregarRegistros() {
         while (stmt.step()) { registros.push(stmt.get()); }
         stmt.free();
 
+        const totalGeralEl = document.getElementById("total-geral");
+
         if (registros.length === 0) {
             lista.innerHTML = '<li style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Nenhum lançamento para esta fatura.</li>';
-            document.getElementById("total-geral").textContent = "Total: R$ 0,00";
+            if (totalGeralEl) totalGeralEl.textContent = "Total: R$ 0,00";
             return;
         }
 
@@ -414,7 +416,7 @@ function carregarRegistros() {
             }
             lista.appendChild(li);
         });
-        document.getElementById("total-geral").textContent = `Total: ${formatarMoeda(somaTotal)}`;
+        if (totalGeralEl) totalGeralEl.textContent = `Total: ${formatarMoeda(somaTotal)}`;
     } catch (e) {
         console.error("Erro:", e);
     }
@@ -423,6 +425,7 @@ function carregarRegistros() {
 function gerarResumoPorCartao() {
     if (!db) return;
     const container = document.getElementById("conteudo-resumo");
+    if (!container) return;
     container.innerHTML = "";
     const cartoesFixos = ["Visa - 10", "Visa - 25"];
 
@@ -497,19 +500,16 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     selecionarCartao(cartao);
     selecionarUsuario(dono);
 
-    let nomeLimpo = estabelecimento;
-    const regexParcela = /(?:\s*-\s*Parcela\s*(\d+)\/(\d+))/i;
-    const match = estabelecimento.match(regexParcela);
-    if (match) {
-        nomeLimpo = estabelecimento.replace(regexParcela, '').trim();
-    }
-
-    document.getElementById("input-estabelecimento").value = nomeLimpo;
+    // Mantém o texto completo (com o - Parcela X/Y) no campo de input
+    document.getElementById("input-estabelecimento").value = estabelecimento;
     document.getElementById("input-valor").value = Number(valor).toFixed(2);
     document.getElementById("input-parcelas-total").value = "1";
 
-    document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
-    document.getElementById("titulo-formulario").style.color = "#d97706";
+    const tituloEl = document.getElementById("titulo-formulario");
+    if (tituloEl) {
+        tituloEl.textContent = "Editando Lançamento";
+        tituloEl.style.color = "#d97706";
+    }
     ativarBotaoSalvar();
 }
 
@@ -522,8 +522,11 @@ function cancelarEdicao() {
     selecionarCartao("Visa - 10");
     selecionarUsuario("Jairo");
 
-    document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-    document.getElementById("titulo-formulario").style.color = "var(--emerald-main)";
+    const tituloEl = document.getElementById("titulo-formulario");
+    if (tituloEl) {
+        tituloEl.textContent = "Novo Lançamento";
+        tituloEl.style.color = "var(--emerald-main)";
+    }
     ativarBotaoSalvar();
 }
 
@@ -551,7 +554,8 @@ function salvarOuAtualizarRegistro() {
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
             const valorParcelaBase = Math.floor((valorTotal / totalParcelas) * 100) / 100;
-            let somaParcial = 0;
+            const totalBaseAcumulado = valorParcelaBase * totalParcelas;
+            const diferencaCentavos = Math.round((valorTotal - totalBaseAcumulado) * 100) / 100;
 
             const [fatAno, fatMes] = faturaBaseStr.split('-');
             let anoFatura = parseInt(fatAno);
@@ -566,10 +570,8 @@ function salvarOuAtualizarRegistro() {
                 const faturaFormatada = `${af}-${mf}`;
 
                 let valorAtualParcela = valorParcelaBase;
-                if (i === totalParcelas) {
-                    valorAtualParcela = Math.round((valorTotal - somaParcial) * 100) / 100;
-                } else {
-                    somaParcial += valorParcelaBase;
+                if (i === 1) {
+                    valorAtualParcela = Math.round((valorParcelaBase + diferencaCentavos) * 100) / 100;
                 }
 
                 const nomeEstabelecimento = `${estabelecimentoBase} - Parcela ${i}/${totalParcelas}`;
@@ -588,8 +590,11 @@ function salvarOuAtualizarRegistro() {
         stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, idEmEdicao]);
         stmt.free();
         idEmEdicao = null;
-        document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
-        document.getElementById("titulo-formulario").style.color = "var(--emerald-main)";
+        const tituloEl = document.getElementById("titulo-formulario");
+        if (tituloEl) {
+            tituloEl.textContent = "Novo Lançamento";
+            tituloEl.style.color = "var(--emerald-main)";
+        }
         mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
     }
 
