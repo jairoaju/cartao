@@ -125,7 +125,7 @@ function atualizarTextoFaturaVisual() {
 
     const [ano, mes] = inputVal.split('-');
     const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    const nomeMes = mesesCurtos[parseInt(mes) - 1] || mes;
+    const nomeMes = meses[parseInt(mes) - 1] || mes;
     const anoCurto = ano.slice(-2);
 
     spanVisual.textContent = `${nomeMes}/${anoCurto}`;
@@ -150,12 +150,12 @@ function definirValoresPadrao() {
 definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
-// Configura o evento de foco/seleção ao pressionar Enter/Próximo no campo de Valor
+// Configuração robusta do evento de foco no campo de valor para ir para parcelas
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
     if (inputValor) {
         inputValor.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
+            if (event.key === "Enter" || event.keyCode === 13) {
                 event.preventDefault();
                 const inputParcelas = document.getElementById("input-parcelas-total");
                 if (inputParcelas) {
