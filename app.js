@@ -13,8 +13,9 @@ let idEmExclusaoPendente = null;
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
-let dataFiltroHistorico = new Date(2026, 9, 1); // Outubro de 2026
-let dataFiltroResumo = new Date(2026, 9, 1);
+// Inicialização dinâmica baseada no último registro ou data atual
+let dataFiltroHistorico = new Date();
+let dataFiltroResumo = new Date();
 
 function inicializarTema() {
     const temaSalvo = localStorage.getItem(THEME_KEY);
@@ -153,7 +154,6 @@ function definirValoresPadrao() {
 definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
-// Tecla Enter no campo valor para ir para parcelas
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
     if (inputValor) {
@@ -172,7 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Inicialização do Banco de Dados SQLite via sql.js
 initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
@@ -182,7 +181,7 @@ initSqlJs({
             const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
             db = new SQL.Database(binaryData);
         } catch (e) {
-            console.error("Erro ao carregar dados salvos, criando novo banco:", e);
+            console.error("Erro ao carregar dados salvos:", e);
             db = new SQL.Database();
         }
     } else {
@@ -203,6 +202,19 @@ initSqlJs({
     
     try {
         db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
+    } catch (e) {}
+
+    // Detecta automaticamente a fatura do último registro cadastrado
+    try {
+        const res = db.exec("SELECT fatura FROM cartao_gastos ORDER BY data DESC, id DESC LIMIT 1");
+        if (res.length > 0 && res[0].values.length > 0) {
+            const ultimaFatura = res[0].values[0][0];
+            const [anoF, mesF] = ultimaFatura.split('-');
+            if (anoF && mesF) {
+                dataFiltroHistorico = new Date(parseInt(anoF), parseInt(mesF) - 1, 1);
+                dataFiltroResumo = new Date(parseInt(anoF), parseInt(mesF) - 1, 1);
+            }
+        }
     } catch (e) {}
 
     persistirBanco();
