@@ -60,7 +60,6 @@ function selecionarCartao(cartao) {
         if (card10) card10.className = "pill-card";
     }
     
-    // Se for Visa 10, força o usuário para Jairo e bloqueia os demais
     if (cartao === "Visa - 10") {
         selecionarUsuario("Jairo");
     } else {
@@ -88,16 +87,19 @@ function selecionarUsuario(usuario) {
         const isSelected = (u.nome === usuario);
         const isVisa10 = (cartaoSelecionadoState === "Visa - 10");
 
-        // Remove todas as classes de estado anteriores para evitar sobreposição
         card.classList.remove('ativo', 'bloqueado');
 
         if (isVisa10 && u.nome !== "Jairo") {
             card.classList.add('bloqueado');
-            // Força inline a cor e opacidade caso o CSS demore para carregar na inicialização
-            card.style.opacity = "0.4";
+            card.style.backgroundColor = "#f1f5f9";
+            card.style.borderColor = "#e2e8f0";
+            card.style.color = "#cbd5e1";
+            card.style.opacity = "0.35";
             card.style.pointerEvents = "none";
         } else {
-            // Restaura propriedades normais para os outros estados
+            card.style.backgroundColor = "";
+            card.style.borderColor = "";
+            card.style.color = "";
             card.style.opacity = "1";
             card.style.pointerEvents = "auto";
             if (isSelected) {
@@ -136,7 +138,7 @@ function atualizarTextoFaturaVisual() {
 
     const [ano, mes] = inputVal.split('-');
     const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    const nomeMes = meses[parseInt(mes) - 1] || mes;
+    const nomeMes = mesesCurtos[parseInt(mes) - 1] || mes;
     const anoCurto = ano.slice(-2);
 
     spanVisual.textContent = `${nomeMes}/${anoCurto}`;
@@ -182,19 +184,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// Inicialização segura do sql.js: prioriza estritamente os dados salvos sem sobrescrever
 initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
     const savedDbHex = localStorage.getItem(STORAGE_KEY);
+    console.log("Conteúdo bruto no localStorage:", savedDbHex ? savedDbHex.substring(0, 30) + "..." : "Vazio");
+
     if (savedDbHex && savedDbHex.length > 10) {
         try {
             const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
             db = new SQL.Database(binaryData);
+            console.log("Banco de dados carregado com sucesso do localStorage!");
         } catch (e) {
-            console.error("Erro ao carregar dados salvos, criando novo banco:", e);
+            console.error("Erro ao converter hex do localStorage para banco:", e);
             db = new SQL.Database();
         }
     } else {
+        console.warn("Nenhum dado válido encontrado no localStorage. Criando novo banco.");
         db = new SQL.Database();
     }
 
@@ -226,11 +233,7 @@ initSqlJs({
         }
     } catch (e) {}
 
-    persistirBanco();
-    
-    // Garante o Visa 10 e o bloqueio de Kátia/Juliana após carregar o banco
     selecionarCartao("Visa - 10");
-    
     ativarBotaoSalvar();
     atualizarAplicacao();
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
