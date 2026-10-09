@@ -29,18 +29,27 @@
             
             <!-- Formulário -->
             <div class="glass-card card-formulario">
-                <div>
-                    <p id="titulo-formulario" class="form-title">Novo Lançamento</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <p id="titulo-formulario" class="form-title" style="margin: 0;">Novo Lançamento</p>
+                    <div style="display: flex; align-items: center; gap: 0.375rem;">
+                        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted-light);">Fatura:</span>
+                        <!-- Container unificado: o input nativo fica invisível por cima cobrindo 100% da área do botão visual -->
+                        <div style="position: relative; display: inline-block; height: 26px;">
+                            <span id="fatura-visual" class="tab-btn tab-ativa" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.2rem 0.6rem; font-size: 11px; border-radius: 0.5rem; height: 100%; min-width: 65px; box-sizing: border-box; pointer-events: none;">Out/26</span>
+                            <input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+                        </div>
+                    </div>
                 </div>
 
+                <!-- Linha unificada: Data da Compra e Cartão lado a lado -->
                 <div class="grid-data-cartao">
                     <div class="col-span-6">
-                        <label for="input-data">Data</label>
+                        <label for="input-data">Data da Compra</label>
                         <input type="date" id="input-data">
                     </div>
                     <div class="col-span-6">
                         <label>Cartão</label>
-                        <div class="selecao-grid">
+                        <div class="selecao-grid" style="margin-top: 0.125rem;">
                             <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">Visa 10</div>
                             <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">Visa 25</div>
                         </div>
@@ -64,21 +73,27 @@
 
                 <div>
                     <label for="input-estabelecimento">Estabelecimento</label>
-                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Posto...">
+                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Loja..." oninput="verificarPreenchimentoFormulario()">
                 </div>
 
-                <div>
-                    <label for="input-valor">Valor (R$)</label>
-                    <input type="number" id="input-valor" step="0.01" placeholder="0,00">
+                <div class="grid-data-cartao">
+                    <div class="col-span-6">
+                        <label for="input-valor">Valor Total (R$)</label>
+                        <input type="number" id="input-valor" step="0.01" placeholder="0,00" oninput="verificarPreenchimentoFormulario()">
+                    </div>
+                    <div class="col-span-6">
+                        <label for="input-parcelas-total">Nº de Parcelas</label>
+                        <input type="number" id="input-parcelas-total" min="1" value="1" placeholder="Ex: 10" style="text-align: center;" oninput="verificarPreenchimentoFormulario()">
+                    </div>
                 </div>
 
-                <!-- ALERTA POSICIONADO CORRETAMENTE LOGO ACIMA DO BOTÃO -->
+                <!-- ALERTA -->
                 <div id="app-alerta" class="app-alerta-box hidden"></div>
 
                 <!-- Botão Padrão (Novo Lançamento) -->
                 <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
 
-                <!-- Botões de Edição Divididos (Ocultos por padrão com !important) -->
+                <!-- Botões de Edição Divididos -->
                 <div id="botoes-edicao-container" class="botoes-edicao-container">
                     <button type="button" id="btn-confirma" class="btn-acao btn-confirma-edicao" onclick="salvarOuAtualizarRegistro()">Confirma</button>
                     <button type="button" id="btn-cancela" class="btn-acao btn-cancela-edicao" onclick="cancelarEdicao()">Cancela</button>
@@ -87,10 +102,18 @@
 
             <!-- Histórico -->
             <div class="glass-card">
-                <div class="flex justify-between items-center historico-header">
-                    <p class="historico-title">Histórico</p>
+                <div class="flex justify-between items-center historico-header" style="margin-bottom: 0.5rem;">
+                    <p class="historico-title">Histórico da Fatura</p>
                     <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
                 </div>
+
+                <!-- Seletor de Mês do Histórico (Fatura) -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 0.375rem 0.625rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border: 1px solid var(--border-light);">
+                    <button onclick="mudarMesHistorico(-1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Mês Anterior">◀</button>
+                    <span id="label-mes-filtro" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Fatura Atual</span>
+                    <button onclick="mudarMesHistorico(1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Próximo Mês">▶</button>
+                </div>
+
                 <div class="overflow-y-auto max-h-registros">
                     <ul id="lista-registros" class="lista-vazia-ul">
                         <li class="lista-carregando-li">Carregando registros...</li>

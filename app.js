@@ -9,10 +9,12 @@ const STORAGE_KEY = "sqlite_cartao_backup_v9";
 const THEME_KEY = "app_theme_mode";
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
-let temporizadorAlerta = null;
 
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
+
+// Inicializa o filtro do histórico apontando para Outubro de 2026
+let dataFiltroHistorico = new Date(2026, 9, 1); // Mês 9 = Outubro
 
 // Gerenciamento de Tema
 function inicializarTema() {
@@ -58,7 +60,11 @@ function selecionarCartao(cartao) {
         card10.className = "pill-card";
     }
     
-    selecionarUsuario("Jairo");
+    if (cartao === "Visa - 10") {
+        selecionarUsuario("Jairo");
+    } else {
+        selecionarUsuario(usuarioSelecionadoState);
+    }
 }
 
 function selecionarUsuario(usuario) {
@@ -98,7 +104,6 @@ function mostrarAlerta(mensagem, tipo = 'sucesso') {
     alertaBox.textContent = mensagem;
     alertaBox.classList.remove('hidden');
 
-    // Define as cores baseadas no tipo (sucesso ou erro)
     if (tipo === 'sucesso') {
         alertaBox.style.backgroundColor = 'var(--emerald-light-bg)';
         alertaBox.style.color = 'var(--emerald-text-light)';
@@ -109,22 +114,37 @@ function mostrarAlerta(mensagem, tipo = 'sucesso') {
         alertaBox.style.borderColor = '#fecaca';
     }
 
-    // Oculta o alerta automaticamente após 4 segundos
     setTimeout(() => {
         alertaBox.classList.add('hidden');
     }, 4000);
 }
 
-function definirDataHoje() {
+function atualizarTextoFaturaVisual() {
+    const inputVal = document.getElementById("input-fatura").value;
+    const spanVisual = document.getElementById("fatura-visual");
+    if (!inputVal || !spanVisual) return;
+
+    const [ano, mes] = inputVal.split('-');
+    const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const nomeMes = mesesCurtos[parseInt(mes) - 1] || mes;
+    const anoCurto = ano.slice(-2);
+
+    spanVisual.textContent = `${nomeMes}/${anoCurto}`;
+}
+
+function definirValoresPadrao() {
     if (idEmEdicao !== null) return;
     const hoje = new Date();
     const ano = hoje.getFullYear();
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
+    
     document.getElementById('input-data').value = `${ano}-${mes}-${dia}`;
+    document.getElementById('input-fatura').value = "2026-10";
+    atualizarTextoFaturaVisual();
 }
-definirDataHoje();
 
+definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
 initSqlJs({
@@ -142,33 +162,72 @@ initSqlJs({
         CREATE TABLE IF NOT EXISTS cartao_gastos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             data TEXT NOT NULL,
+            fatura TEXT NOT NULL,
             cartao TEXT NOT NULL,
             dono_do_cartao TEXT NOT NULL,
             estabelecimento TEXT NOT NULL,
             valor REAL NOT NULL
         );
     `);
+    
+    try {
+        db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
+    } catch (e) {
+        // Coluna já existe
+    }
+    db.run("UPDATE cartao_gastos SET fatura = '2026-10' WHERE fatura IS NULL OR fatura = '' OR fatura = '2025-10'");
+    persistirBanco();
+
     ativarBotaoSalvar();
     atualizarAplicacao();
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
+
+function verificarPreenchimentoFormulario() {
+    const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
+    const valorInput = document.getElementById("input-valor").value.trim();
+    const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
+    const faturaInput = document.getElementById("input-fatura").value;
+    const btnSalvar = document.getElementById("btn-salvar");
+    const btnConfirma = document.getElementById("btn-confirma");
+
+    const numParcelas = parseInt(parcelasInput) || 1;
+    const formularioValido = estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1 && faturaInput !== "";
+
+    if (idEmEdicao !== null) {
+        if (btnConfirma) btnConfirma.disabled = !formularioValido;
+    } else {
+        if (btnSalvar) {
+            btnSalvar.disabled = !formularioValido;
+            if (formularioValido) {
+                btnSalvar.classList.remove("btn-desativado");
+                btnSalvar.classList.add("btn-salvar-ativo");
+            } else {
+                btnSalvar.classList.remove("btn-salvar-ativo");
+                btnSalvar.classList.add("btn-desativado");
+            }
+        }
+    }
+}
 
 function ativarBotaoSalvar() {
     const btnSalvar = document.getElementById("btn-salvar");
     const containerEdicao = document.getElementById("botoes-edicao-container");
     const btnConfirma = document.getElementById("btn-confirma");
+    const inputParcelas = document.getElementById("input-parcelas-total");
 
     if (idEmEdicao !== null) {
         btnSalvar.classList.add("hidden");
         containerEdicao.style.setProperty('display', 'grid', 'important');
-        btnConfirma.disabled = false;
         btnConfirma.className = "btn-acao btn-confirma-edicao";
+        if (inputParcelas) inputParcelas.disabled = true;
     } else {
         btnSalvar.classList.remove("hidden");
         containerEdicao.style.setProperty('display', 'none', 'important');
-        btnSalvar.disabled = false;
         btnSalvar.className = "btn-acao btn-salvar-ativo";
         btnSalvar.textContent = "Salvar Lançamento";
+        if (inputParcelas) inputParcelas.disabled = false;
     }
+    verificarPreenchimentoFormulario();
 }
 
 function persistirBanco() {
@@ -180,16 +239,12 @@ function persistirBanco() {
 
 function exportarBackup() {
     try {
-        // Gera o binário do banco de dados SQLite
         const binaryArray = db.export();
         const blob = new Blob([binaryArray], { type: 'application/x-sqlite3' });
         const url = URL.createObjectURL(blob);
-        
-        // Data atual formatada para o nome do arquivo (ex: backup_gastos_2026-10-07.sqlite)
         const dataHoje = new Date().toISOString().split('T')[0];
         const nomeArquivo = `backup_gastos_${dataHoje}.sqlite`;
 
-        // Dispara o download usando o método padrão e universal do navegador
         const linkTemp = document.createElement('a');
         linkTemp.href = url;
         linkTemp.download = nomeArquivo;
@@ -197,7 +252,6 @@ function exportarBackup() {
         document.body.appendChild(linkTemp);
         linkTemp.click();
         
-        // Limpa o elemento e a URL após o disparo
         document.body.removeChild(linkTemp);
         URL.revokeObjectURL(url);
     } catch (error) {
@@ -245,6 +299,27 @@ function formatarDataBR(dataIso) {
     return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataIso;
 }
 
+function formatarFaturaBR(faturaIso) {
+    if (!faturaIso) return '';
+    const partes = faturaIso.split('-');
+    if (partes.length !== 2) return faturaIso;
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const nomeMes = meses[parseInt(partes[1]) - 1] || partes[1];
+    return `${nomeMes} de ${partes[0]}`;
+}
+
+function mudarMesHistorico(direcao) {
+    dataFiltroHistorico.setMonth(dataFiltroHistorico.getMonth() + direcao);
+    carregarRegistros();
+}
+
+function atualizarLabelMesFiltro() {
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const nomeMes = meses[dataFiltroHistorico.getMonth()];
+    const ano = dataFiltroHistorico.getFullYear();
+    document.getElementById("label-mes-filtro").textContent = `Fatura: ${nomeMes} de ${ano}`;
+}
+
 function mudarAba(aba) {
     const secLancamentos = document.getElementById("secao-lancamentos");
     const secResumo = document.getElementById("secao-resumo");
@@ -272,28 +347,37 @@ function mudarAba(aba) {
 }
 
 function atualizarAplicacao() {
+    atualizarLabelMesFiltro();
     carregarRegistros();
 }
 
 function carregarRegistros() {
     if (!db) return;
+    atualizarLabelMesFiltro();
     const lista = document.getElementById("lista-registros");
     lista.innerHTML = "";
+
     try {
-        const stmt = db.prepare("SELECT id, data, cartao, dono_do_cartao, estabelecimento, valor FROM cartao_gastos ORDER BY data DESC, id DESC");
+        const anoFiltro = dataFiltroHistorico.getFullYear();
+        const mesFiltro = String(dataFiltroHistorico.getMonth() + 1).padStart(2, '0');
+        const faturaFiltroStr = `${anoFiltro}-${mesFiltro}`;
+
+        const stmt = db.prepare("SELECT id, data, fatura, cartao, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE fatura = ? ORDER BY data DESC, id DESC");
+        stmt.bind([faturaFiltroStr]);
+
         const registros = [];
         let somaTotal = 0;
         while (stmt.step()) { registros.push(stmt.get()); }
         stmt.free();
 
         if (registros.length === 0) {
-            lista.innerHTML = '<li style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Nenhum lançamento encontrado.</li>';
+            lista.innerHTML = '<li style="color: var(--text-muted-light); font-size: 12px; text-align: center; padding: 1rem 0;">Nenhum lançamento para esta fatura.</li>';
             document.getElementById("total-geral").textContent = "Total: R$ 0,00";
             return;
         }
 
         registros.forEach(reg => {
-            const [id, data, cartao, dono, estabelecimento, valor] = reg;
+            const [id, data, fatura, cartao, dono, estabelecimento, valor] = reg;
             somaTotal += valor;
             const li = document.createElement("li");
             
@@ -316,14 +400,14 @@ function carregarRegistros() {
                 li.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 0.125rem; flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
-                            <span style="color: var(--text-muted-light);">📅 ${formatarDataBR(data)}</span> 
+                            <span style="color: var(--text-muted-light);">📅 Compra: ${formatarDataBR(data)}</span> 
                             <span style="color: var(--emerald-main); font-weight: 800; font-size: 12px;">${formatarMoeda(valor)}</span>
                         </div>
                         <p class="estabelecimento-nome">${estabelecimento}</p>
-                        <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Usuário: ${dono}</span>
+                        <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Fatura: ${formatarFaturaBR(fatura)} • 👤 ${dono}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.25rem;">
-                        <button onclick="carregarParaEdicao(${id}, '${data}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
+                        <button onclick="carregarParaEdicao(${id}, '${data}', '${fatura}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
                         <button onclick="pedirConfirmacaoExclusao(${id})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Excluir">🗑</button>
                     </div>
                 `;
@@ -344,15 +428,15 @@ function gerarResumoPorCartao() {
 
     cartoesFixos.forEach(cartao => {
         try {
-            const stmt = db.prepare("SELECT data, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? ORDER BY dono_do_cartao ASC, data DESC");
+            const stmt = db.prepare("SELECT data, fatura, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? ORDER BY fatura DESC, dono_do_cartao ASC");
             stmt.bind([cartao]);
             const registros = [];
             let totalCartao = 0;
             const subtotaisPorDono = {};
 
             while (stmt.step()) {
-                const [data, dono, estabelecimento, valor] = stmt.get();
-                registros.push({ data, dono, estabelecimento, valor });
+                const [data, fatura, dono, estabelecimento, valor] = stmt.get();
+                registros.push({ data, fatura, dono, estabelecimento, valor });
                 totalCartao += valor;
                 subtotaisPorDono[dono] = (subtotaisPorDono[dono] || 0) + valor;
             }
@@ -388,7 +472,7 @@ function gerarResumoPorCartao() {
                         <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="inner-item-box">
                             <div style="display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1;">
                                 <span class="estabelecimento-nome">${g.estabelecimento}</span>
-                                <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono} • ${formatarDataBR(g.data)}</span>
+                                <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">📄 Fatura: ${formatarFaturaBR(g.fatura)} • 👤 ${g.dono}</span>
                             </div>
                             <span class="font-mono" style="color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
                         </li>`;
@@ -403,17 +487,27 @@ function gerarResumoPorCartao() {
     });
 }
 
-function carregarParaEdicao(id, data, cartao, dono, estabelecimento, valor) {
+function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, valor) {
     idEmEdicao = id;
     idEmExclusaoPendente = null;
     document.getElementById("input-data").value = data;
+    document.getElementById("input-fatura").value = fatura || "2026-10";
+    atualizarTextoFaturaVisual();
     
     selecionarCartao(cartao);
     selecionarUsuario(dono);
 
-    document.getElementById("input-estabelecimento").value = estabelecimento;
+    let nomeLimpo = estabelecimento;
+    const regexParcela = /(?:\s*-\s*Parcela\s*(\d+)\/(\d+))/i;
+    const match = estabelecimento.match(regexParcela);
+    if (match) {
+        nomeLimpo = estabelecimento.replace(regexParcela, '').trim();
+    }
+
+    document.getElementById("input-estabelecimento").value = nomeLimpo;
     document.getElementById("input-valor").value = Number(valor).toFixed(2);
-    
+    document.getElementById("input-parcelas-total").value = "1";
+
     document.getElementById("titulo-formulario").textContent = "Editando Lançamento";
     document.getElementById("titulo-formulario").style.color = "#d97706";
     ativarBotaoSalvar();
@@ -423,7 +517,8 @@ function cancelarEdicao() {
     idEmEdicao = null;
     document.getElementById("input-estabelecimento").value = "";
     document.getElementById("input-valor").value = "";
-    definirDataHoje();
+    document.getElementById("input-parcelas-total").value = "1";
+    definirValoresPadrao();
     selecionarCartao("Visa - 10");
     selecionarUsuario("Jairo");
 
@@ -434,31 +529,63 @@ function cancelarEdicao() {
 
 function salvarOuAtualizarRegistro() {
     if (!db) return;
-    const data = document.getElementById("input-data").value;
+    const dataStr = document.getElementById("input-data").value;
+    const faturaBaseStr = document.getElementById("input-fatura").value;
     const cartao = cartaoSelecionadoState;
     const dono = usuarioSelecionadoState;
-    const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
-    const valorInput = document.getElementById("input-valor").value;
-    
-    if (!data || !cartao || !dono || !estabelecimento || !valorInput) {
+    let estabelecimentoBase = document.getElementById("input-estabelecimento").value.trim();
+    const valorTotalInput = document.getElementById("input-valor").value;
+    const totalParcelas = parseInt(document.getElementById("input-parcelas-total").value) || 1;
+
+    if (!dataStr || !faturaBaseStr || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
         mostrarAlerta("Por favor, preencha todos os campos!", "erro");
         return;
     }
 
-    const valor = parseFloat(valorInput);
-    if (isNaN(valor) || valor <= 0) {
+    const valorTotal = parseFloat(valorTotalInput);
+    if (isNaN(valorTotal) || valorTotal <= 0) {
         mostrarAlerta("Insira um valor válido em reais!", "erro");
         return;
     }
 
     if (idEmEdicao === null) {
-        const stmt = db.prepare("INSERT INTO cartao_gastos (data, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?)");
-        stmt.run([data, cartao, dono, estabelecimento, valor]);
-        stmt.free();
-        mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
+        if (totalParcelas > 1) {
+            const valorParcelaBase = Math.floor((valorTotal / totalParcelas) * 100) / 100;
+            let somaParcial = 0;
+
+            const [fatAno, fatMes] = faturaBaseStr.split('-');
+            let anoFatura = parseInt(fatAno);
+            let mesFatura = parseInt(fatMes) - 1;
+
+            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
+
+            for (let i = 1; i <= totalParcelas; i++) {
+                const dataFaturaObj = new Date(anoFatura, mesFatura + (i - 1), 1);
+                const af = dataFaturaObj.getFullYear();
+                const mf = String(dataFaturaObj.getMonth() + 1).padStart(2, '0');
+                const faturaFormatada = `${af}-${mf}`;
+
+                let valorAtualParcela = valorParcelaBase;
+                if (i === totalParcelas) {
+                    valorAtualParcela = Math.round((valorTotal - somaParcial) * 100) / 100;
+                } else {
+                    somaParcial += valorParcelaBase;
+                }
+
+                const nomeEstabelecimento = `${estabelecimentoBase} - Parcela ${i}/${totalParcelas}`;
+                stmt.run([dataStr, faturaFormatada, cartao, dono, nomeEstabelecimento, valorAtualParcela]);
+            }
+            stmt.free();
+            mostrarAlerta(`${totalParcelas} parcelas geradas com sucesso!`, "sucesso");
+        } else {
+            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
+            stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal]);
+            stmt.free();
+            mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
+        }
     } else {
-        const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
-        stmt.run([data, cartao, dono, estabelecimento, valor, idEmEdicao]);
+        const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, fatura = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
+        stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, idEmEdicao]);
         stmt.free();
         idEmEdicao = null;
         document.getElementById("titulo-formulario").textContent = "Novo Lançamento";
@@ -467,13 +594,8 @@ function salvarOuAtualizarRegistro() {
     }
 
     persistirBanco();
-    document.getElementById("input-estabelecimento").value = "";
-    document.getElementById("input-valor").value = "";
-    definirDataHoje();
-    selecionarCartao("Visa - 10");
-    selecionarUsuario("Jairo");
+    document.getElementById("input-parcelas-total").value = "1";
     ativarBotaoSalvar();
-    document.getElementById("input-estabelecimento").focus();
     atualizarAplicacao();
 }
 
