@@ -13,8 +13,9 @@ let idEmExclusaoPendente = null;
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
-// Inicializa o filtro do histórico apontando para Outubro de 2026
-let dataFiltroHistorico = new Date(2026, 9, 1); // Mês 9 = Outubro
+// Inicializa os filtros de data apontando para Outubro de 2026
+let dataFiltroHistorico = new Date(2026, 9, 1);
+let dataFiltroResumo = new Date(2026, 9, 1);
 
 // Gerenciamento de Tema
 function inicializarTema() {
@@ -24,7 +25,7 @@ function inicializarTema() {
     if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
         document.body.classList.add('dark-mode');
         document.getElementById('btn-tema').textContent = '☀️';
-        document.getElementById('meta-theme-color').setAttribute('content', '#090d16');
+        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
     } else {
         document.body.classList.remove('dark-mode');
         document.getElementById('btn-tema').textContent = '🌙';
@@ -37,7 +38,7 @@ function alternarTema() {
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
         document.getElementById('btn-tema').textContent = '☀️';
-        document.getElementById('meta-theme-color').setAttribute('content', '#090d16');
+        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
     } else {
         localStorage.setItem(THEME_KEY, 'light');
         document.getElementById('btn-tema').textContent = '🌙';
@@ -130,6 +131,10 @@ function atualizarTextoFaturaVisual() {
     const anoCurto = ano.slice(-2);
 
     spanVisual.textContent = `${nomeMes}/${anoCurto}`;
+
+    if (!spanVisual.classList.contains('ativo')) {
+        spanVisual.classList.add('ativo');
+    }
 }
 
 function definirValoresPadrao() {
@@ -172,9 +177,7 @@ initSqlJs({
     
     try {
         db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
-    } catch (e) {
-        // Coluna já existe
-    }
+    } catch (e) {}
     db.run("UPDATE cartao_gastos SET fatura = '2026-10' WHERE fatura IS NULL OR fatura = '' OR fatura = '2025-10'");
     persistirBanco();
 
@@ -188,9 +191,7 @@ function verificarPreenchimentoFormulario() {
     const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
     const inputFaturaEl = document.getElementById("input-fatura");
     
-    // Garante que pega a fatura do input ou usa a padrão caso esteja vazio
     const faturaInput = inputFaturaEl ? (inputFaturaEl.value || "2026-10") : "2026-10";
-    
     const btnSalvar = document.getElementById("btn-salvar");
     const btnConfirma = document.getElementById("btn-confirma");
 
@@ -212,6 +213,7 @@ function verificarPreenchimentoFormulario() {
         }
     }
 }
+
 function ativarBotaoSalvar() {
     const btnSalvar = document.getElementById("btn-salvar");
     const containerEdicao = document.getElementById("botoes-edicao-container");
@@ -326,6 +328,19 @@ function atualizarLabelMesFiltro() {
     if (labelEl) labelEl.textContent = `Fatura: ${nomeMes} de ${ano}`;
 }
 
+function mudarMesResumo(direcao) {
+    dataFiltroResumo.setMonth(dataFiltroResumo.getMonth() + direcao);
+    gerarResumoPorCartao();
+}
+
+function atualizarLabelMesResumo() {
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const nomeMes = meses[dataFiltroResumo.getMonth()];
+    const ano = dataFiltroResumo.getFullYear();
+    const labelEl = document.getElementById("label-mes-resumo");
+    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes} de ${ano}`;
+}
+
 function mudarAba(aba) {
     const secLancamentos = document.getElementById("secao-lancamentos");
     const secResumo = document.getElementById("secao-resumo");
@@ -339,6 +354,7 @@ function mudarAba(aba) {
         if (secResumo) { secResumo.classList.remove("flex"); secResumo.classList.add("hidden"); }
         if (tabLanc) tabLanc.className = "tab-btn tab-ativa";
         if (tabRes) tabRes.className = "tab-btn tab-inativa";
+        carregarRegistros();
     } else {
         if (secResumo) { secResumo.classList.remove("hidden"); secResumo.classList.add("flex"); }
         if (secLancamentos) { secLancamentos.classList.remove("flex"); secLancamentos.classList.add("hidden"); }
@@ -350,6 +366,7 @@ function mudarAba(aba) {
 
 function atualizarAplicacao() {
     atualizarLabelMesFiltro();
+    atualizarLabelMesResumo();
     carregarRegistros();
 }
 
@@ -427,15 +444,21 @@ function carregarRegistros() {
 
 function gerarResumoPorCartao() {
     if (!db) return;
+    atualizarLabelMesResumo();
     const container = document.getElementById("conteudo-resumo");
     if (!container) return;
     container.innerHTML = "";
+    
     const cartoesFixos = ["Visa - 10", "Visa - 25"];
+    const anoFiltro = dataFiltroResumo.getFullYear();
+    const mesFiltro = String(dataFiltroResumo.getMonth() + 1).padStart(2, '0');
+    const faturaFiltroStr = `${anoFiltro}-${mesFiltro}`;
 
     cartoesFixos.forEach(cartao => {
         try {
-            const stmt = db.prepare("SELECT data, fatura, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? ORDER BY fatura DESC, dono_do_cartao ASC");
-            stmt.bind([cartao]);
+            const stmt = db.prepare("SELECT data, fatura, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? AND fatura = ? ORDER BY dono_do_cartao ASC, data DESC");
+            stmt.bind([cartao, faturaFiltroStr]);
+            
             const registros = [];
             let totalCartao = 0;
             const subtotaisPorDono = {};
@@ -459,7 +482,7 @@ function gerarResumoPorCartao() {
             `;
 
             if (registros.length === 0) {
-                cardDiv.innerHTML += `<p style="font-size: 11px; color: var(--text-muted-light); text-align: center; margin: 0.25rem 0;">Nenhum lançamento registrado.</p>`;
+                cardDiv.innerHTML += `<p style="font-size: 11px; color: var(--text-muted-light); text-align: center; margin: 0.25rem 0;">Nenhum lançamento para esta fatura.</p>`;
             } else {
                 let subHtml = `<div class="subtotais-box" style="display: flex; flex-direction: column; gap: 0.25rem;"><span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;">Subtotais por Usuário:</span>`;
                 for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
@@ -478,7 +501,7 @@ function gerarResumoPorCartao() {
                         <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="inner-item-box">
                             <div style="display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1;">
                                 <span class="estabelecimento-nome">${g.estabelecimento}</span>
-                                <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">📄 Fatura: ${formatarFaturaBR(g.fatura)} • 👤 ${g.dono}</span>
+                                <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono}</span>
                             </div>
                             <span class="font-mono" style="color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
                         </li>`;
@@ -503,7 +526,6 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     selecionarCartao(cartao);
     selecionarUsuario(dono);
 
-    // Mantém o texto completo (com o - Parcela X/Y) no campo de input
     document.getElementById("input-estabelecimento").value = estabelecimento;
     document.getElementById("input-valor").value = Number(valor).toFixed(2);
     document.getElementById("input-parcelas-total").value = "1";
