@@ -86,9 +86,12 @@ body.dark-mode .pill-card.ativo {
 }
 
 body.dark-mode .pill-card.bloqueado {
-    background-color: rgba(15, 23, 42, 0.3);
-    border-color: #090d16;
-    color: #334155;
+    background-color: rgba(15, 23, 42, 0.2) !important;
+    border-color: #090d16 !important;
+    color: #475569 !important;
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 }
 
 body.dark-mode .btn-desativado {

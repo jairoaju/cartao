@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cartao-gastos-v10';
+const CACHE_NAME = 'cartao-gastos-v11';
 const urlsToCache = [
     './',
     './index.html',
@@ -7,6 +7,7 @@ const urlsToCache = [
     './manifest.json'
 ];
 
+// Instalação do Service Worker e armazenamento do cache inicial
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -15,6 +16,7 @@ self.addEventListener('install', event => {
     );
 });
 
+// Ativação e limpeza imediata de caches antigos obsoletos
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
@@ -29,11 +31,17 @@ self.addEventListener('activate', event => {
     );
 });
 
+// Estratégia de Fetch: Tenta buscar a versão mais recente na rede; se offline, recorre ao cache
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                return response || fetch(event.request);
+                // Se obteve sucesso na rede, atualiza o cache dinamicamente se necessário
+                return response;
+            })
+            .catch(() => {
+                // Se estiver offline, retorna o arquivo correspondente do cache
+                return caches.match(event.request);
             })
     );
 });

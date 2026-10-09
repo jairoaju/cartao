@@ -10,8 +10,8 @@ const THEME_KEY = "app_theme_mode";
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
 
-// Alterado para iniciar com o Cartão 25 como padrão
-let cartaoSelecionadoState = "Visa - 25";
+// Inicializa o padrão com Visa 10 e Jairo
+let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
 let dataFiltroHistorico = new Date();
@@ -60,6 +60,7 @@ function selecionarCartao(cartao) {
         if (card10) card10.className = "pill-card";
     }
     
+    // Se for Visa 10, força o usuário para Jairo e bloqueia os demais
     if (cartao === "Visa - 10") {
         selecionarUsuario("Jairo");
     } else {
@@ -87,12 +88,21 @@ function selecionarUsuario(usuario) {
         const isSelected = (u.nome === usuario);
         const isVisa10 = (cartaoSelecionadoState === "Visa - 10");
 
+        // Remove todas as classes de estado anteriores para evitar sobreposição
+        card.classList.remove('ativo', 'bloqueado');
+
         if (isVisa10 && u.nome !== "Jairo") {
-            card.className = "pill-card bloqueado";
-        } else if (isSelected) {
-            card.className = "pill-card ativo";
+            card.classList.add('bloqueado');
+            // Força inline a cor e opacidade caso o CSS demore para carregar na inicialização
+            card.style.opacity = "0.4";
+            card.style.pointerEvents = "none";
         } else {
-            card.className = "pill-card";
+            // Restaura propriedades normais para os outros estados
+            card.style.opacity = "1";
+            card.style.pointerEvents = "auto";
+            if (isSelected) {
+                card.classList.add('ativo');
+            }
         }
     });
 }
@@ -152,8 +162,7 @@ function definirValoresPadrao() {
 }
 
 definirValoresPadrao();
-// Inicializa selecionando o Cartão 25 por padrão
-selecionarCartao("Visa - 25");
+selecionarCartao("Visa - 10");
 
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
@@ -177,12 +186,12 @@ initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
     const savedDbHex = localStorage.getItem(STORAGE_KEY);
-    if (savedDbHex) {
+    if (savedDbHex && savedDbHex.length > 10) {
         try {
             const binaryData = new Uint8Array(savedDbHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
             db = new SQL.Database(binaryData);
         } catch (e) {
-            console.error("Erro ao carregar dados salvos:", e);
+            console.error("Erro ao carregar dados salvos, criando novo banco:", e);
             db = new SQL.Database();
         }
     } else {
@@ -218,6 +227,10 @@ initSqlJs({
     } catch (e) {}
 
     persistirBanco();
+    
+    // Garante o Visa 10 e o bloqueio de Kátia/Juliana após carregar o banco
+    selecionarCartao("Visa - 10");
+    
     ativarBotaoSalvar();
     atualizarAplicacao();
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
@@ -581,7 +594,7 @@ function cancelarEdicao() {
     document.getElementById("input-valor").value = "";
     document.getElementById("input-parcelas-total").value = "1";
     definirValoresPadrao();
-    selecionarCartao("Visa - 25");
+    selecionarCartao("Visa - 10");
     selecionarUsuario("Jairo");
 
     const tituloEl = document.getElementById("titulo-formulario");
