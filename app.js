@@ -214,14 +214,6 @@ initSqlJs({
             valor_total REAL DEFAULT 0
         );
     `);
-    
-    try {
-        db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
-    } catch (e) {}
-
-    try {
-        db.run("ALTER TABLE cartao_gastos ADD COLUMN valor_total REAL DEFAULT 0");
-    } catch (e) {}
 
     try {
         const res = db.exec("SELECT fatura FROM cartao_gastos ORDER BY data DESC, id DESC LIMIT 1");
@@ -386,7 +378,7 @@ function carregarRegistros() {
         const mesFiltro = String(dataFiltroHistorico.getMonth() + 1).padStart(2, '0');
         const faturaFiltroStr = `${anoFiltro}-${mesFiltro}`;
 
-        const stmt = db.prepare("SELECT id, data, fatura, cartao, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE fatura = ? ORDER BY data DESC, id DESC");
+        const stmt = db.prepare("SELECT id, data, fatura, cartao, dono_do_cartao, estabelecimento, valor, valor_total FROM cartao_gastos WHERE fatura = ? ORDER BY data DESC, id DESC");
         stmt.bind([faturaFiltroStr]);
 
         const registros = [];
@@ -409,39 +401,92 @@ function carregarRegistros() {
             
             if (idEmExclusaoPendente === id) {
                 li.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
-                li.innerHTML = `
-                    <div style="font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;">
-                        <span>⚠ Confirmar exclusão?</span>
-                        <span class="font-mono" style="color: #92400e;">${formatarMoeda(valor)}</span>
-                    </div>
-                    <div style="font-size: 11px; color: #d97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${estabelecimento}</div>
-                    <div style="display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;">
-                        <button onclick="cancelarExclusao()" style="background-color: #e2e8f0; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Cancelar</button>
-                        <button onclick="efetivarExclusao(${id})" style="background-color: #dc2626; color: white; padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Sim, Excluir</button>
-                    </div>
-                `;
+                
+                const divInfo = document.createElement("div");
+                divInfo.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
+                const spanWarn = document.createElement("span");
+                spanWarn.textContent = "⚠ Confirmar exclusão?";
+                const spanVal = document.createElement("span");
+                spanVal.className = "font-mono";
+                spanVal.style.color = "#92400e";
+                spanVal.textContent = formatarMoeda(valor);
+                divInfo.appendChild(spanWarn);
+                divInfo.appendChild(spanVal);
+
+                const divEst = document.createElement("div");
+                divEst.style.cssText = "font-size: 11px; color: #d97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
+                divEst.textContent = estabelecimento;
+
+                const divBtns = document.createElement("div");
+                divBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
+                
+                const btnCancel = document.createElement("button");
+                btnCancel.style.cssText = "background-color: #e2e8f0; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+                btnCancel.textContent = "Cancelar";
+                btnCancel.addEventListener('click', cancelarExclusao);
+
+                const btnConfirm = document.createElement("button");
+                btnConfirm.style.cssText = "background-color: #dc2626; color: white; padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+                btnConfirm.textContent = "Sim, Excluir";
+                btnConfirm.addEventListener('click', () => efetivarExclusao(id));
+
+                divBtns.appendChild(btnCancel);
+                divBtns.appendChild(btnConfirm);
+
+                li.appendChild(divInfo);
+                li.appendChild(divEst);
+                li.appendChild(divBtns);
             } else {
                 li.className = "inner-item-box";
                 li.style.cssText = "display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;";
-                li.innerHTML = `
-                    <div style="display: flex; flex-direction: column; gap: 0.05rem; flex: 1; min-width: 0;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
-                            <span class="estabelecimento-nome" style="font-size: 12px; font-weight: 700; color: #475569;">${estabelecimento}</span>
-                            <span style="color: var(--emerald-main); font-weight: 800; font-size: 12px;">${formatarMoeda(valor)}</span>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center; font-size: 10px; color: var(--text-muted-light);" class="font-mono">
-                            <span>📅 ${formatarDataBR(data)}</span>
-                            <span>•</span>
-                            <span>💳 ${cartao}</span>
-                            <span>•</span>
-                            <span>👤 ${dono}</span>
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.25rem;">
-                        <button onclick="carregarParaEdicao(${id}, '${data}', '${fatura}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
-                        <button onclick="pedirConfirmacaoExclusao(${id})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Excluir">🗑</button>
-                    </div>
-                `;
+
+                const divMain = document.createElement("div");
+                divMain.style.cssText = "display: flex; flex-direction: column; gap: 0.05rem; flex: 1; min-width: 0;";
+
+                const divRow1 = document.createElement("div");
+                divRow1.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 10px;";
+                divRow1.className = "font-mono";
+
+                const spanEstab = document.createElement("span");
+                spanEstab.className = "estabelecimento-nome";
+                spanEstab.style.cssText = "font-size: 12px; font-weight: 700; color: #475569;";
+                spanEstab.textContent = estabelecimento;
+
+                const spanValor = document.createElement("span");
+                spanValor.style.cssText = "color: var(--emerald-main); font-weight: 800; font-size: 12px;";
+                spanValor.textContent = formatarMoeda(valor);
+
+                divRow1.appendChild(spanEstab);
+                divRow1.appendChild(spanValor);
+
+                const divRow2 = document.createElement("div");
+                divRow2.style.cssText = "display: flex; gap: 0.5rem; align-items: center; font-size: 10px; color: var(--text-muted-light);";
+                divRow2.className = "font-mono";
+                divRow2.textContent = `📅 ${formatarDataBR(data)} • 💳 ${cartao} • 👤 ${dono}`;
+
+                divMain.appendChild(divRow1);
+                divMain.appendChild(divRow2);
+
+                const divActions = document.createElement("div");
+                divActions.style.cssText = "display: flex; align-items: center; gap: 0.25rem;";
+
+                const btnEdit = document.createElement("button");
+                btnEdit.style.cssText = "background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;";
+                btnEdit.title = "Editar";
+                btnEdit.textContent = "✏️";
+                btnEdit.addEventListener('click', () => carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, valor));
+
+                const btnDel = document.createElement("button");
+                btnDel.style.cssText = "background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;";
+                btnDel.title = "Excluir";
+                btnDel.textContent = "🗑";
+                btnDel.addEventListener('click', () => pedirConfirmacaoExclusao(id));
+
+                divActions.appendChild(btnEdit);
+                divActions.appendChild(btnDel);
+
+                li.appendChild(divMain);
+                li.appendChild(divActions);
             }
             lista.appendChild(li);
         });
@@ -474,7 +519,8 @@ function gerarResumoPorCartao() {
 
             while (stmt.step()) {
                 const [id, data, fatura, cartaoBanco, dono, estabelecimento, valor, valor_total] = stmt.get();
-                registros.push({ id, data, fatura, cartao: cartaoBanco, dono, estabelecimento, valor, valor_total });
+                const vTotalFinal = valor_total !== undefined && valor_total !== null ? valor_total : valor;
+                registros.push({ id, data, fatura, cartao: cartaoBanco, dono, estabelecimento, valor, valor_total: vTotalFinal });
                 totalCartao += valor;
                 subtotaisPorDono[dono] = (subtotaisPorDono[dono] || 0) + valor;
             }
@@ -483,57 +529,114 @@ function gerarResumoPorCartao() {
             const cardDiv = document.createElement("div");
             cardDiv.className = "inner-item-box";
             cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;";
-            cardDiv.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;">
-                    <span style="font-weight: bold; color: var(--emerald-main); font-size: 12px;">💳 Cartão: ${cartao}</span> 
-                    <span class="badge-cartao-resumo">${formatarMoeda(totalCartao)}</span>
-                </div>
-            `;
+
+            const cardHeader = document.createElement("div");
+            cardHeader.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;";
+            
+            const spanCardNome = document.createElement("span");
+            spanCardNome.style.cssText = "font-weight: bold; color: var(--emerald-main); font-size: 12px;";
+            spanCardNome.textContent = `💳 Cartão: ${cartao}`;
+
+            const spanCardTotal = document.createElement("span");
+            spanCardTotal.className = "badge-cartao-resumo";
+            spanCardTotal.textContent = formatarMoeda(totalCartao);
+
+            cardHeader.appendChild(spanCardNome);
+            cardHeader.appendChild(spanCardTotal);
+            cardDiv.appendChild(cardHeader);
 
             if (registros.length === 0) {
-                cardDiv.innerHTML += `<p style="font-size: 11px; color: var(--text-muted-light); text-align: center; margin: 0.25rem 0;">Nenhum lançamento para esta fatura.</p>`;
+                const pVazio = document.createElement("p");
+                pVazio.style.cssText = "font-size: 11px; color: var(--text-muted-light); text-align: center; margin: 0.25rem 0;";
+                pVazio.textContent = "Nenhum lançamento para esta fatura.";
+                cardDiv.appendChild(pVazio);
             } else {
-                let subHtml = `<div class="subtotais-box" style="display: flex; flex-direction: column; gap: 0.25rem;"><span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;">Subtotais por Usuário:</span>`;
+                const subBox = document.createElement("div");
+                subBox.className = "subtotais-box";
+                subBox.style.cssText = "display: flex; flex-direction: column; gap: 0.25rem;";
+
+                const subTitle = document.createElement("span");
+                subTitle.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;";
+                subTitle.textContent = "Subtotais por Usuário:";
+                subBox.appendChild(subTitle);
+
                 for (const [dono, subtotal] of Object.entries(subtotaisPorDono)) {
-                    subHtml += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="font-mono">
-                            <span style="color: var(--text-muted-light);">👤 ${dono}</span> 
-                            <span style="color: var(--emerald-main); font-weight: 600;">${formatarMoeda(subtotal)}</span>
-                        </div>`;
+                    const subRow = document.createElement("div");
+                    subRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 11px;";
+                    subRow.className = "font-mono";
+
+                    const spanDono = document.createElement("span");
+                    spanDono.style.cssText = "color: var(--text-muted-light);";
+                    spanDono.textContent = `👤 ${dono}`;
+
+                    const spanSubVal = document.createElement("span");
+                    spanSubVal.style.cssText = "color: var(--emerald-main); font-weight: 600;";
+                    spanSubVal.textContent = formatarMoeda(subtotal);
+
+                    subRow.appendChild(spanDono);
+                    subRow.appendChild(spanSubVal);
+                    subBox.appendChild(subRow);
                 }
-                subHtml += `</div>`;
-                cardDiv.innerHTML += subHtml;
+                cardDiv.appendChild(subBox);
 
-                let itensHtml = `<span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;">Lançamentos (clique para detalhes):</span><ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem;">`;
+                const labelLanc = document.createElement("span");
+                labelLanc.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;";
+                labelLanc.textContent = "Lançamentos (clique para detalhes):";
+                cardDiv.appendChild(labelLanc);
+
+                const ulEl = document.createElement("ul");
+                ulEl.style.cssText = "list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem;";
+
                 registros.forEach(g => {
-                    const dadosJson = JSON.stringify({
-                        id: g.id,
-                        estabelecimento: g.estabelecimento,
-                        valor: g.valor,
-                        valorTotal: g.valor_total || g.valor,
-                        dono: g.dono,
-                        data: g.data,
-                        fatura: g.fatura,
-                        cartao: g.cartao
-                    }).replace(/"/g, '&quot;');
+                    const li = document.createElement("li");
+                    li.className = "inner-item-box";
+                    li.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 11px; cursor: pointer;";
 
-                    itensHtml += `
-                        <li onclick="mostrarModalDetalhes('${dadosJson}')" class="inner-item-box" style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; cursor: pointer;">
-                            <div style="display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
-                                    <span class="estabelecimento-nome" style="font-size: 11px; font-weight: 700; color: #475569;">${g.estabelecimento}</span>
-                                </div>
-                                <div style="display: flex; gap: 0.4rem; align-items: center; font-size: 9px; color: var(--text-muted-light);" class="font-mono">
-                                    <span>📅 ${formatarDataBR(g.data)}</span>
-                                    <span>•</span>
-                                    <span>👤 ${g.dono}</span>
-                                </div>
-                            </div>
-                            <span class="font-mono" style="color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
-                        </li>`;
+                    const divInfo = document.createElement("div");
+                    divInfo.style.cssText = "display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; flex: 1;";
+
+                    const divRow1 = document.createElement("div");
+                    divRow1.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 10px;";
+                    divRow1.className = "font-mono";
+
+                    const spanEst = document.createElement("span");
+                    spanEst.className = "estabelecimento-nome";
+                    spanEst.style.cssText = "font-size: 11px; font-weight: 700; color: #475569;";
+                    spanEst.textContent = g.estabelecimento;
+                    divRow1.appendChild(spanEst);
+
+                    const divRow2 = document.createElement("div");
+                    divRow2.style.cssText = "display: flex; gap: 0.4rem; align-items: center; font-size: 9px; color: var(--text-muted-light);";
+                    divRow2.className = "font-mono";
+                    divRow2.textContent = `📅 ${formatarDataBR(g.data)} • 👤 ${g.dono}`;
+
+                    divInfo.appendChild(divRow1);
+                    divInfo.appendChild(divRow2);
+
+                    const spanVal = document.createElement("span");
+                    spanVal.className = "font-mono";
+                    spanVal.style.cssText = "color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;";
+                    spanVal.textContent = formatarMoeda(g.valor);
+
+                    li.appendChild(divInfo);
+                    li.appendChild(spanVal);
+
+                    li.addEventListener('click', () => {
+                        mostrarModalDetalhes({
+                            id: g.id,
+                            estabelecimento: g.estabelecimento,
+                            valor: g.valor,
+                            valorTotal: g.valor_total || g.valor,
+                            dono: g.dono,
+                            data: g.data,
+                            fatura: g.fatura,
+                            cartao: g.cartao
+                        });
+                    });
+
+                    ulEl.appendChild(li);
                 });
-                itensHtml += `</ul>`;
-                cardDiv.innerHTML += itensHtml;
+                cardDiv.appendChild(ulEl);
             }
             container.appendChild(cardDiv);
         } catch (e) {
@@ -547,7 +650,7 @@ function abrirModalDetalhesResumo(dadosJson) {
 }
 
 function mostrarModalDetalhes(dadosJson) {
-    const dados = typeof dadosJson === 'string' ? JSON.parse(dadosJson.replace(/&quot;/g, '"')) : dadosJson;
+    const dados = typeof dadosJson === 'string' ? JSON.parse(dadosJson) : dadosJson;
     dadosModalAtual = dados;
     
     let modal = document.getElementById("modal-detalhes");
@@ -563,14 +666,14 @@ function mostrarModalDetalhes(dadosJson) {
     }
 
     modal.classList.remove("hidden");
-    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 1rem;";
+    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
 
     const isDark = document.body.classList.contains('dark-mode');
     const bgCor = isDark ? "#1e293b" : "#ffffff";
     const textoCor = isDark ? "#f1f5f9" : "#0f172a";
     const bordaCor = isDark ? "#334155" : "#e2e8f0";
 
-    container.style.cssText = `background-color: ${bgCor}; color: ${textoCor}; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 360px; position: relative; border: 1px solid ${bordaCor};`;
+    container.style.cssText = `background-color: ${bgCor}; color: ${textoCor}; padding: 1.125rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 300px; position: relative; border: 1px solid ${bordaCor}; box-sizing: border-box;`;
 
     let estabelecimentoLimpo = dados.estabelecimento;
     let parcelaInfo = "À vista";
@@ -585,65 +688,168 @@ function mostrarModalDetalhes(dadosJson) {
     const valorTotalFormatado = formatarMoeda(dados.valorTotal || dados.valor);
     const valorParcelaFormatado = formatarMoeda(dados.valor);
 
-    let conteudoHtml = `
-        <button onclick="fecharModalDetalhes()" style="position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #94a3b8; line-height: 1;">&times;</button>
-    `;
+    container.innerHTML = "";
+
+    const btnClose = document.createElement("button");
+    btnClose.style.cssText = "position: absolute; top: 0.625rem; right: 0.625rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #94a3b8; line-height: 1;";
+    btnClose.innerHTML = "&times;";
+    btnClose.addEventListener('click', fecharModalDetalhes);
+    container.appendChild(btnClose);
 
     if (confirmandoExclusaoModal) {
-        conteudoHtml += `
-            <div style="background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.875rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.625rem; margin-top: 0.5rem;">
-                <div style="font-size: 12px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;">
-                    <span>⚠ Confirmar exclusão?</span>
-                    <span class="font-mono" style="color: #92400e;">${valorParcelaFormatado}</span>
-                </div>
-                <div style="font-size: 11px; color: #d97706; word-break: break-word;">${dados.estabelecimento}</div>
-                <div style="display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;">
-                    <button onclick="cancelarExclusaoModal()" style="background-color: #e2e8f0; color: #334155; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Cancelar</button>
-                    <button onclick="efetivarExclusaoModal(${dados.id})" style="background-color: #dc2626; color: white; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Sim, Excluir</button>
-                </div>
-            </div>
-        `;
-    } else {
-        conteudoHtml += `
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div style="border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.75rem;">
-                    <p style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Estabelecimento original</p>
-                    <p style="font-size: 14px; font-weight: 700; color: ${textoCor};" class="estabelecimento-nome">${estabelecimentoLimpo}</p>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                    <div>
-                        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 0.15rem;">Status / Parcela</p>
-                        <p style="font-size: 12px; font-weight: 600; color: ${textoCor};">${parcelaInfo}</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 0.15rem;">👤 Usuário</p>
-                        <p style="font-size: 12px; font-weight: 600; color: ${textoCor};">${dados.dono}</p>
-                    </div>
-                </div>
-                <div style="background-color: ${isDark ? 'rgba(23, 147, 209, 0.25)' : '#e0f2fe'}; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid ${isDark ? '#0369a1' : '#bae6fd'}; display: flex; flex-direction: column; gap: 0.35rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;">Valor desta parcela:</span>
-                        <span style="font-size: 13px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;" class="font-mono">${valorParcelaFormatado}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;">Valor total da compra:</span>
-                        <span style="font-size: 13px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;" class="font-mono">${valorTotalFormatado}</span>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 11px; color: #94a3b8;">
-                    <span>📅 Compra: ${formatarDataBR(dados.data)}</span>
-                    <span>💳 Fatura: ${formatarFaturaBR(dados.fatura)}</span>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-top: 1px solid ${bordaCor}; padding-top: 0.75rem; margin-top: 0.25rem;">
-                    <button onclick="editarDoModal(${dados.id}, '${dados.data}', '${dados.fatura}', '${dados.cartao}', '${dados.dono}', '${dados.estabelecimento.replace(/'/g, "\\'")}', ${dados.valor})" style="background-color: #d97706; color: white; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">✏️ Editar</button>
-                    <button onclick="pedirConfirmacaoExclusaoModal()" style="background-color: #dc2626; color: white; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">🗑 Excluir</button>
-                </div>
-                <button onclick="fecharModalDetalhes()" style="background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">Fechar</button>
-            </div>
-        `;
-    }
+        const divDelBox = document.createElement("div");
+        divDelBox.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
 
-    container.innerHTML = conteudoHtml;
+        const divDelRow1 = document.createElement("div");
+        divDelRow1.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
+        
+        const spanDelWarn = document.createElement("span");
+        spanDelWarn.textContent = "⚠ Confirmar exclusão?";
+        const spanDelVal = document.createElement("span");
+        spanDelVal.className = "font-mono";
+        spanDelVal.style.color = "#92400e";
+        spanDelVal.textContent = valorParcelaFormatado;
+        divDelRow1.appendChild(spanDelWarn);
+        divDelRow1.appendChild(spanDelVal);
+
+        const divDelEst = document.createElement("div");
+        divDelEst.style.cssText = "font-size: 11px; color: #d97706; word-break: break-word;";
+        divDelEst.textContent = dados.estabelecimento;
+
+        const divDelBtns = document.createElement("div");
+        divDelBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
+
+        const btnCancelModal = document.createElement("button");
+        btnCancelModal.style.cssText = "background-color: #e2e8f0; color: #334155; padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+        btnCancelModal.textContent = "Cancelar";
+        btnCancelModal.addEventListener('click', cancelarExclusaoModal);
+
+        const btnConfirmModal = document.createElement("button");
+        btnConfirmModal.style.cssText = "background-color: #dc2626; color: white; padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+        btnConfirmModal.textContent = "Sim, Excluir";
+        btnConfirmModal.addEventListener('click', () => efetivarExclusaoModal(dados.id));
+
+        divDelBtns.appendChild(btnCancelModal);
+        divDelBtns.appendChild(btnConfirmModal);
+
+        divDelBox.appendChild(divDelRow1);
+        divDelBox.appendChild(divDelEst);
+        divDelBox.appendChild(divDelBtns);
+        container.appendChild(divDelBox);
+    } else {
+        const divMainContent = document.createElement("div");
+        divMainContent.style.cssText = "display: flex; flex-direction: column; gap: 0.75rem;";
+
+        const divEstOrig = document.createElement("div");
+        divEstOrig.style.cssText = `border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.5rem;`;
+        
+        const pEstLabel = document.createElement("p");
+        pEstLabel.style.cssText = "font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem;";
+        pEstLabel.textContent = "Estabelecimento original";
+
+        const pEstVal = document.createElement("p");
+        pEstVal.className = "estabelecimento-nome";
+        pEstVal.style.cssText = `font-size: 13px; font-weight: 700; color: ${textoCor}; word-break: break-word;`;
+        pEstVal.textContent = estabelecimentoLimpo;
+
+        divEstOrig.appendChild(pEstLabel);
+        divEstOrig.appendChild(pEstVal);
+
+        const divGrid1 = document.createElement("div");
+        divGrid1.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;";
+
+        const col1 = document.createElement("div");
+        const pCol1Lbl = document.createElement("p");
+        pCol1Lbl.style.cssText = "font-size: 10px; color: #94a3b8; margin-bottom: 0.1rem;";
+        pCol1Lbl.textContent = "Status / Parcela";
+        const pCol1Val = document.createElement("p");
+        pCol1Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
+        pCol1Val.textContent = parcelaInfo;
+        col1.appendChild(pCol1Lbl);
+        col1.appendChild(pCol1Val);
+
+        const col2 = document.createElement("div");
+        const pCol2Lbl = document.createElement("p");
+        pCol2Lbl.style.cssText = "font-size: 10px; color: #94a3b8; margin-bottom: 0.1rem;";
+        pCol2Lbl.textContent = "👤 Usuário";
+        const pCol2Val = document.createElement("p");
+        pCol2Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
+        pCol2Val.textContent = dados.dono;
+        col2.appendChild(pCol2Lbl);
+        col2.appendChild(pCol2Val);
+
+        divGrid1.appendChild(col1);
+        divGrid1.appendChild(col2);
+
+        const divHighlight = document.createElement("div");
+        divHighlight.style.cssText = `background-color: ${isDark ? 'rgba(23, 147, 209, 0.25)' : '#e0f2fe'}; padding: 0.625rem; border-radius: 0.75rem; border: 1px solid ${isDark ? '#0369a1' : '#bae6fd'}; display: flex; flex-direction: column; gap: 0.3rem;`;
+
+        const rowP = document.createElement("div");
+        rowP.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
+        const spanPLbl = document.createElement("span");
+        spanPLbl.style.cssText = `font-size: 10px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;`;
+        spanPLbl.textContent = "Valor desta parcela:";
+        const spanPVal = document.createElement("span");
+        spanPVal.className = "font-mono";
+        spanPVal.style.cssText = `font-size: 12px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;`;
+        spanPVal.textContent = valorParcelaFormatado;
+        rowP.appendChild(spanPLbl);
+        rowP.appendChild(spanPVal);
+
+        const rowT = document.createElement("div");
+        rowT.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
+        const spanTLbl = document.createElement("span");
+        spanTLbl.style.cssText = `font-size: 10px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;`;
+        spanTLbl.textContent = "Valor total da compra:";
+        const spanTVal = document.createElement("span");
+        spanTVal.className = "font-mono";
+        spanTVal.style.cssText = `font-size: 12px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;`;
+        spanTVal.textContent = valorTotalFormatado;
+        rowT.appendChild(spanTLbl);
+        rowT.appendChild(spanTVal);
+
+        divHighlight.appendChild(rowP);
+        divHighlight.appendChild(rowT);
+
+        const divMeta = document.createElement("div");
+        divMeta.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 10px; color: #94a3b8;";
+        const spanComp = document.createElement("span");
+        spanComp.textContent = `📅 Compra: ${formatarDataBR(dados.data)}`;
+        const spanFat = document.createElement("span");
+        spanFat.textContent = `💳 Fatura: ${formatarFaturaBR(dados.fatura)}`;
+        divMeta.appendChild(spanComp);
+        divMeta.appendChild(spanFat);
+
+        const divModalBtns = document.createElement("div");
+        divModalBtns.style.cssText = `display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-top: 1px solid ${bordaCor}; padding-top: 0.625rem; margin-top: 0.125rem;`;
+
+        const btnEditModal = document.createElement("button");
+        btnEditModal.style.cssText = "background-color: #d97706; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;";
+        btnEditModal.textContent = "✏️ Editar";
+        btnEditModal.addEventListener('click', () => editarDoModal(dados.id, dados.data, dados.fatura, dados.cartao, dados.dono, dados.estabelecimento, dados.valor));
+
+        const btnDelModal = document.createElement("button");
+        btnDelModal.style.cssText = "background-color: #dc2626; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;";
+        btnDelModal.textContent = "🗑 Excluir";
+        btnDelModal.addEventListener('click', pedirConfirmacaoExclusaoModal);
+
+        divModalBtns.appendChild(btnEditModal);
+        divModalBtns.appendChild(btnDelModal);
+
+        const btnCloseModal = document.createElement("button");
+        btnCloseModal.style.cssText = `background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%;`;
+        btnCloseModal.textContent = "Fechar";
+        btnCloseModal.addEventListener('click', fecharModalDetalhes);
+
+        divMainContent.appendChild(divEstOrig);
+        divMainContent.appendChild(divGrid1);
+        divMainContent.appendChild(divHighlight);
+        divMainContent.appendChild(divMeta);
+        divMainContent.appendChild(divModalBtns);
+        divMainContent.appendChild(btnCloseModal);
+
+        container.appendChild(divMainContent);
+    }
 }
 
 function fecharModalDetalhes() {
@@ -821,4 +1027,59 @@ function efetivarExclusao(id) {
     persistirBanco();
     atualizarAplicacao();
     mostrarAlerta("Lançamento excluído com sucesso!", "sucesso");
+}
+
+function exportarBackup() {
+    if (!db) {
+        mostrarAlerta("Banco de dados não inicializado!", "erro");
+        return;
+    }
+    try {
+        const binaryArray = db.export();
+        const blob = new Blob([binaryArray], { type: "application/x-sqlite3" });
+        const url = URL.createObjectURL(blob);
+        
+        const dataAtual = new Date().toISOString().slice(0, 10);
+        const nomeArquivo = `backup_cartao_${dataAtual}.sqlite`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = nomeArquivo;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        mostrarAlerta("Backup exportado com sucesso!", "sucesso");
+    } catch (e) {
+        console.error("Erro ao exportar backup:", e);
+        mostrarAlerta("Erro ao exportar backup.", "erro");
+    }
+}
+
+function importarBackup(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const arrayBuffer = e.target.result;
+            const uint8Array = new Uint8Array(arrayBuffer);
+            
+            initSqlJs({
+                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+            }).then(SQL => {
+                db = new SQL.Database(uint8Array);
+                persistirBanco();
+                atualizarAplicacao();
+                mostrarAlerta("Backup importado com sucesso!", "sucesso");
+            });
+        } catch (err) {
+            console.error("Erro ao importar backup:", err);
+            mostrarAlerta("Arquivo de backup inválido ou corrompido.", "erro");
+        }
+    };
+    reader.readAsArrayBuffer(arquivo);
+    event.target.value = "";
 }
