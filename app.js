@@ -628,10 +628,13 @@ function salvarOuAtualizarRegistro() {
 
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
-            // Aritmética de centavos inteiros blindada contra erros de ponto flutuante
             const valorTotalCentavos = Math.round(valorTotal * 100);
+            
+            // Usa Math.floor para definir o valor base padrão das parcelas
             const valorBaseCentavos = Math.floor(valorTotalCentavos / totalParcelas);
-            const restoCentavos = valorTotalCentavos % totalParcelas;
+            
+            // Concentra toda a diferença de centavos acumulada exclusivamente na 1ª parcela
+            const restoTotalCentavos = valorTotalCentavos - (valorBaseCentavos * totalParcelas);
 
             const [fatAno, fatMes] = faturaBaseStr.split('-');
             let anoFatura = parseInt(fatAno);
@@ -645,7 +648,7 @@ function salvarOuAtualizarRegistro() {
                 const mf = String(dataFaturaObj.getMonth() + 1).padStart(2, '0');
                 const faturaFormatada = `${af}-${mf}`;
 
-                let centavosDaParcela = valorBaseCentavos + (i <= restoCentavos ? 1 : 0);
+                let centavosDaParcela = valorBaseCentavos + (i === 1 ? restoTotalCentavos : 0);
                 let valorAtualParcela = centavosDaParcela / 100;
 
                 const nomeEstabelecimento = `${estabelecimentoBase} - Parcela ${i}/${totalParcelas}`;
