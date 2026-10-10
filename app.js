@@ -9,8 +9,9 @@ const STORAGE_KEY = "sqlite_cartao_backup_v9";
 const THEME_KEY = "app_theme_mode";
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
+let confirmandoExclusaoModal = false;
+let dadosModalAtual = null;
 
-// Inicializa o padrão com Visa 10 e Jairo
 let cartaoSelecionadoState = "Visa - 10";
 let usuarioSelecionadoState = "Jairo";
 
@@ -184,7 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Inicialização segura do sql.js: prioriza estritamente os dados salvos sem sobrescrever
 initSqlJs({
     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
 }).then(SQL => {
@@ -210,12 +210,17 @@ initSqlJs({
             cartao TEXT NOT NULL,
             dono_do_cartao TEXT NOT NULL,
             estabelecimento TEXT NOT NULL,
-            valor REAL NOT NULL
+            valor REAL NOT NULL,
+            valor_total REAL DEFAULT 0
         );
     `);
     
     try {
         db.run("ALTER TABLE cartao_gastos ADD COLUMN fatura TEXT DEFAULT '2026-10'");
+    } catch (e) {}
+
+    try {
+        db.run("ALTER TABLE cartao_gastos ADD COLUMN valor_total REAL DEFAULT 0");
     } catch (e) {}
 
     try {
@@ -294,58 +299,6 @@ function persistirBanco() {
     localStorage.setItem(STORAGE_KEY, hexString);
 }
 
-function exportarBackup() {
-    try {
-        const binaryArray = db.export();
-        const blob = new Blob([binaryArray], { type: 'application/x-sqlite3' });
-        const url = URL.createObjectURL(blob);
-        const dataHoje = new Date().toISOString().split('T')[0];
-        const nomeArquivo = `backup_gastos_${dataHoje}.sqlite`;
-
-        const linkTemp = document.createElement('a');
-        linkTemp.href = url;
-        linkTemp.download = nomeArquivo;
-        
-        document.body.appendChild(linkTemp);
-        linkTemp.click();
-        
-        document.body.removeChild(linkTemp);
-        URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error("Erro ao exportar backup:", error);
-        alert("Erro ao gerar o arquivo de backup.");
-    }
-}
-
-function importarBackup(event) {
-    const arquivo = event.target.files[0];
-    if (!arquivo) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const uInt8Array = new Uint8Array(e.target.result);
-            initSqlJs({
-                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
-            }).then(SQL => {
-                db = new SQL.Database(uInt8Array);
-                persistirBackupDireto(uInt8Array);
-                cancelarEdicao();
-                atualizarAplicacao();
-                mostrarAlerta("Banco de dados importado com sucesso!", "sucesso");
-            });
-        } catch (err) {
-            mostrarAlerta("Erro ao importar o arquivo SQLite.", "erro");
-        }
-        event.target.value = "";
-    };
-    reader.readAsArrayBuffer(arquivo);
-}
-
-function persistirBackupDireto(uInt8Array) {
-    const hexString = Array.from(uInt8Array).map(b => b.toString(16).padStart(2, '0')).join('');
-    localStorage.setItem(STORAGE_KEY, hexString);
-}
-
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
@@ -397,6 +350,7 @@ function mudarAba(aba) {
     const tabLanc = document.getElementById("tab-lancamentos");
     const tabRes = document.getElementById("tab-resumo");
 
+    fecharModalDetalhes();
     idEmExclusaoPendente = null;
 
     if (aba === 'lancamentos') {
@@ -470,13 +424,18 @@ function carregarRegistros() {
                 li.className = "inner-item-box";
                 li.style.cssText = "display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;";
                 li.innerHTML = `
-                    <div style="display: flex; flex-direction: column; gap: 0.125rem; flex: 1; min-width: 0;">
+                    <div style="display: flex; flex-direction: column; gap: 0.05rem; flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
-                            <span style="color: var(--text-muted-light);">📅 Compra: ${formatarDataBR(data)}</span> 
+                            <span class="estabelecimento-nome" style="font-size: 12px; font-weight: 700; color: #475569;">${estabelecimento}</span>
                             <span style="color: var(--emerald-main); font-weight: 800; font-size: 12px;">${formatarMoeda(valor)}</span>
                         </div>
-                        <p class="estabelecimento-nome">${estabelecimento}</p>
-                        <span style="font-size: 10px; color: var(--text-muted-light);">💳 ${cartao} • Fatura: ${formatarFaturaBR(fatura)} • 👤 ${dono}</span>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; font-size: 10px; color: var(--text-muted-light);" class="font-mono">
+                            <span>📅 ${formatarDataBR(data)}</span>
+                            <span>•</span>
+                            <span>💳 ${cartao}</span>
+                            <span>•</span>
+                            <span>👤 ${dono}</span>
+                        </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.25rem;">
                         <button onclick="carregarParaEdicao(${id}, '${data}', '${fatura}', '${cartao}', '${dono}', '${estabelecimento.replace(/'/g, "\\'")}', ${valor})" style="background: none; border: none; color: var(--text-muted-light); cursor: pointer; padding: 0.375rem; font-size: 12px;" title="Editar">✏️</button>
@@ -506,7 +465,7 @@ function gerarResumoPorCartao() {
 
     cartoesFixos.forEach(cartao => {
         try {
-            const stmt = db.prepare("SELECT data, fatura, dono_do_cartao, estabelecimento, valor FROM cartao_gastos WHERE cartao = ? AND fatura = ? ORDER BY dono_do_cartao ASC, data DESC");
+            const stmt = db.prepare("SELECT id, data, fatura, cartao, dono_do_cartao, estabelecimento, valor, valor_total FROM cartao_gastos WHERE cartao = ? AND fatura = ? ORDER BY dono_do_cartao ASC, data DESC");
             stmt.bind([cartao, faturaFiltroStr]);
             
             const registros = [];
@@ -514,8 +473,8 @@ function gerarResumoPorCartao() {
             const subtotaisPorDono = {};
 
             while (stmt.step()) {
-                const [data, fatura, dono, estabelecimento, valor] = stmt.get();
-                registros.push({ data, fatura, dono, estabelecimento, valor });
+                const [id, data, fatura, cartaoBanco, dono, estabelecimento, valor, valor_total] = stmt.get();
+                registros.push({ id, data, fatura, cartao: cartaoBanco, dono, estabelecimento, valor, valor_total });
                 totalCartao += valor;
                 subtotaisPorDono[dono] = (subtotaisPorDono[dono] || 0) + valor;
             }
@@ -523,7 +482,7 @@ function gerarResumoPorCartao() {
 
             const cardDiv = document.createElement("div");
             cardDiv.className = "inner-item-box";
-            cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem;";
+            cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;";
             cardDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;">
                     <span style="font-weight: bold; color: var(--emerald-main); font-size: 12px;">💳 Cartão: ${cartao}</span> 
@@ -545,13 +504,30 @@ function gerarResumoPorCartao() {
                 subHtml += `</div>`;
                 cardDiv.innerHTML += subHtml;
 
-                let itensHtml = `<span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;">Lançamentos:</span><ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem;">`;
+                let itensHtml = `<span style="font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;">Lançamentos (clique para detalhes):</span><ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.25rem;">`;
                 registros.forEach(g => {
+                    const dadosJson = JSON.stringify({
+                        id: g.id,
+                        estabelecimento: g.estabelecimento,
+                        valor: g.valor,
+                        valorTotal: g.valor_total || g.valor,
+                        dono: g.dono,
+                        data: g.data,
+                        fatura: g.fatura,
+                        cartao: g.cartao
+                    }).replace(/"/g, '&quot;');
+
                     itensHtml += `
-                        <li style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;" class="inner-item-box">
-                            <div style="display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex: 1;">
-                                <span class="estabelecimento-nome">${g.estabelecimento}</span>
-                                <span style="font-size: 10px; color: var(--text-muted-light);" class="font-mono">👤 ${g.dono}</span>
+                        <li onclick="mostrarModalDetalhes('${dadosJson}')" class="inner-item-box" style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; cursor: pointer;">
+                            <div style="display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; flex: 1;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px;" class="font-mono">
+                                    <span class="estabelecimento-nome" style="font-size: 11px; font-weight: 700; color: #475569;">${g.estabelecimento}</span>
+                                </div>
+                                <div style="display: flex; gap: 0.4rem; align-items: center; font-size: 9px; color: var(--text-muted-light);" class="font-mono">
+                                    <span>📅 ${formatarDataBR(g.data)}</span>
+                                    <span>•</span>
+                                    <span>👤 ${g.dono}</span>
+                                </div>
                             </div>
                             <span class="font-mono" style="color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;">${formatarMoeda(g.valor)}</span>
                         </li>`;
@@ -566,9 +542,159 @@ function gerarResumoPorCartao() {
     });
 }
 
+function abrirModalDetalhesResumo(dadosJson) {
+    mostrarModalDetalhes(dadosJson);
+}
+
+function mostrarModalDetalhes(dadosJson) {
+    const dados = typeof dadosJson === 'string' ? JSON.parse(dadosJson.replace(/&quot;/g, '"')) : dadosJson;
+    dadosModalAtual = dados;
+    
+    let modal = document.getElementById("modal-detalhes");
+    let container = document.getElementById("modal-detalhes-conteudo");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "modal-detalhes";
+        container = document.createElement("div");
+        container.id = "modal-detalhes-conteudo";
+        modal.appendChild(container);
+        document.body.appendChild(modal);
+    }
+
+    modal.classList.remove("hidden");
+    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 1rem;";
+
+    const isDark = document.body.classList.contains('dark-mode');
+    const bgCor = isDark ? "#1e293b" : "#ffffff";
+    const textoCor = isDark ? "#f1f5f9" : "#0f172a";
+    const bordaCor = isDark ? "#334155" : "#e2e8f0";
+
+    container.style.cssText = `background-color: ${bgCor}; color: ${textoCor}; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 360px; position: relative; border: 1px solid ${bordaCor};`;
+
+    let estabelecimentoLimpo = dados.estabelecimento;
+    let parcelaInfo = "À vista";
+    
+    const regexParcela = / - Parcela (\d+)\/(\d+)$/;
+    const match = dados.estabelecimento.match(regexParcela);
+    if (match) {
+        estabelecimentoLimpo = dados.estabelecimento.replace(regexParcela, "");
+        parcelaInfo = `Parcela ${match[1]} de ${match[2]}`;
+    }
+
+    const valorTotalFormatado = formatarMoeda(dados.valorTotal || dados.valor);
+    const valorParcelaFormatado = formatarMoeda(dados.valor);
+
+    let conteudoHtml = `
+        <button onclick="fecharModalDetalhes()" style="position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #94a3b8; line-height: 1;">&times;</button>
+    `;
+
+    if (confirmandoExclusaoModal) {
+        conteudoHtml += `
+            <div style="background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.875rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.625rem; margin-top: 0.5rem;">
+                <div style="font-size: 12px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;">
+                    <span>⚠ Confirmar exclusão?</span>
+                    <span class="font-mono" style="color: #92400e;">${valorParcelaFormatado}</span>
+                </div>
+                <div style="font-size: 11px; color: #d97706; word-break: break-word;">${dados.estabelecimento}</div>
+                <div style="display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;">
+                    <button onclick="cancelarExclusaoModal()" style="background-color: #e2e8f0; color: #334155; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Cancelar</button>
+                    <button onclick="efetivarExclusaoModal(${dados.id})" style="background-color: #dc2626; color: white; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;">Sim, Excluir</button>
+                </div>
+            </div>
+        `;
+    } else {
+        conteudoHtml += `
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.75rem;">
+                    <p style="font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Estabelecimento original</p>
+                    <p style="font-size: 14px; font-weight: 700; color: ${textoCor};" class="estabelecimento-nome">${estabelecimentoLimpo}</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div>
+                        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 0.15rem;">Status / Parcela</p>
+                        <p style="font-size: 12px; font-weight: 600; color: ${textoCor};">${parcelaInfo}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 10px; color: #94a3b8; margin-bottom: 0.15rem;">👤 Usuário</p>
+                        <p style="font-size: 12px; font-weight: 600; color: ${textoCor};">${dados.dono}</p>
+                    </div>
+                </div>
+                <div style="background-color: ${isDark ? 'rgba(23, 147, 209, 0.25)' : '#e0f2fe'}; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid ${isDark ? '#0369a1' : '#bae6fd'}; display: flex; flex-direction: column; gap: 0.35rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;">Valor desta parcela:</span>
+                        <span style="font-size: 13px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;" class="font-mono">${valorParcelaFormatado}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;">Valor total da compra:</span>
+                        <span style="font-size: 13px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;" class="font-mono">${valorTotalFormatado}</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 11px; color: #94a3b8;">
+                    <span>📅 Compra: ${formatarDataBR(dados.data)}</span>
+                    <span>💳 Fatura: ${formatarFaturaBR(dados.fatura)}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-top: 1px solid ${bordaCor}; padding-top: 0.75rem; margin-top: 0.25rem;">
+                    <button onclick="editarDoModal(${dados.id}, '${dados.data}', '${dados.fatura}', '${dados.cartao}', '${dados.dono}', '${dados.estabelecimento.replace(/'/g, "\\'")}', ${dados.valor})" style="background-color: #d97706; color: white; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">✏️ Editar</button>
+                    <button onclick="pedirConfirmacaoExclusaoModal()" style="background-color: #dc2626; color: white; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">🗑 Excluir</button>
+                </div>
+                <button onclick="fecharModalDetalhes()" style="background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: none; padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">Fechar</button>
+            </div>
+        `;
+    }
+
+    container.innerHTML = conteudoHtml;
+}
+
+function fecharModalDetalhes() {
+    confirmandoExclusaoModal = false;
+    dadosModalAtual = null;
+    const modal = document.getElementById("modal-detalhes");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+    }
+}
+
+function pedirConfirmacaoExclusaoModal() {
+    confirmandoExclusaoModal = true;
+    if (dadosModalAtual) {
+        mostrarModalDetalhes(dadosModalAtual);
+    }
+}
+
+function cancelarExclusaoModal() {
+    confirmandoExclusaoModal = false;
+    if (dadosModalAtual) {
+        mostrarModalDetalhes(dadosModalAtual);
+    }
+}
+
+function efetivarExclusaoModal(id) {
+    if (!db) return;
+    const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
+    stmt.run([id]);
+    stmt.free();
+
+    confirmandoExclusaoModal = false;
+    dadosModalAtual = null;
+    persistirBanco();
+    fecharModalDetalhes();
+    gerarResumoPorCartao();
+    mostrarAlerta("Lançamento excluído com sucesso!", "sucesso");
+}
+
+function editarDoModal(id, data, fatura, cartao, dono, estabelecimento, valor) {
+    confirmandoExclusaoModal = false;
+    fecharModalDetalhes();
+    mudarAba('lancamentos');
+    carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, valor);
+}
+
 function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, valor) {
     idEmEdicao = id;
     idEmExclusaoPendente = null;
+    fecharModalDetalhes();
     document.getElementById("input-data").value = data;
     document.getElementById("input-fatura").value = fatura || "2026-10";
     atualizarTextoFaturaVisual();
@@ -629,18 +755,14 @@ function salvarOuAtualizarRegistro() {
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
             const valorTotalCentavos = Math.round(valorTotal * 100);
-            
-            // Usa Math.floor para definir o valor base padrão das parcelas
             const valorBaseCentavos = Math.floor(valorTotalCentavos / totalParcelas);
-            
-            // Concentra toda a diferença de centavos acumulada exclusivamente na 1ª parcela
             const restoTotalCentavos = valorTotalCentavos - (valorBaseCentavos * totalParcelas);
 
             const [fatAno, fatMes] = faturaBaseStr.split('-');
             let anoFatura = parseInt(fatAno);
             let mesFatura = parseInt(fatMes) - 1;
 
-            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
+            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor, valor_total) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             for (let i = 1; i <= totalParcelas; i++) {
                 const dataFaturaObj = new Date(anoFatura, mesFatura + (i - 1), 1);
@@ -652,44 +774,31 @@ function salvarOuAtualizarRegistro() {
                 let valorAtualParcela = centavosDaParcela / 100;
 
                 const nomeEstabelecimento = `${estabelecimentoBase} - Parcela ${i}/${totalParcelas}`;
-                stmt.run([dataStr, faturaFormatada, cartao, dono, nomeEstabelecimento, valorAtualParcela]);
+                stmt.run([dataStr, faturaFormatada, cartao, dono, nomeEstabelecimento, valorAtualParcela, valorTotal]);
             }
             stmt.free();
             mostrarAlerta(`${totalParcelas} parcelas geradas com sucesso!`, "sucesso");
         } else {
-            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor) VALUES (?, ?, ?, ?, ?, ?)");
-            stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal]);
+            const stmt = db.prepare("INSERT INTO cartao_gastos (data, fatura, cartao, dono_do_cartao, estabelecimento, valor, valor_total) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, valorTotal]);
             stmt.free();
             mostrarAlerta("Lançamento salvo com sucesso!", "sucesso");
         }
     } else {
-        const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, fatura = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ? WHERE id = ?");
-        stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, idEmEdicao]);
+        const stmt = db.prepare("UPDATE cartao_gastos SET data = ?, fatura = ?, cartao = ?, dono_do_cartao = ?, estabelecimento = ?, valor = ?, valor_total = ? WHERE id = ?");
+        stmt.run([dataStr, faturaBaseStr, cartao, dono, estabelecimentoBase, valorTotal, valorTotal, idEmEdicao]);
         stmt.free();
         mostrarAlerta("Lançamento atualizado com sucesso!", "sucesso");
     }
 
     persistirBanco();
-
-    // Limpa os campos e reseta o formulário após salvar/atualizar
-    idEmEdicao = null;
-    document.getElementById("input-estabelecimento").value = "";
-    document.getElementById("input-valor").value = "";
-    document.getElementById("input-parcelas-total").value = "1";
-    definirValoresPadrao();
-    selecionarCartao("Visa - 10");
-
-    const tituloEl = document.getElementById("titulo-formulario");
-    if (tituloEl) {
-        tituloEl.textContent = "Novo Lançamento";
-        tituloEl.style.color = "var(--emerald-main)";
-    }
-
+    cancelarEdicao();
     ativarBotaoSalvar();
     atualizarAplicacao();
 }
 
 function pedirConfirmacaoExclusao(id) {
+    fecharModalDetalhes();
     idEmExclusaoPendente = id;
     carregarRegistros();
 }
@@ -702,6 +811,7 @@ function cancelarExclusao() {
 function efetivarExclusao(id) {
     if (!db) return;
     if (idEmEdicao === id) cancelarEdicao();
+    fecharModalDetalhes();
 
     const stmt = db.prepare("DELETE FROM cartao_gastos WHERE id = ?");
     stmt.run([id]);
