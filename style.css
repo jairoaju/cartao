@@ -174,7 +174,7 @@ body {
 }
 
 header {
-    padding: 1rem;
+    padding: 0.375rem 1rem; /* Reduzido de 1rem para 0.375rem na altura (cima/baixo) */
     background-color: var(--card-light);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
