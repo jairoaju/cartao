@@ -7,6 +7,8 @@ if ('serviceWorker' in navigator) {
 let db = null;
 const STORAGE_KEY = "sqlite_cartao_backup_v9";
 const THEME_KEY = "app_theme_mode";
+const MELHOR_DIA_CONFIG_KEY = "sqlite_cartao_melhor_dia_v2";
+
 let idEmEdicao = null;
 let idEmExclusaoPendente = null;
 let confirmandoExclusaoModal = false;
@@ -18,35 +20,122 @@ let usuarioSelecionadoState = "Jairo";
 let dataFiltroHistorico = new Date();
 let dataFiltroResumo = new Date();
 
+let configMelhoresDiasMensal = {};
+
+function carregarMelhoresDias() {
+    const salvo = localStorage.getItem(MELHOR_DIA_CONFIG_KEY);
+    if (salvo) {
+        try {
+            configMelhoresDiasMensal = JSON.parse(salvo);
+        } catch (e) {
+            console.error("Erro ao carregar melhores dias:", e);
+        }
+    }
+}
+
+function salvarMelhorDiaMes(faturaAnoMes, cartao, dia) {
+    if (!configMelhoresDiasMensal[faturaAnoMes]) {
+        configMelhoresDiasMensal[faturaAnoMes] = { "Visa - 10": 11, "Visa - 25": 26 };
+    }
+    configMelhoresDiasMensal[faturaAnoMes][cartao] = parseInt(dia) || 1;
+    localStorage.setItem(MELHOR_DIA_CONFIG_KEY, JSON.stringify(configMelhoresDiasMensal));
+    atualizarFaturaSugerida();
+}
+
+function obterMelhorDiaAtual(faturaAnoMes, cartao) {
+    if (configMelhoresDiasMensal[faturaAnoMes] && configMelhoresDiasMensal[faturaAnoMes][cartao]) {
+        return configMelhoresDiasMensal[faturaAnoMes][cartao];
+    }
+    return cartao === "Visa - 10" ? 11 : 26;
+}
+
+carregarMelhoresDias();
+
 function inicializarTema() {
     const temaSalvo = localStorage.getItem(THEME_KEY);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
     if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
         document.body.classList.add('dark-mode');
-        document.getElementById('btn-tema').textContent = '☀️';
-        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
+        const metaTheme = document.getElementById('meta-theme-color');
+        if (metaTheme) metaTheme.setAttribute('content', '#020617');
     } else {
         document.body.classList.remove('dark-mode');
-        document.getElementById('btn-tema').textContent = '🌙';
-        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+        const metaTheme = document.getElementById('meta-theme-color');
+        if (metaTheme) metaTheme.setAttribute('content', '#ffffff');
     }
 }
 
 function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
+    const metaTheme = document.getElementById('meta-theme-color');
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
-        document.getElementById('btn-tema').textContent = '☀️';
-        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
+        if (metaTheme) metaTheme.setAttribute('content', '#020617');
     } else {
         localStorage.setItem(THEME_KEY, 'light');
-        document.getElementById('btn-tema').textContent = '🌙';
-        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+        if (metaTheme) metaTheme.setAttribute('content', '#ffffff');
     }
 }
 
 inicializarTema();
+
+function abrirModalConfiguracoesGerais() {
+    let modal = document.getElementById("modal-configuracoes-gerais");
+    let container = document.getElementById("modal-configuracoes-conteudo");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "modal-configuracoes-gerais";
+        container = document.createElement("div");
+        container.id = "modal-configuracoes-conteudo";
+        modal.appendChild(container);
+        document.body.appendChild(modal);
+    }
+
+    modal.classList.remove("hidden");
+    modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
+
+    const isDark = document.body.classList.contains('dark-mode');
+    const bgCor = isDark ? "#1e293b" : "#ffffff";
+    const textoCor = isDark ? "#f1f5f9" : "#0f172a";
+    const bordaCor = isDark ? "#334155" : "#e2e8f0";
+
+    container.style.cssText = `background-color: ${bgCor}; color: ${textoCor}; padding: 1.25rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); width: 100%; max-width: 300px; position: relative; border: 1px solid ${bordaCor}; box-sizing: border-box; display: flex; flex-direction: column; gap: 0.85rem;`;
+
+    container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 13px;">⚙️ Configurações</span>
+            <button onclick="fecharModalConfiguracoesGerais()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #94a3b8; line-height: 1;">&times;</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 0.25rem 0;">
+            <span>Aparência:</span>
+            <button onclick="alternarTema(); fecharModalConfiguracoesGerais();" style="background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: 1px solid ${bordaCor}; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
+                ${isDark ? '☀️ Modo Claro' : '🌙 Modo Escuro'}
+            </button>
+        </div>
+
+        <div style="border-top: 1px solid ${bordaCor}; pt-3; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; padding-top: 0.5rem;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-muted-light);">Melhor Dia de Compra</span>
+            <button onclick="fecharModalConfiguracoesGerais(); abrirModalMelhoresDias();" style="background-color: var(--emerald-main, #0284c7); color: white; border: none; padding: 0.45rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;">
+                📅 Configurar Dias da Fatura
+            </button>
+        </div>
+
+        <button onclick="fecharModalConfiguracoesGerais()" style="background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 0.25rem;">
+            Fechar
+        </button>
+    `;
+}
+
+function fecharModalConfiguracoesGerais() {
+    const modal = document.getElementById("modal-configuracoes-gerais");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+    }
+}
 
 function selecionarCartao(cartao) {
     cartaoSelecionadoState = cartao;
@@ -66,6 +155,7 @@ function selecionarCartao(cartao) {
     } else {
         selecionarUsuario(usuarioSelecionadoState);
     }
+    atualizarFaturaSugerida();
 }
 
 function selecionarUsuario(usuario) {
@@ -149,6 +239,46 @@ function atualizarTextoFaturaVisual() {
     }
 }
 
+function calcularFaturaSugerida(dataIso, cartao) {
+    if (!dataIso) return "";
+    const partes = dataIso.split('-');
+    if (partes.length !== 3) return "";
+
+    let ano = parseInt(partes[0]);
+    let mes = parseInt(partes[1]) - 1;
+    const dia = parseInt(partes[2]);
+
+    const mesStrBase = String(mes + 1).padStart(2, '0');
+    const faturaBase = `${ano}-${mesStrBase}`;
+
+    const melhorDia = obterMelhorDiaAtual(faturaBase, cartao);
+
+    if (dia >= melhorDia) {
+        mes += 1;
+        if (mes > 11) {
+            mes = 0;
+            ano += 1;
+        }
+    }
+
+    const mesStr = String(mes + 1).padStart(2, '0');
+    return `${ano}-${mesStr}`;
+}
+
+function atualizarFaturaSugerida() {
+    if (idEmEdicao !== null) return;
+    const inputData = document.getElementById('input-data');
+    const inputFatura = document.getElementById('input-fatura');
+    
+    if (inputData && inputFatura) {
+        const faturaSugerida = calcularFaturaSugerida(inputData.value, cartaoSelecionadoState);
+        if (faturaSugerida) {
+            inputFatura.value = faturaSugerida;
+            atualizarTextoFaturaVisual();
+        }
+    }
+}
+
 function definirValoresPadrao() {
     if (idEmEdicao !== null) return;
     const hoje = new Date();
@@ -157,11 +287,9 @@ function definirValoresPadrao() {
     const dia = String(hoje.getDate()).padStart(2, '0');
     
     const inputData = document.getElementById('input-data');
-    const inputFatura = document.getElementById('input-fatura');
-
     if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
-    if (inputFatura) inputFatura.value = `${ano}-${mes}`;
-    atualizarTextoFaturaVisual();
+
+    atualizarFaturaSugerida();
 }
 
 definirValoresPadrao();
@@ -169,6 +297,9 @@ selecionarCartao("Visa - 10");
 
 document.addEventListener("DOMContentLoaded", () => {
     const inputValor = document.getElementById("input-valor");
+    const inputData = document.getElementById("input-data");
+    const inputFatura = document.getElementById("input-fatura");
+
     if (inputValor) {
         inputValor.addEventListener("keydown", function(event) {
             if (event.key === "Enter" || event.keyCode === 13) {
@@ -181,6 +312,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     inputParcelas.focus();
                 }
             }
+        });
+    }
+
+    if (inputData) {
+        inputData.addEventListener("change", () => {
+            atualizarFaturaSugerida();
+        });
+    }
+
+    if (inputFatura) {
+        inputFatura.addEventListener("change", () => {
+            atualizarTextoFaturaVisual();
         });
     }
 });
@@ -643,6 +786,27 @@ function gerarResumoPorCartao() {
             console.error("Erro no resumo:", e);
         }
     });
+}
+
+function abrirModalMelhoresDias() {
+    const inputData = document.getElementById("input-data");
+    const dataIso = inputData ? inputData.value : new Date().toISOString().slice(0, 10);
+    const faturaBase = dataIso.slice(0, 7);
+
+    const dia10Atual = obterMelhorDiaAtual(faturaBase, "Visa - 10");
+    const dia25Atual = obterMelhorDiaAtual(faturaBase, "Visa - 25");
+
+    const novoDia10 = prompt(`A partir de qual dia as compras do Visa - 10 vão para a próxima fatura em ${faturaBase}?`, dia10Atual);
+    if (novoDia10 !== null && novoDia10.trim() !== "") {
+        salvarMelhorDiaMes(faturaBase, "Visa - 10", novoDia10);
+    }
+
+    const novoDia25 = prompt(`A partir de qual dia as compras do Visa - 25 vão para a próxima fatura em ${faturaBase}?`, dia25Atual);
+    if (novoDia25 !== null && novoDia25.trim() !== "") {
+        salvarMelhorDiaMes(faturaBase, "Visa - 25", novoDia25);
+    }
+
+    mostrarAlerta("Melhores dias atualizados para esta fatura!", "sucesso");
 }
 
 function abrirModalDetalhesResumo(dadosJson) {
