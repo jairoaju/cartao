@@ -92,4 +92,71 @@
                     <button type="button" id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled class="btn-acao btn-desativado w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Salvar Lançamento</button>
                     
                     <div id="botoes-edicao-container" style="display: none !important;" class="grid-cols-2 gap-2">
-                        <button type="button" onclick="cancelarEdicao()" class="btn-acao bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 py-2.5
+                        <button type="button" onclick="cancelarEdicao()" class="btn-acao bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancelar</button>
+                        <button type="button" id="btn-confirma" onclick="salvarOuAtualizarRegistro()" class="btn-acao bg-amber-600 hover:bg-amber-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Atualizar</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Card de Histórico -->
+            <div class="card-base p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <button onclick="mudarMesHistorico(-1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Mês Anterior">◀</button>
+                    <span id="label-mes-filtro" class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">Fatura: --</span>
+                    <button onclick="mudarMesHistorico(1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Próximo Mês">▶</button>
+                </div>
+
+                <ul id="lista-registros" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
+                    <li class="text-slate-400 text-xs text-center py-4">Carregando lançamentos...</li>
+                </ul>
+
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-2.5 flex justify-between items-center">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total da Fatura</span>
+                    <span id="total-geral" class="font-mono font-extrabold text-sm text-sky-600 dark:text-sky-400">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Backup -->
+            <div class="flex gap-2">
+                <button type="button" onclick="exportarBackup()" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+                    📤 Exportar Backup
+                </button>
+                <label class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center">
+                    📥 Importar Backup
+                    <input type="file" accept=".sqlite" onchange="importarBackup(event)" class="hidden">
+                </label>
+            </div>
+
+        </section>
+
+        <!-- SEÇÃO 2: RESUMO POR CARTÃO -->
+        <section id="secao-resumo" class="hidden flex-col gap-4">
+            <div class="card-base p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <button onclick="mudarMesResumo(-1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Mês Anterior">◀</button>
+                    <span id="label-mes-resumo" class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">Fatura: --</span>
+                    <button onclick="mudarMesResumo(1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Próximo Mês">▶</button>
+                </div>
+
+                <div id="conteudo-resumo" class="flex flex-col gap-3">
+                    <!-- Preenchido via app.js -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé com o Botão de Configurações fixo no canto inferior esquerdo -->
+    <footer class="fixed bottom-0 left-0 w-full flex justify-start p-4 pointer-events-none z-50">
+        <button type="button" 
+                onclick="abrirModalConfiguracoesGerais()" 
+                class="pointer-events-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full w-12 h-12 flex items-center justify-center text-xl shadow-lg hover:scale-105 transition-transform cursor-pointer" 
+                title="Configurações">
+            ⚙️
+        </button>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
