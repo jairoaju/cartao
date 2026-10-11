@@ -1,130 +1,172 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta id="meta-theme-color" name="theme-color" content="#ffffff">
-<title>Controle de Cartões</title>
-<!-- Tailwind CSS CDN para estilização rápida e responsiva -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- sql.js para gerenciar banco de dados SQLite local no navegador -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff" id="meta-theme-color">
+    <title>Controle de Gastos do Cartão</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-slate-50 text-slate-800 transition-colors duration-200 min-h-screen flex flex-col pb-16">
-​<!-- Conteúdo Principal -->
-<main class="max-w-md mx-auto w-full p-4 flex flex-col gap-4 flex-1">
-​<!-- Bloco de Alerta do Sistema -->
-<div id="app-alerta" class="hidden text-xs font-medium p-3 rounded-xl border transition-all duration-200 text-center shadow-sm"></div>
-​<!-- Abas de Navegação (Lançamentos / Resumo por Cartão) -->
-<nav class="flex rounded-xl p-1 bg-slate-200/70 dark:bg-slate-800 gap-1 select-none">
-<button id="tab-lancamentos" onclick="mudarAba('lancamentos')" class="tab-btn tab-ativa flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer">Lançamentos</button>
-<button id="tab-resumo" onclick="mudarAba('resumo')" class="tab-btn tab-inativa flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer">Resumo por Cartão</button>
-</nav>
-​<!-- SEÇÃO 1: LANÇAMENTOS -->
-<section id="secao-lancamentos" class="flex flex-col gap-4">
-​<!-- Card de Formulário de Cadastro / Edição -->
-<div class="card-base p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-​<!-- Título do Formulário -->
-<div class="flex justify-between items-center">
-<h2 id="titulo-formulario" class="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Novo Lançamento</h2>
-</div>
-​<!-- Seleção de Cartão (Pílulas) -->
-<div class="flex flex-col gap-1.5">
-<label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cartão</label>
-<div class="grid grid-cols-2 gap-2">
-<button type="button" id="card-cartao-visa10" onclick="selecionarCartao('Visa - 10')" class="pill-card py-2 px-3 rounded-xl border font-mono text-xs font-bold text-center transition-all cursor-pointer">Visa - 10</button>
-<button type="button" id="card-cartao-visa25" onclick="selecionarCartao('Visa - 25')" class="pill-card py-2 px-3 rounded-xl border font-mono text-xs font-bold text-center transition-all cursor-pointer">Visa - 25</button>
-</div>
-</div>
-​<!-- Seleção de Usuário (Pílulas) -->
-<div class="flex flex-col gap-1.5">
-<label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Usuário</label>
-<div class="grid grid-cols-3 gap-1.5">
-<button type="button" id="card-usuario-jairo" onclick="selecionarUsuario('Jairo')" class="pill-card py-1.5 px-2 rounded-xl border text-[11px] font-bold text-center transition-all cursor-pointer">Jairo</button>
-<button type="button" id="card-usuario-katia" onclick="selecionarUsuario('Kátia')" class="pill-card py-1.5 px-2 rounded-xl border text-[11px] font-bold text-center transition-all cursor-pointer">Kátia</button>
-<button type="button" id="card-usuario-juliana" onclick="selecionarUsuario('Juliana')" class="pill-card py-1.5 px-2 rounded-xl border text-[11px] font-bold text-center transition-all cursor-pointer">Juliana</button>
-</div>
-</div>
-​<!-- Campos de Data e Fatura -->
-<div class="grid grid-cols-2 gap-2">
-<div class="flex flex-col gap-1">
-<label for="input-data" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data Compra</label>
-<input type="date" id="input-data" class="input-base font-mono text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-</div>
-<div class="flex flex-col gap-1">
-<label for="input-fatura" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mês Fatura</label>
-<div class="flex items-center gap-1.5">
-<input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" class="input-base font-mono text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 flex-1">
-<span id="fatura-visual" class="text-[11px] font-mono font-bold text-sky-600 dark:text-sky-400 px-1 whitespace-nowrap">--/--</span>
-</div>
-</div>
-</div>
-​<!-- Estabelecimento -->
-<div class="flex flex-col gap-1">
-<label for="input-estabelecimento" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estabelecimento</label>
-<input type="text" id="input-estabelecimento" oninput="verificarPreenchimentoFormulario()" placeholder="Ex: Supermercado" class="input-base text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-</div>
-​<!-- Valor e Parcelas -->
-<div class="grid grid-cols-2 gap-2">
-<div class="flex flex-col gap-1">
-<label for="input-valor" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Valor (R$)</label>
-<input type="number" step="0.01" id="input-valor" oninput="verificarPreenchimentoFormulario()" placeholder="0,00" class="input-base font-mono text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-</div>
-<div class="flex flex-col gap-1">
-<label for="input-parcelas-total" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Parcelas</label>
-<input type="number" min="1" value="1" id="input-parcelas-total" oninput="verificarPreenchimentoFormulario()" class="input-base font-mono text-xs p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500">
-</div>
-</div>
-​<!-- Botões de Ação do Formulário -->
-<div class="mt-1">
-<button type="button" id="btn-salvar" onclick="salvarOuAtualizarRegistro()" disabled class="btn-acao btn-desativado w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Salvar Lançamento</button>
-​<div id="botoes-edicao-container" style="display: none !important;" class="grid-cols-2 gap-2">
-<button type="button" onclick="cancelarEdicao()" class="btn-acao bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancelar</button>
-<button type="button" id="btn-confirma" onclick="salvarOuAtualizarRegistro()" class="btn-acao bg-amber-600 hover:bg-amber-700 text-white py-2.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer">Atualizar</button>
-</div>
-</div>
-​</div>
-​<!-- Card de Histórico e Filtro de Fatura -->
-<div class="card-base p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-<div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2.5">
-<button onclick="mudarMesHistorico(-1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Mês Anterior">◀</button>
-<span id="label-mes-filtro" class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">Fatura: --</span>
-<button onclick="mudarMesHistorico(1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Próximo Mês">▶</button>
-</div>
-​<ul id="lista-registros" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-<li class="text-slate-400 text-xs text-center py-4">Carregando lançamentos...</li>
-</ul>
-​<div class="border-t border-slate-100 dark:border-slate-800 pt-2.5 flex justify-between items-center">
-<span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total da Fatura</span>
-<span id="total-geral" class="font-mono font-extrabold text-sm text-sky-600 dark:text-sky-400">R$ 0,00</span>
-</div>
-</div>
-​<!-- Ferramentas de Backup -->
-<div class="flex gap-2">
-<button type="button" onclick="exportarBackup()" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 transition-all cursor-pointer flex items-center justify-center gap-1.5">
-📤 Exportar Backup
-</button>
-<label class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center">
-📥 Importar Backup
-<input type="file" accept=".sqlite" onchange="importarBackup(event)" class="hidden">
-</label>
-</div>
-​</section>
-​<!-- SEÇÃO 2: RESUMO POR CARTÃO -->
-<section id="secao-resumo" class="hidden flex-col gap-4">
-<div class="card-base p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-<div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2.5">
-<button onclick="mudarMesResumo(-1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Mês Anterior">◀</button>
-<span id="label-mes-resumo" class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">Fatura: --</span>
-<button onclick="mudarMesResumo(1)" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs transition-all cursor-pointer" title="Próximo Mês">▶</button>
-</div>
-​<div id="conteudo-resumo" class="flex flex-col gap-3">
-<!-- Preenchido dinamicamente pelo app.js -->
-</div>
-</div>
-</section>
-​</main>
-​<script src="app.js"></script>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="header-icon">💳</span>
+            <h1 class="header-title">Cartões</h1>
+        </div>
+        <button id="btn-tema" class="btn-tema" onclick="alternarTema()" title="Alternar Tema">🌙</button>
+    </header>
+
+    <nav>
+        <button id="tab-lancamentos" class="tab-btn tab-ativa" onclick="mudarAba('lancamentos')">📝 Lançamentos</button>
+        <button id="tab-resumo" class="tab-btn tab-inativa" onclick="mudarAba('resumo')">📊 Resumo por Cartão</button>
+    </nav>
+
+    <main>
+        <!-- SEÇÃO: LANÇAMENTOS -->
+        <section id="secao-lancamentos" class="flex flex-col gap-3">
+            
+            <!-- Formulário -->
+            <div class="glass-card card-formulario">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <p id="titulo-formulario" class="form-title" style="margin: 0;">Novo Lançamento</p>
+                </div>
+
+                <!-- Linha unificada: Data da Compra e Cartão lado a lado -->
+                <div class="grid-data-cartao">
+                    <div class="col-span-6">
+                        <label for="input-data">Data da Compra</label>
+                        <input type="date" id="input-data">
+                    </div>
+                    <div class="col-span-6">
+                        <label>Cartão</label>
+                        <div class="selecao-grid" style="margin-top: 0.125rem;">
+                            <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">Visa 10</div>
+                            <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">Visa 25</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Linha de Usuários e Fatura ajustada -->
+                <div>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <span style="flex: 3; font-size: 11px; font-weight: 500; color: var(--text-muted-light);">Usuário</span>
+                        <span style="flex: 1; font-size: 11px; font-weight: 500; color: var(--text-muted-light); padding-left: 0.5rem;">Fatura</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; width: 100%; align-items: center;">
+                        <!-- Grupo de Usuários (Mais próximos entre si) -->
+                        <div style="display: flex; gap: 0.1875rem; flex: 3; min-width: 0;">
+                            <!-- Jairo -->
+                            <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
+                                <span class="usuario-texto">Jairo</span>
+                            </div>
+                            <!-- Kátia -->
+                            <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
+                                <span class="usuario-texto">Kátia</span>
+                            </div>
+                            <!-- Juliana -->
+                            <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
+                                <span class="usuario-texto">Juliana</span>
+                            </div>
+                        </div>
+
+                        <!-- Espaçador visual para afastar a fatura para a direita -->
+                        <div style="width: 0.375rem;"></div>
+
+                        <!-- Fatura -->
+                        <div style="position: relative; flex: 1; min-width: 0; height: 38px;">
+                            <span id="fatura-visual" class="pill-card ativo" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box; pointer-events: none; font-size: 11px; padding: 0;">Out/26</span>
+                            <input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="input-estabelecimento">Estabelecimento</label>
+                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Loja..." oninput="verificarPreenchimentoFormulario()">
+                </div>
+
+                <div class="grid-data-cartao">
+                    <div class="col-span-6">
+                        <label for="input-valor">Valor Total (R$)</label>
+                        <input type="number" id="input-valor" step="0.01" placeholder="0,00" oninput="verificarPreenchimentoFormulario()">
+                    </div>
+                    <div class="col-span-6">
+                        <label for="input-parcelas-total">Nº de Parcelas</label>
+                        <input type="number" id="input-parcelas-total" min="1" value="1" placeholder="Ex: 1" style="text-align: center;" oninput="verificarPreenchimentoFormulario()">
+                    </div>
+                </div>
+
+                <!-- ALERTA -->
+                <div id="app-alerta" class="app-alerta-box hidden"></div>
+
+                <!-- Botão Padrão (Novo Lançamento) -->
+                <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
+
+                <!-- Botões de Edição Divididos -->
+                <div id="botoes-edicao-container" class="botoes-edicao-container">
+                    <button type="button" id="btn-confirma" class="btn-acao btn-confirma-edicao" onclick="salvarOuAtualizarRegistro()">Confirma</button>
+                    <button type="button" id="btn-cancela" class="btn-acao btn-cancela-edicao" onclick="cancelarEdicao()">Cancela</button>
+                </div>
+            </div>
+
+            <!-- Histórico -->
+            <div class="glass-card">
+                <div class="flex justify-between items-center historico-header" style="margin-bottom: 0.5rem;">
+                    <p class="historico-title">HISTÓRICO MENSAL</p>
+                    <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
+                </div>
+
+                <!-- Seletor de Mês do Histórico (Fatura) -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 0.375rem 0.625rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border: 1px solid var(--border-light);">
+                    <button onclick="mudarMesHistorico(-1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Mês Anterior">◀</button>
+                    <span id="label-mes-filtro" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Fatura Atual</span>
+                    <button onclick="mudarMesHistorico(1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Próximo Mês">▶</button>
+                </div>
+
+                <div class="overflow-y-auto max-h-registros">
+                    <ul id="lista-registros" class="lista-vazia-ul">
+                        <li class="lista-carregando-li">Carregando registros...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Backup / Importação -->
+            <div class="glass-card backup-card-padding">
+                <div class="flex gap-2 items-center">
+                    <button class="btn-backup" onclick="exportarBackup()">💾 Exportar Backup</button>
+                    <label class="btn-backup btn-importar-label">
+                        📂 Importar Backup
+                        <input type="file" id="input-importar" accept=".sqlite" style="display: none;" onchange="importarBackup(event)">
+                    </label>
+                </div>
+                <div id="container-link-download" class="container-download-margin hidden"></div>
+            </div>
+
+        </section>
+
+        <!-- SEÇÃO: RESUMO -->
+        <section id="secao-resumo" class="hidden flex-col gap-3">
+            <div class="glass-card">
+                <p class="resumo-main-title">Resumo Consolidado por Cartão</p>
+
+                <!-- Seletor de Mês do Resumo por Cartão -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 0.375rem 0.625rem; border-radius: 0.5rem; margin-top: 0.25rem; margin-bottom: 0.5rem; border: 1px solid var(--border-light);">
+                    <button onclick="mudarMesResumo(-1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Mês Anterior">◀</button>
+                    <span id="label-mes-resumo" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Fatura Atual</span>
+                    <button onclick="mudarMesResumo(1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Próximo Mês">▶</button>
+                </div>
+
+                <div id="conteudo-resumo" class="conteudo-resumo-flex overflow-y-auto max-h-resumo">
+                    <p class="resumo-carregando-p">Calculando resumo...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
