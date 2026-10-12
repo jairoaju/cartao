@@ -99,12 +99,6 @@ body.dark-mode .btn-desativado {
     color: #475569;
 }
 
-body.dark-mode .btn-backup {
-    background-color: var(--btn-secondary-bg-dark) !important;
-    color: var(--btn-secondary-text-dark) !important;
-    border-color: var(--border-dark) !important;
-}
-
 body.dark-mode .tab-inativa {
     background-color: #1e293b;
     color: #94a3b8;
@@ -196,7 +190,7 @@ header {
     color: var(--emerald-main) !important;
 }
 
-/* --- ESTILOS DO MENU DE OPÇÕES (HAMBÚRGUER) CORRIGIDOS PARA MOBILE --- */
+/* --- ESTILOS DO MENU DE OPÇÕES (HAMBÚRGUER) MOBILE --- */
 .menu-container {
     position: relative;
     display: inline-block;
@@ -378,7 +372,7 @@ label {
     color: var(--text-muted-light);
 }
 
-input[type="date"], input[type="text"], input[type="number"], input[type="month"] {
+input[type="date"], input[type="text"], input[type="number"], select {
     width: 100%;
     height: 42px;
     padding: 0.55rem;
@@ -386,17 +380,30 @@ input[type="date"], input[type="text"], input[type="number"], input[type="month"
     border: 1px solid #cbd5e1;
     border-radius: 0.75rem;
     outline: none;
-    font-size: 14px; /* Evita zoom automático no iOS/Android */
+    font-size: 14px;
     box-sizing: border-box;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     color: var(--text-light);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1em;
+}
+
+body.dark-mode select {
+    background-color: var(--input-bg-dark) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-dark) !important;
 }
 
 #input-parcelas-total {
     text-align: center;
+    background-image: none !important;
 }
 
-input:focus {
+input:focus, select:focus {
     border-color: var(--emerald-main);
 }
 

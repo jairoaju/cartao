@@ -157,17 +157,29 @@ function mostrarAlerta(mensagem, tipo = 'sucesso') {
     }, 4000);
 }
 
-function atualizarTextoFaturaVisual() {
-    const inputVal = document.getElementById("input-fatura").value;
-    const spanVisual = document.getElementById("fatura-visual");
-    if (!inputVal || !spanVisual) return;
+function popularAnosFatura() {
+    const selectAno = document.getElementById('select-fatura-ano');
+    if (!selectAno) return;
+    
+    selectAno.innerHTML = '';
+    const anoAtual = new Date().getFullYear();
+    
+    for (let ano = anoAtual - 1; ano <= anoAtual + 5; ano++) {
+        const option = document.createElement('option');
+        option.value = ano;
+        option.textContent = ano;
+        selectAno.appendChild(option);
+    }
+}
 
-    const [ano, mes] = inputVal.split('-');
-    const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    const nomeMes = mesesCurtos[parseInt(mes) - 1] || mes;
-    const anoCurto = ano.slice(-2);
-
-    spanVisual.textContent = `${nomeMes}/${anoCurto}`;
+function atualizarValorFaturaOculto() {
+    const mes = document.getElementById('select-fatura-mes').value;
+    const ano = document.getElementById('select-fatura-ano').value;
+    const inputFatura = document.getElementById('input-fatura');
+    
+    if (inputFatura) {
+        inputFatura.value = `${ano}-${mes}`;
+    }
 }
 
 function definirValoresPadrao() {
@@ -178,11 +190,16 @@ function definirValoresPadrao() {
     const dia = String(hoje.getDate()).padStart(2, '0');
     
     const inputData = document.getElementById('input-data');
-    const inputFatura = document.getElementById('input-fatura');
+    const selectMes = document.getElementById('select-fatura-mes');
+    const selectAno = document.getElementById('select-fatura-ano');
 
     if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
-    if (inputFatura) inputFatura.value = `${ano}-${mes}`;
-    atualizarTextoFaturaVisual();
+    
+    popularAnosFatura();
+    if (selectMes) selectMes.value = mes;
+    if (selectAno) selectAno.value = ano;
+    
+    atualizarValorFaturaOculto();
 }
 
 definirValoresPadrao();
@@ -443,7 +460,8 @@ function carregarRegistros() {
                 divBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
                 
                 const btnCancel = document.createElement("button");
-                btnCancel.style.cssText = "background-color: var(--btn-secondary-bg-light); color: var(--btn-secondary-text-light); padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+                btnCancel.className = "btn-cancela-edicao";
+                btnCancel.style.cssText = "padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; cursor: pointer;";
                 btnCancel.textContent = "Cancelar";
                 btnCancel.addEventListener('click', cancelarExclusao);
 
@@ -738,7 +756,8 @@ function mostrarModalDetalhes(dadosJson) {
         divDelBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
 
         const btnCancelModal = document.createElement("button");
-        btnCancelModal.style.cssText = "background-color: var(--btn-secondary-bg-light); color: var(--btn-secondary-text-light); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+        btnCancelModal.className = "btn-cancela-edicao";
+        btnCancelModal.style.cssText = "padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; cursor: pointer;";
         btnCancelModal.textContent = "Cancelar";
         btnCancelModal.addEventListener('click', cancelarExclusaoModal);
 
@@ -799,17 +818,22 @@ function mostrarModalDetalhes(dadosJson) {
         divGrid1.appendChild(col1);
         divGrid1.appendChild(col2);
 
+        // Bloco de destaque de valores corrigido para alto contraste no modo escuro
         const divHighlight = document.createElement("div");
-        divHighlight.style.cssText = `background-color: ${isDark ? 'rgba(23, 147, 209, 0.25)' : '#e0f2fe'}; padding: 0.625rem; border-radius: 0.75rem; border: 1px solid ${isDark ? '#0369a1' : '#bae6fd'}; display: flex; flex-direction: column; gap: 0.3rem;`;
+        const highlightBg = isDark ? "rgba(3, 105, 161, 0.3)" : "#e0f2fe";
+        const highlightBorder = isDark ? "#0284c7" : "#bae6fd";
+        const highlightText = isDark ? "#38bdf8" : "#0369a1";
+
+        divHighlight.style.cssText = `background-color: ${highlightBg}; padding: 0.625rem; border-radius: 0.75rem; border: 1px solid ${highlightBorder}; display: flex; flex-direction: column; gap: 0.3rem;`;
 
         const rowP = document.createElement("div");
         rowP.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanPLbl = document.createElement("span");
-        spanPLbl.style.cssText = `font-size: 10px; color: var(--valor-destaque); font-weight: 500;`;
+        spanPLbl.style.cssText = `font-size: 10px; color: ${highlightText}; font-weight: 600;`;
         spanPLbl.textContent = "Valor desta parcela:";
         const spanPVal = document.createElement("span");
         spanPVal.className = "font-mono";
-        spanPVal.style.cssText = `font-size: 12px; color: var(--valor-destaque); font-weight: 700;`;
+        spanPVal.style.cssText = `font-size: 12px; color: ${highlightText}; font-weight: 800;`;
         spanPVal.textContent = valorParcelaFormatado;
         rowP.appendChild(spanPLbl);
         rowP.appendChild(spanPVal);
@@ -817,11 +841,11 @@ function mostrarModalDetalhes(dadosJson) {
         const rowT = document.createElement("div");
         rowT.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanTLbl = document.createElement("span");
-        spanTLbl.style.cssText = `font-size: 10px; color: var(--valor-destaque); font-weight: 500;`;
+        spanTLbl.style.cssText = `font-size: 10px; color: ${highlightText}; font-weight: 600;`;
         spanTLbl.textContent = "Valor total da compra:";
         const spanTVal = document.createElement("span");
         spanTVal.className = "font-mono";
-        spanTVal.style.cssText = `font-size: 12px; color: var(--valor-destaque); font-weight: 700;`;
+        spanTVal.style.cssText = `font-size: 12px; color: ${highlightText}; font-weight: 800;`;
         spanTVal.textContent = valorTotalFormatado;
         rowT.appendChild(spanTLbl);
         rowT.appendChild(spanTVal);
@@ -854,8 +878,10 @@ function mostrarModalDetalhes(dadosJson) {
         divModalBtns.appendChild(btnEditModal);
         divModalBtns.appendChild(btnDelModal);
 
+        // Botão Fechar corrigido para refletir as cores do tema
         const btnCloseModal = document.createElement("button");
-        btnCloseModal.style.cssText = `background-color: var(--btn-secondary-bg-light); color: ${textoCor}; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%;`;
+        btnCloseModal.className = "btn-cancela-edicao";
+        btnCloseModal.style.cssText = "padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; text-align: center;";
         btnCloseModal.textContent = "Fechar";
         btnCloseModal.addEventListener('click', fecharModalDetalhes);
 
@@ -920,8 +946,13 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     idEmExclusaoPendente = null;
     fecharModalDetalhes();
     document.getElementById("input-data").value = data;
-    document.getElementById("input-fatura").value = fatura || "2026-10";
-    atualizarTextoFaturaVisual();
+    
+    if (fatura) {
+        const [anoF, mesF] = fatura.split('-');
+        document.getElementById("select-fatura-mes").value = mesF;
+        document.getElementById("select-fatura-ano").value = anoF;
+        atualizarValorFaturaOculto();
+    }
     
     selecionarCartao(cartao);
     selecionarUsuario(dono);
