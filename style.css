@@ -343,7 +343,7 @@ main {
 
 .grid-data-fatura {
     display: grid;
-    grid-template-columns: 1.5fr 1fr; /* Data maior, Fatura menor */
+    grid-template-columns: 1fr 1.5fr; /* Data menor, Fatura maior */
     gap: 0.5rem;
     align-items: end;
 }
