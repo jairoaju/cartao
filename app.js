@@ -745,7 +745,7 @@ function mostrarModalDetalhes(dadosJson) {
         
         const pEstLabel = document.createElement("p");
         pEstLabel.style.cssText = "font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem;";
-        pEstLabel.textContent = "Estabelecimento original";
+        pEstLabel.textContent = "Estabelecimento";
 
         const pEstVal = document.createElement("p");
         pEstVal.className = "estabelecimento-nome";
