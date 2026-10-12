@@ -1039,12 +1039,16 @@ function exportarBackup() {
         const blob = new Blob([binaryArray], { type: "application/x-sqlite3" });
         const url = URL.createObjectURL(blob);
         
-        const dataAtual = new Date().toISOString().slice(0, 10);
-        const nomeArquivo = `backup_cartao_${dataAtual}.sqlite`;
-
+        // const dataAtual = new Date().toISOString().slice(0, 10);
+        // const nomeArquivo = `backup_cartao_${dataAtual}.sqlite`;
+        const DATA_AUX = new Date().toLocaleDateString().slice(0,10).replaceAll("/", "-");
+        const DATA_ATUAL = DATA_AUX.slice(6,10) + DATA_AUX.slice(2,6) + DATA_AUX.slice(0,2);
+        const NOME_ARQUIVO = `backup_cartao_${DATA_ATUAL}.sqlite`;
+     
         const a = document.createElement('a');
         a.href = url;
-        a.download = nomeArquivo;
+        // a.download = nomeArquivo;
+        a.download = NOME_ARQUIVO;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
