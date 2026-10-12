@@ -50,7 +50,6 @@ body.dark-mode select {
     border-color: var(--border-dark) !important;
 }
 
-/* Força a cor do texto e do ícone do calendário/mês no modo escuro sem depender do color-scheme */
 body.dark-mode input[type="date"],
 body.dark-mode input[type="month"] {
     color: #f8fafc !important;
