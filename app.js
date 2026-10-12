@@ -18,18 +18,32 @@ let usuarioSelecionadoState = "Jairo";
 let dataFiltroHistorico = new Date();
 let dataFiltroResumo = new Date();
 
+function atualizarTextoMenuTema(isDark) {
+    const icone = document.getElementById('icone-menu-tema');
+    const texto = document.getElementById('texto-menu-tema');
+    if (icone && texto) {
+        if (isDark) {
+            icone.textContent = '☀️';
+            texto.textContent = 'Modo Claro';
+        } else {
+            icone.textContent = '🌙';
+            texto.textContent = 'Modo Escuro';
+        }
+    }
+}
+
 function inicializarTema() {
     const temaSalvo = localStorage.getItem(THEME_KEY);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
     if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
         document.body.classList.add('dark-mode');
-        document.getElementById('btn-tema').textContent = '☀️';
         document.getElementById('meta-theme-color').setAttribute('content', '#020617');
+        atualizarTextoMenuTema(true);
     } else {
         document.body.classList.remove('dark-mode');
-        document.getElementById('btn-tema').textContent = '🌙';
         document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+        atualizarTextoMenuTema(false);
     }
 }
 
@@ -37,14 +51,37 @@ function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
-        document.getElementById('btn-tema').textContent = '☀️';
         document.getElementById('meta-theme-color').setAttribute('content', '#020617');
+        atualizarTextoMenuTema(true);
     } else {
         localStorage.setItem(THEME_KEY, 'light');
-        document.getElementById('btn-tema').textContent = '🌙';
         document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+        atualizarTextoMenuTema(false);
     }
 }
+
+function alternarMenuOpcoes(event) {
+    event.stopPropagation();
+    const menu = document.getElementById("dropdown-menu-opcoes");
+    if (menu) {
+        menu.classList.toggle("hidden");
+    }
+}
+
+function fecharMenuOpcoes() {
+    const menu = document.getElementById("dropdown-menu-opcoes");
+    if (menu) {
+        menu.classList.add("hidden");
+    }
+}
+
+document.addEventListener("click", (event) => {
+    const menu = document.getElementById("dropdown-menu-opcoes");
+    const btnMenu = document.getElementById("btn-menu-principal");
+    if (menu && btnMenu && !menu.contains(event.target) && !btnMenu.contains(event.target)) {
+        menu.classList.add("hidden");
+    }
+});
 
 inicializarTema();
 
@@ -92,20 +129,8 @@ function selecionarUsuario(usuario) {
 
         if (isVisa10 && u.nome !== "Jairo") {
             card.classList.add('bloqueado');
-            card.style.backgroundColor = "#f1f5f9";
-            card.style.borderColor = "#e2e8f0";
-            card.style.color = "#cbd5e1";
-            card.style.opacity = "0.35";
-            card.style.pointerEvents = "none";
-        } else {
-            card.style.backgroundColor = "";
-            card.style.borderColor = "";
-            card.style.color = "";
-            card.style.opacity = "1";
-            card.style.pointerEvents = "auto";
-            if (isSelected) {
-                card.classList.add('ativo');
-            }
+        } else if (isSelected) {
+            card.classList.add('ativo');
         }
     });
 }
@@ -143,10 +168,6 @@ function atualizarTextoFaturaVisual() {
     const anoCurto = ano.slice(-2);
 
     spanVisual.textContent = `${nomeMes}/${anoCurto}`;
-
-    if (!spanVisual.classList.contains('ativo')) {
-        spanVisual.classList.add('ativo');
-    }
 }
 
 function definirValoresPadrao() {
@@ -421,7 +442,7 @@ function carregarRegistros() {
                 divBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
                 
                 const btnCancel = document.createElement("button");
-                btnCancel.style.cssText = "background-color: #e2e8f0; color: #334155; padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+                btnCancel.style.cssText = "background-color: var(--btn-secondary-bg-light); color: var(--btn-secondary-text-light); padding: 0.25rem 0.625rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
                 btnCancel.textContent = "Cancelar";
                 btnCancel.addEventListener('click', cancelarExclusao);
 
@@ -449,11 +470,11 @@ function carregarRegistros() {
 
                 const spanEstab = document.createElement("span");
                 spanEstab.className = "estabelecimento-nome";
-                spanEstab.style.cssText = "font-size: 12px; font-weight: 700; color: #475569;";
+                spanEstab.style.cssText = "font-size: 12px; font-weight: 700;";
                 spanEstab.textContent = estabelecimento;
 
                 const spanValor = document.createElement("span");
-                spanValor.style.cssText = "color: var(--emerald-main); font-weight: 800; font-size: 12px;";
+                spanValor.style.cssText = "color: var(--valor-destaque); font-weight: 800; font-size: 12px;";
                 spanValor.textContent = formatarMoeda(valor);
 
                 divRow1.appendChild(spanEstab);
@@ -528,13 +549,13 @@ function gerarResumoPorCartao() {
 
             const cardDiv = document.createElement("div");
             cardDiv.className = "inner-item-box";
-            cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;";
+            cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem;";
 
             const cardHeader = document.createElement("div");
             cardHeader.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;";
             
             const spanCardNome = document.createElement("span");
-            spanCardNome.style.cssText = "font-weight: bold; color: var(--emerald-main); font-size: 12px;";
+            spanCardNome.style.cssText = "font-weight: bold; color: var(--valor-destaque); font-size: 12px;";
             spanCardNome.textContent = `💳 Cartão: ${cartao}`;
 
             const spanCardTotal = document.createElement("span");
@@ -556,7 +577,7 @@ function gerarResumoPorCartao() {
                 subBox.style.cssText = "display: flex; flex-direction: column; gap: 0.25rem;";
 
                 const subTitle = document.createElement("span");
-                subTitle.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem;";
+                subTitle.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); letter-spacing: 0.05em; margin-bottom: 0.125rem;";
                 subTitle.textContent = "Subtotais por Usuário:";
                 subBox.appendChild(subTitle);
 
@@ -570,7 +591,7 @@ function gerarResumoPorCartao() {
                     spanDono.textContent = `👤 ${dono}`;
 
                     const spanSubVal = document.createElement("span");
-                    spanSubVal.style.cssText = "color: var(--emerald-main); font-weight: 600;";
+                    spanSubVal.style.cssText = "color: var(--valor-destaque); font-weight: 600;";
                     spanSubVal.textContent = formatarMoeda(subtotal);
 
                     subRow.appendChild(spanDono);
@@ -580,7 +601,7 @@ function gerarResumoPorCartao() {
                 cardDiv.appendChild(subBox);
 
                 const labelLanc = document.createElement("span");
-                labelLanc.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.125rem;";
+                labelLanc.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); letter-spacing: 0.05em; margin-top: 0.125rem;";
                 labelLanc.textContent = "Lançamentos (clique para detalhes):";
                 cardDiv.appendChild(labelLanc);
 
@@ -601,7 +622,7 @@ function gerarResumoPorCartao() {
 
                     const spanEst = document.createElement("span");
                     spanEst.className = "estabelecimento-nome";
-                    spanEst.style.cssText = "font-size: 11px; font-weight: 700; color: #475569;";
+                    spanEst.style.cssText = "font-size: 11px; font-weight: 700;";
                     spanEst.textContent = g.estabelecimento;
                     divRow1.appendChild(spanEst);
 
@@ -615,7 +636,7 @@ function gerarResumoPorCartao() {
 
                     const spanVal = document.createElement("span");
                     spanVal.className = "font-mono";
-                    spanVal.style.cssText = "color: var(--emerald-main); font-weight: 800; font-size: 12px; margin-left: 0.5rem;";
+                    spanVal.style.cssText = "color: var(--valor-destaque); font-weight: 800; font-size: 12px; margin-left: 0.5rem;";
                     spanVal.textContent = formatarMoeda(g.valor);
 
                     li.appendChild(divInfo);
@@ -645,10 +666,6 @@ function gerarResumoPorCartao() {
     });
 }
 
-function abrirModalDetalhesResumo(dadosJson) {
-    mostrarModalDetalhes(dadosJson);
-}
-
 function mostrarModalDetalhes(dadosJson) {
     const dados = typeof dadosJson === 'string' ? JSON.parse(dadosJson) : dadosJson;
     dadosModalAtual = dados;
@@ -669,7 +686,7 @@ function mostrarModalDetalhes(dadosJson) {
     modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
 
     const isDark = document.body.classList.contains('dark-mode');
-    const bgCor = isDark ? "#1e293b" : "#ffffff";
+    const bgCor = isDark ? "#0f172a" : "#ffffff";
     const textoCor = isDark ? "#f1f5f9" : "#0f172a";
     const bordaCor = isDark ? "#334155" : "#e2e8f0";
 
@@ -691,7 +708,7 @@ function mostrarModalDetalhes(dadosJson) {
     container.innerHTML = "";
 
     const btnClose = document.createElement("button");
-    btnClose.style.cssText = "position: absolute; top: 0.625rem; right: 0.625rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #94a3b8; line-height: 1;";
+    btnClose.style.cssText = "position: absolute; top: 0.625rem; right: 0.625rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted-light); line-height: 1;";
     btnClose.innerHTML = "&times;";
     btnClose.addEventListener('click', fecharModalDetalhes);
     container.appendChild(btnClose);
@@ -720,7 +737,7 @@ function mostrarModalDetalhes(dadosJson) {
         divDelBtns.style.cssText = "display: flex; gap: 0.5rem; justify-content: end; margin-top: 0.25rem;";
 
         const btnCancelModal = document.createElement("button");
-        btnCancelModal.style.cssText = "background-color: #e2e8f0; color: #334155; padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
+        btnCancelModal.style.cssText = "background-color: var(--btn-secondary-bg-light); color: var(--btn-secondary-text-light); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-weight: 600; font-size: 11px; border: none; cursor: pointer;";
         btnCancelModal.textContent = "Cancelar";
         btnCancelModal.addEventListener('click', cancelarExclusaoModal);
 
@@ -744,7 +761,7 @@ function mostrarModalDetalhes(dadosJson) {
         divEstOrig.style.cssText = `border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.5rem;`;
         
         const pEstLabel = document.createElement("p");
-        pEstLabel.style.cssText = "font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem;";
+        pEstLabel.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.15rem;";
         pEstLabel.textContent = "Estabelecimento";
 
         const pEstVal = document.createElement("p");
@@ -760,7 +777,7 @@ function mostrarModalDetalhes(dadosJson) {
 
         const col1 = document.createElement("div");
         const pCol1Lbl = document.createElement("p");
-        pCol1Lbl.style.cssText = "font-size: 10px; color: #94a3b8; margin-bottom: 0.1rem;";
+        pCol1Lbl.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
         pCol1Lbl.textContent = "Status / Parcela";
         const pCol1Val = document.createElement("p");
         pCol1Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
@@ -770,7 +787,7 @@ function mostrarModalDetalhes(dadosJson) {
 
         const col2 = document.createElement("div");
         const pCol2Lbl = document.createElement("p");
-        pCol2Lbl.style.cssText = "font-size: 10px; color: #94a3b8; margin-bottom: 0.1rem;";
+        pCol2Lbl.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
         pCol2Lbl.textContent = "👤 Usuário";
         const pCol2Val = document.createElement("p");
         pCol2Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
@@ -787,11 +804,11 @@ function mostrarModalDetalhes(dadosJson) {
         const rowP = document.createElement("div");
         rowP.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanPLbl = document.createElement("span");
-        spanPLbl.style.cssText = `font-size: 10px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;`;
+        spanPLbl.style.cssText = `font-size: 10px; color: var(--valor-destaque); font-weight: 500;`;
         spanPLbl.textContent = "Valor desta parcela:";
         const spanPVal = document.createElement("span");
         spanPVal.className = "font-mono";
-        spanPVal.style.cssText = `font-size: 12px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;`;
+        spanPVal.style.cssText = `font-size: 12px; color: var(--valor-destaque); font-weight: 700;`;
         spanPVal.textContent = valorParcelaFormatado;
         rowP.appendChild(spanPLbl);
         rowP.appendChild(spanPVal);
@@ -799,11 +816,11 @@ function mostrarModalDetalhes(dadosJson) {
         const rowT = document.createElement("div");
         rowT.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanTLbl = document.createElement("span");
-        spanTLbl.style.cssText = `font-size: 10px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 500;`;
+        spanTLbl.style.cssText = `font-size: 10px; color: var(--valor-destaque); font-weight: 500;`;
         spanTLbl.textContent = "Valor total da compra:";
         const spanTVal = document.createElement("span");
         spanTVal.className = "font-mono";
-        spanTVal.style.cssText = `font-size: 12px; color: ${isDark ? '#38bdf8' : '#0369a1'}; font-weight: 700;`;
+        spanTVal.style.cssText = `font-size: 12px; color: var(--valor-destaque); font-weight: 700;`;
         spanTVal.textContent = valorTotalFormatado;
         rowT.appendChild(spanTLbl);
         rowT.appendChild(spanTVal);
@@ -812,7 +829,7 @@ function mostrarModalDetalhes(dadosJson) {
         divHighlight.appendChild(rowT);
 
         const divMeta = document.createElement("div");
-        divMeta.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 10px; color: #94a3b8;";
+        divMeta.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 10px; color: var(--text-muted-light);";
         const spanComp = document.createElement("span");
         spanComp.textContent = `📅 Compra: ${formatarDataBR(dados.data)}`;
         const spanFat = document.createElement("span");
@@ -837,7 +854,7 @@ function mostrarModalDetalhes(dadosJson) {
         divModalBtns.appendChild(btnDelModal);
 
         const btnCloseModal = document.createElement("button");
-        btnCloseModal.style.cssText = `background-color: ${isDark ? '#334155' : '#f1f5f9'}; color: ${textoCor}; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%;`;
+        btnCloseModal.style.cssText = `background-color: var(--btn-secondary-bg-light); color: ${textoCor}; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%;`;
         btnCloseModal.textContent = "Fechar";
         btnCloseModal.addEventListener('click', fecharModalDetalhes);
 
@@ -932,7 +949,7 @@ function cancelarEdicao() {
     const tituloEl = document.getElementById("titulo-formulario");
     if (tituloEl) {
         tituloEl.textContent = "Novo Lançamento";
-        tituloEl.style.color = "var(--emerald-main)";
+        tituloEl.style.color = "var(--valor-destaque)";
     }
     ativarBotaoSalvar();
 }
@@ -1041,7 +1058,7 @@ function exportarBackup() {
         
         const AGORA = new Date();
         const ANO = AGORA.getFullYear();
-        const MES = String(AGORA.getMonth() + 1).padStart(2, '0'); // o mês começa em 0 padstart com total de 2 caracteres
+        const MES = String(AGORA.getMonth() + 1).padStart(2, '0');
         const DIA = String(AGORA.getDate()).padStart(2, '0');
 
         const DATA_ATUAL = `${ANO}-${MES}-${DIA}`;
@@ -1049,7 +1066,6 @@ function exportarBackup() {
              
         const a = document.createElement('a');
         a.href = url;
-        // a.download = nomeArquivo;
         a.download = NOME_ARQUIVO;
         document.body.appendChild(a);
         a.click();

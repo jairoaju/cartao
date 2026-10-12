@@ -2,171 +2,157 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#ffffff" id="meta-theme-color">
-    <title>Controle de Gastos do Cartão</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Cartão de Crédito</title>
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <!-- sql.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 </head>
 <body>
 
+    <!-- CABEÇALHO -->
     <header>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span class="header-icon">💳</span>
-            <h1 class="header-title">Cartões</h1>
+        <h1 class="header-title">Gerenciador de Faturas</h1>
+        
+        <!-- MENU HAMBÚRGUER DE OPÇÕES -->
+        <div class="menu-container">
+            <button id="btn-menu-principal" onclick="alternarMenuOpcoes(event)" title="Menu de Opções">
+                ☰
+            </button>
+            
+            <div id="dropdown-menu-opcoes" class="hidden">
+                <button onclick="alternarTema(); fecharMenuOpcoes();" class="dropdown-item">
+                    <span id="icone-menu-tema">☀️</span> <span id="texto-menu-tema">Modo Claro</span>
+                </button>
+
+                <div class="dropdown-divider"></div>
+
+                <button onclick="exportarBackup(); fecharMenuOpcoes();" class="dropdown-item">
+                    💾 Exportar Backup
+                </button>
+
+                <label class="dropdown-item" style="cursor: pointer;">
+                    📂 Importar Backup
+                    <input type="file" id="input-importar-menu" accept=".sqlite" onchange="importarBackup(event); fecharMenuOpcoes();" class="hidden">
+                </label>
+            </div>
         </div>
-        <button id="btn-tema" class="btn-tema" onclick="alternarTema()" title="Alternar Tema">🌙</button>
     </header>
 
-    <nav>
-        <button id="tab-lancamentos" class="tab-btn tab-ativa" onclick="mudarAba('lancamentos')">📝 Lançamentos</button>
-        <button id="tab-resumo" class="tab-btn tab-inativa" onclick="mudarAba('resumo')">📊 Resumo por Cartão</button>
-    </nav>
-
+    <!-- CONTEÚDO PRINCIPAL -->
     <main>
+        <!-- Alerta de Feedback -->
+        <div id="app-alerta" class="app-alerta-box hidden"></div>
+
+        <!-- Abas de Navegação -->
+        <nav>
+            <button id="tab-lancamentos" class="tab-btn tab-ativa" onclick="mudarAba('lancamentos')">Lançamentos</button>
+            <button id="tab-resumo" class="tab-btn tab-inativa" onclick="mudarAba('resumo')">Resumo por Cartão</button>
+        </nav>
+
         <!-- SEÇÃO: LANÇAMENTOS -->
         <section id="secao-lancamentos" class="flex flex-col gap-3">
-            
             <!-- Formulário -->
             <div class="glass-card card-formulario">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <p id="titulo-formulario" class="form-title" style="margin: 0;">Novo Lançamento</p>
-                </div>
-
-                <!-- Linha unificada: Data da Compra e Cartão lado a lado -->
-                <div class="grid-data-cartao">
-                    <div class="col-span-6">
-                        <label for="input-data">Data da Compra</label>
-                        <input type="date" id="input-data">
+                <h2 id="titulo-formulario" class="form-title">Novo Lançamento</h2>
+                
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label>Data da Compra</label>
+                        <input type="date" id="input-data" class="font-mono" onchange="verificarPreenchimentoFormulario()">
                     </div>
-                    <div class="col-span-6">
+
+                    <div>
+                        <label>Fatura Referente</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="month" id="input-fatura" class="font-mono" onchange="atualizarTextoFaturaVisual(); verificarPreenchimentoFormulario()">
+                            <span id="fatura-visual" class="font-mono badge-total" style="padding: 0.35rem 0.6rem;">---</span>
+                        </div>
+                    </div>
+
+                    <!-- Seleção de Cartão -->
+                    <div>
                         <label>Cartão</label>
-                        <div class="selecao-grid" style="margin-top: 0.125rem;">
-                            <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">Visa 10</div>
-                            <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">Visa 25</div>
+                        <div class="selecao-grid">
+                            <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">Visa - 10</div>
+                            <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">Visa - 25</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Linha de Usuários e Fatura ajustada -->
-                <div>
-                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.25rem;">
-                        <span style="flex: 3; font-size: 11px; font-weight: 500; color: var(--text-muted-light);">Usuário</span>
-                        <span style="flex: 1; font-size: 11px; font-weight: 500; color: var(--text-muted-light); padding-left: 0.5rem;">Fatura</span>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; width: 100%; align-items: center;">
-                        <!-- Grupo de Usuários (Mais próximos entre si) -->
-                        <div style="display: flex; gap: 0.1875rem; flex: 3; min-width: 0;">
-                            <!-- Jairo -->
-                            <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
-                                <span class="usuario-texto">Jairo</span>
-                            </div>
-                            <!-- Kátia -->
-                            <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
-                                <span class="usuario-texto">Kátia</span>
-                            </div>
-                            <!-- Juliana -->
-                            <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')" style="flex: 1; min-width: 0; padding: 0.5rem 0.125rem;">
-                                <span class="usuario-texto">Juliana</span>
-                            </div>
-                        </div>
-
-                        <!-- Espaçador visual para afastar a fatura para a direita -->
-                        <div style="width: 0.375rem;"></div>
-
-                        <!-- Fatura -->
-                        <div style="position: relative; flex: 1; min-width: 0; height: 38px;">
-                            <span id="fatura-visual" class="pill-card ativo" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box; pointer-events: none; font-size: 11px; padding: 0;">Out/26</span>
-                            <input type="month" id="input-fatura" onchange="atualizarTextoFaturaVisual()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;">
+                    <!-- Seleção de Usuário -->
+                    <div>
+                        <label>Usuário</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.375rem; height: 38px;">
+                            <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')">Jairo</div>
+                            <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')">Kátia</div>
+                            <div id="card-usuario-juliana" class="pill-card" onclick="selecionarUsuario('Juliana')">Juliana</div>
                         </div>
                     </div>
-                </div>
 
-                <div>
-                    <label for="input-estabelecimento">Estabelecimento</label>
-                    <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado, Loja..." oninput="verificarPreenchimentoFormulario()">
-                </div>
-
-                <div class="grid-data-cartao">
-                    <div class="col-span-6">
-                        <label for="input-valor">Valor Total (R$)</label>
-                        <input type="number" id="input-valor" step="0.01" placeholder="0,00" oninput="verificarPreenchimentoFormulario()">
+                    <div>
+                        <label>Estabelecimento</label>
+                        <input type="text" id="input-estabelecimento" placeholder="Ex: Supermercado" oninput="verificarPreenchimentoFormulario()">
                     </div>
-                    <div class="col-span-6">
-                        <label for="input-parcelas-total">Nº de Parcelas</label>
-                        <input type="number" id="input-parcelas-total" min="1" value="1" placeholder="Ex: 1" style="text-align: center;" oninput="verificarPreenchimentoFormulario()">
+
+                    <div class="grid-data-cartao">
+                        <div style="grid-column: span 6 / span 6;">
+                            <label>Valor Total (R$)</label>
+                            <input type="number" step="0.01" id="input-valor" class="font-mono" placeholder="0,00" oninput="verificarPreenchimentoFormulario()">
+                        </div>
+                        <div style="grid-column: span 6 / span 6;">
+                            <label>Parcelas</label>
+                            <input type="number" min="1" value="1" id="input-parcelas-total" class="font-mono" oninput="verificarPreenchimentoFormulario()">
+                        </div>
                     </div>
-                </div>
 
-                <!-- ALERTA -->
-                <div id="app-alerta" class="app-alerta-box hidden"></div>
-
-                <!-- Botão Padrão (Novo Lançamento) -->
-                <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
-
-                <!-- Botões de Edição Divididos -->
-                <div id="botoes-edicao-container" class="botoes-edicao-container">
-                    <button type="button" id="btn-confirma" class="btn-acao btn-confirma-edicao" onclick="salvarOuAtualizarRegistro()">Confirma</button>
-                    <button type="button" id="btn-cancela" class="btn-acao btn-cancela-edicao" onclick="cancelarEdicao()">Cancela</button>
+                    <!-- Botões de Ação -->
+                    <div>
+                        <button id="btn-salvar" class="btn-acao btn-desativado" onclick="salvarOuAtualizarRegistro()" disabled>Salvar Lançamento</button>
+                        
+                        <div id="botoes-edicao-container" class="botoes-edicao-container">
+                            <button id="btn-cancela" class="btn-acao btn-cancela-edicao" onclick="cancelarEdicao()">Cancelar</button>
+                            <button id="btn-confirma" class="btn-acao btn-confirma-edicao" onclick="salvarOuAtualizarRegistro()" disabled>Atualizar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Histórico -->
+            <!-- Lista de Lançamentos do Mês -->
             <div class="glass-card">
-                <div class="flex justify-between items-center historico-header" style="margin-bottom: 0.5rem;">
-                    <p class="historico-title">HISTÓRICO MENSAL</p>
-                    <span id="total-geral" class="badge-total">Total: R$ 0,00</span>
+                <div class="flex justify-between items-center historico-header">
+                    <button onclick="mudarMesHistorico(-1)" style="background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-muted-light);">◀</button>
+                    <span id="label-mes-filtro" class="historico-title" style="font-size: 12px;">Fatura: ---</span>
+                    <button onclick="mudarMesHistorico(1)" style="background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-muted-light);">▶</button>
                 </div>
 
-                <!-- Seletor de Mês do Histórico (Fatura) -->
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 0.375rem 0.625rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border: 1px solid var(--border-light);">
-                    <button onclick="mudarMesHistorico(-1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Mês Anterior">◀</button>
-                    <span id="label-mes-filtro" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Fatura Atual</span>
-                    <button onclick="mudarMesHistorico(1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Próximo Mês">▶</button>
-                </div>
+                <ul id="lista-registros" class="lista-vazia-ul overflow-y-auto max-h-registros">
+                    <!-- Preenchido via JS -->
+                </ul>
 
-                <div class="overflow-y-auto max-h-registros">
-                    <ul id="lista-registros" class="lista-vazia-ul">
-                        <li class="lista-carregando-li">Carregando registros...</li>
-                    </ul>
+                <div id="total-geral" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-light); font-size: 12px; font-weight: bold; text-align: right;" class="font-mono badge-total">
+                    Total: R$ 0,00
                 </div>
             </div>
-
-            <!-- Backup / Importação -->
-            <div class="glass-card backup-card-padding">
-                <div class="flex gap-2 items-center">
-                    <button class="btn-backup" onclick="exportarBackup()">💾 Exportar Backup</button>
-                    <label class="btn-backup btn-importar-label">
-                        📂 Importar Backup
-                        <input type="file" id="input-importar" accept=".sqlite" style="display: none;" onchange="importarBackup(event)">
-                    </label>
-                </div>
-                <div id="container-link-download" class="container-download-margin hidden"></div>
-            </div>
-
         </section>
 
-        <!-- SEÇÃO: RESUMO -->
+        <!-- SEÇÃO: RESUMO POR CARTÃO -->
         <section id="secao-resumo" class="hidden flex-col gap-3">
             <div class="glass-card">
-                <p class="resumo-main-title">Resumo Consolidado por Cartão</p>
-
-                <!-- Seletor de Mês do Resumo por Cartão -->
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); padding: 0.375rem 0.625rem; border-radius: 0.5rem; margin-top: 0.25rem; margin-bottom: 0.5rem; border: 1px solid var(--border-light);">
-                    <button onclick="mudarMesResumo(-1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Mês Anterior">◀</button>
-                    <span id="label-mes-resumo" style="font-size: 11px; font-weight: 600; color: var(--text-main);">Fatura Atual</span>
-                    <button onclick="mudarMesResumo(1)" style="background: none; border: none; cursor: pointer; font-weight: bold; color: var(--emerald-main); padding: 0.25rem 0.5rem;" title="Próximo Mês">▶</button>
+                <div class="flex justify-between items-center historico-header">
+                    <button onclick="mudarMesResumo(-1)" style="background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-muted-light);">◀</button>
+                    <span id="label-mes-resumo" class="resumo-main-title" style="font-size: 12px;">Fatura: ---</span>
+                    <button onclick="mudarMesResumo(1)" style="background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-muted-light);">▶</button>
                 </div>
 
                 <div id="conteudo-resumo" class="conteudo-resumo-flex overflow-y-auto max-h-resumo">
-                    <p class="resumo-carregando-p">Calculando resumo...</p>
+                    <!-- Preenchido via JS -->
                 </div>
             </div>
         </section>
-
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
