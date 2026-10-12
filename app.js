@@ -1039,14 +1039,14 @@ function exportarBackup() {
         const blob = new Blob([binaryArray], { type: "application/x-sqlite3" });
         const url = URL.createObjectURL(blob);
         
-        // const dataAtual = new Date().toISOString().slice(0, 10);
-        // const nomeArquivo = `backup_cartao_${dataAtual}.sqlite`;
-        const DATA_AUX = new Date().toLocaleDateString().slice(0,10); //dd/mm/aaaa
-        const [DIA, MES, ANO] = DATA_AUX.split('/');
-        const DATA_ATUAL = `${ANO}-${MES}-${DIA}`; //aaaa-mm-dd
+        const AGORA = new Date();
+        const ANO = AGORA.getFullYear();
+        const MES = String(AGORA.getMonth() + 1).padStart(2, '0'); // o mês começa em 0 padstart com total de 2 caracteres
+        const DIA = String(AGORA.getDate()).padStart(2, '0');
 
+        const DATA_ATUAL = `${ANO}-${MES}-${DIA}`;
         const NOME_ARQUIVO = `backup_cartao_${DATA_ATUAL}.sqlite`;
-     
+             
         const a = document.createElement('a');
         a.href = url;
         // a.download = nomeArquivo;
