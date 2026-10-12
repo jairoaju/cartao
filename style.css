@@ -50,6 +50,18 @@ body.dark-mode select {
     border-color: var(--border-dark) !important;
 }
 
+/* Força a cor do texto e do ícone do calendário/mês no modo escuro sem depender do color-scheme */
+body.dark-mode input[type="date"],
+body.dark-mode input[type="month"] {
+    color: #f8fafc !important;
+}
+
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+body.dark-mode input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(2);
+    opacity: 0.9;
+}
+
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
     color: var(--text-muted-dark) !important;
