@@ -1041,8 +1041,10 @@ function exportarBackup() {
         
         // const dataAtual = new Date().toISOString().slice(0, 10);
         // const nomeArquivo = `backup_cartao_${dataAtual}.sqlite`;
-        const DATA_AUX = new Date().toLocaleDateString().slice(0,10).replaceAll("/", "-");
-        const DATA_ATUAL = DATA_AUX.slice(6,10) + DATA_AUX.slice(2,6) + DATA_AUX.slice(0,2);
+        const DATA_AUX = new Date().toLocaleDateString().slice(0,10); //dd/mm/aaaa
+        const [DIA, MES, ANO] = DATA_AUX.split('/');
+        const DATA_ATUAL = `${ANO}-${MES}-${DIA}`; //aaaa-mm-dd
+
         const NOME_ARQUIVO = `backup_cartao_${DATA_ATUAL}.sqlite`;
      
         const a = document.createElement('a');
