@@ -61,11 +61,11 @@
                 <div class="flex flex-col gap-3">
                     <!-- Linha: Data da Compra e Fatura Lado a Lado -->
                     <div class="grid-data-fatura">
-                        <div style="grid-column: span 7 / span 7;">
+                        <div style="grid-column: span 5 / span 5;">
                             <label>Data da Compra</label>
                             <input type="date" id="input-data" class="font-mono" onchange="aoMudarDataCompra(); verificarPreenchimentoFormulario()">
                         </div>
-                        <div style="grid-column: span 5 / span 5;">
+                        <div style="grid-column: span 7 / span 7;">
                             <label>Fatura</label>
                             <input type="month" id="input-fatura" class="font-mono" onchange="verificarPreenchimentoFormulario()" oninput="verificarPreenchimentoFormulario()" onblur="garantirFaturaValida()">
                         </div>
