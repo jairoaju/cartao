@@ -178,6 +178,21 @@ function aoMudarDataCompra() {
     }
 }
 
+function garantirFaturaValida() {
+    const inputDataEl = document.getElementById("input-data");
+    const inputFaturaEl = document.getElementById("input-fatura");
+    if (!inputFaturaEl) return;
+    
+    let faturaVal = inputFaturaEl.value ? inputFaturaEl.value.trim() : "";
+    if ((!faturaVal || faturaVal === "") && inputDataEl && inputDataEl.value) {
+        const partes = inputDataEl.value.split('-');
+        if (partes.length >= 2) {
+            inputFaturaEl.value = `${partes[0]}-${partes[1]}`;
+        }
+    }
+    verificarPreenchimentoFormulario();
+}
+
 function definirValoresPadrao() {
     if (idEmEdicao !== null) return;
     const hoje = new Date();
@@ -245,7 +260,7 @@ initSqlJs({
     `);
 
     try {
-        const res = db.exec("SELECT fatura FROM cartao_gastos ORDER BY data DESC, id DESC LIMIT 1");
+        const res = db.exec("SELECT fatura FROM cartao_gastos WHERE fatura IS NOT NULL AND fatura != '' ORDER BY data DESC, id DESC LIMIT 1");
         if (res.length > 0 && res[0].values.length > 0) {
             const ultimaFatura = res[0].values[0][0];
             const [anoF, mesF] = ultimaFatura.split('-');
@@ -271,7 +286,6 @@ function verificarPreenchimentoFormulario() {
     let faturaInput = inputFaturaEl ? inputFaturaEl.value.trim() : "";
     const dataInput = inputDataEl ? inputDataEl.value.trim() : "";
     
-    // Auto-recupera a fatura se a data da compra estiver selecionada
     if ((!faturaInput || faturaInput === "") && dataInput) {
         const partesData = dataInput.split('-');
         if (partesData.length >= 2) {
@@ -284,7 +298,12 @@ function verificarPreenchimentoFormulario() {
     const btnConfirma = document.getElementById("btn-confirma");
 
     const numParcelas = parseInt(parcelasInput) || 1;
-    const formularioValido = dataInput !== "" && faturaInput !== "" && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
+    
+    // Validação estrita regex para o formato AAAA-MM (Ex: 2026-10)
+    const regexFaturaValida = /^\d{4}-\d{2}$/;
+    const faturaEhValida = regexFaturaValida.test(faturaInput);
+
+    const formularioValido = dataInput !== "" && faturaEhValida && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
 
     if (idEmEdicao !== null) {
         if (btnConfirma) btnConfirma.disabled = !formularioValido;
@@ -938,8 +957,9 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     fecharModalDetalhes();
     document.getElementById("input-data").value = data;
     
-    if (fatura) {
-        document.getElementById("input-fatura").value = fatura;
+    const inputFatura = document.getElementById("input-fatura");
+    if (inputFatura) {
+        inputFatura.value = fatura;
     }
     
     selecionarCartao(cartao);
@@ -984,7 +1004,7 @@ function salvarOuAtualizarRegistro() {
     const valorTotalInput = document.getElementById("input-valor").value;
     const totalParcelas = parseInt(document.getElementById("input-parcelas-total").value) || 1;
 
-    // Se o campo de fatura estiver vazio, extrai do campo de data de compra (Ex: 2026-10-12 -> 2026-10)
+    // Se a fatura estiver vazia ou nula, auto-recupera a partir do ano e mês da Data da Compra
     if ((!faturaBaseStr || faturaBaseStr.trim() === "") && dataStr) {
         const partes = dataStr.split('-');
         if (partes.length >= 2) {
@@ -994,8 +1014,10 @@ function salvarOuAtualizarRegistro() {
         }
     }
 
-    if (!dataStr || !faturaBaseStr || faturaBaseStr.trim() === "" || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
-        mostrarAlerta("Por favor, preencha todos os campos obrigatórios!", "erro");
+    // BLOQUEIO RIGOROSO: Impede terminantemente a gravação se a fatura não for no formato 'AAAA-MM'
+    const regexFaturaValida = /^\d{4}-\d{2}$/;
+    if (!dataStr || !faturaBaseStr || !regexFaturaValida.test(faturaBaseStr.trim()) || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
+        mostrarAlerta("Erro: O campo 'Fatura' é obrigatório e precisa estar no formato correto!", "erro");
         return;
     }
 
@@ -1004,6 +1026,8 @@ function salvarOuAtualizarRegistro() {
         mostrarAlerta("Insira um valor válido em reais!", "erro");
         return;
     }
+
+    faturaBaseStr = faturaBaseStr.trim();
 
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
