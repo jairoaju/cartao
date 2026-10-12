@@ -157,6 +157,27 @@ function mostrarAlerta(mensagem, tipo = 'sucesso') {
     }, 4000);
 }
 
+function formatarFaturaTresLetras(faturaIso) {
+    if (!faturaIso) return '';
+    const partes = faturaIso.split('-');
+    if (partes.length !== 2) return faturaIso;
+    const meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+    const nomeMes = meses[parseInt(partes[1], 10) - 1] || partes[1];
+    return `${nomeMes}/${partes[0]}`;
+}
+
+function aoMudarDataCompra() {
+    const inputData = document.getElementById("input-data");
+    const inputFatura = document.getElementById("input-fatura");
+    if (!inputData || !inputData.value || !inputFatura) return;
+    
+    const [ano, mes] = inputData.value.split('-');
+    if (ano && mes) {
+        inputFatura.value = `${ano}-${mes}`;
+        verificarPreenchimentoFormulario();
+    }
+}
+
 function definirValoresPadrao() {
     if (idEmEdicao !== null) return;
     const hoje = new Date();
@@ -165,7 +186,10 @@ function definirValoresPadrao() {
     const dia = String(hoje.getDate()).padStart(2, '0');
     
     const inputData = document.getElementById('input-data');
+    const inputFatura = document.getElementById('input-fatura');
+
     if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
+    if (inputFatura) inputFatura.value = `${ano}-${mes}`;
 }
 
 definirValoresPadrao();
@@ -238,16 +262,29 @@ initSqlJs({
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
 
 function verificarPreenchimentoFormulario() {
-    const dataStr = document.getElementById("input-data").value.trim();
     const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
     const valorInput = document.getElementById("input-valor").value.trim();
     const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
+    const inputFaturaEl = document.getElementById("input-fatura");
+    const inputDataEl = document.getElementById("input-data");
     
+    let faturaInput = inputFaturaEl ? inputFaturaEl.value.trim() : "";
+    const dataInput = inputDataEl ? inputDataEl.value.trim() : "";
+    
+    // Auto-recupera a fatura se a data da compra estiver selecionada
+    if ((!faturaInput || faturaInput === "") && dataInput) {
+        const partesData = dataInput.split('-');
+        if (partesData.length >= 2) {
+            faturaInput = `${partesData[0]}-${partesData[1]}`;
+            if (inputFaturaEl) inputFaturaEl.value = faturaInput;
+        }
+    }
+
     const btnSalvar = document.getElementById("btn-salvar");
     const btnConfirma = document.getElementById("btn-confirma");
 
     const numParcelas = parseInt(parcelasInput) || 1;
-    const formularioValido = dataStr !== "" && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
+    const formularioValido = dataInput !== "" && faturaInput !== "" && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
 
     if (idEmEdicao !== null) {
         if (btnConfirma) btnConfirma.disabled = !formularioValido;
@@ -305,26 +342,17 @@ function formatarDataBR(dataIso) {
     return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataIso;
 }
 
-function formatarFaturaBR(faturaIso) {
-    if (!faturaIso) return '';
-    const partes = faturaIso.split('-');
-    if (partes.length !== 2) return faturaIso;
-    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-    const nomeMes = meses[parseInt(partes[1]) - 1] || partes[1];
-    return `${nomeMes} de ${partes[0]}`;
-}
-
 function mudarMesHistorico(direcao) {
     dataFiltroHistorico.setMonth(dataFiltroHistorico.getMonth() + direcao);
     carregarRegistros();
 }
 
 function atualizarLabelMesFiltro() {
-    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
     const nomeMes = meses[dataFiltroHistorico.getMonth()];
     const ano = dataFiltroHistorico.getFullYear();
     const labelEl = document.getElementById("label-mes-filtro");
-    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes} de ${ano}`;
+    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes}/${ano}`;
 }
 
 function mudarMesResumo(direcao) {
@@ -333,11 +361,11 @@ function mudarMesResumo(direcao) {
 }
 
 function atualizarLabelMesResumo() {
-    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
     const nomeMes = meses[dataFiltroResumo.getMonth()];
     const ano = dataFiltroResumo.getFullYear();
     const labelEl = document.getElementById("label-mes-resumo");
-    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes} de ${ano}`;
+    if (labelEl) labelEl.textContent = `Fatura: ${nomeMes}/${ano}`;
 }
 
 function mudarAba(aba) {
@@ -822,7 +850,7 @@ function mostrarModalDetalhes(dadosJson) {
         const spanComp = document.createElement("span");
         spanComp.textContent = `📅 Compra: ${formatarDataBR(dados.data)}`;
         const spanFat = document.createElement("span");
-        spanFat.textContent = `💳 Fatura: ${formatarFaturaBR(dados.fatura)}`;
+        spanFat.textContent = `💳 Fatura: ${formatarFaturaTresLetras(dados.fatura)}`;
         divMeta.appendChild(spanComp);
         divMeta.appendChild(spanFat);
 
@@ -910,6 +938,10 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     fecharModalDetalhes();
     document.getElementById("input-data").value = data;
     
+    if (fatura) {
+        document.getElementById("input-fatura").value = fatura;
+    }
+    
     selecionarCartao(cartao);
     selecionarUsuario(dono);
 
@@ -945,14 +977,25 @@ function cancelarEdicao() {
 function salvarOuAtualizarRegistro() {
     if (!db) return;
     const dataStr = document.getElementById("input-data").value;
+    let faturaBaseStr = document.getElementById("input-fatura").value;
     const cartao = cartaoSelecionadoState;
     const dono = usuarioSelecionadoState;
     let estabelecimentoBase = document.getElementById("input-estabelecimento").value.trim();
     const valorTotalInput = document.getElementById("input-valor").value;
     const totalParcelas = parseInt(document.getElementById("input-parcelas-total").value) || 1;
 
-    if (!dataStr || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
-        mostrarAlerta("Por favor, preencha todos os campos!", "erro");
+    // Se o campo de fatura estiver vazio, extrai do campo de data de compra (Ex: 2026-10-12 -> 2026-10)
+    if ((!faturaBaseStr || faturaBaseStr.trim() === "") && dataStr) {
+        const partes = dataStr.split('-');
+        if (partes.length >= 2) {
+            faturaBaseStr = `${partes[0]}-${partes[1]}`;
+            const inputFaturaEl = document.getElementById("input-fatura");
+            if (inputFaturaEl) inputFaturaEl.value = faturaBaseStr;
+        }
+    }
+
+    if (!dataStr || !faturaBaseStr || faturaBaseStr.trim() === "" || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
+        mostrarAlerta("Por favor, preencha todos os campos obrigatórios!", "erro");
         return;
     }
 
@@ -961,9 +1004,6 @@ function salvarOuAtualizarRegistro() {
         mostrarAlerta("Insira um valor válido em reais!", "erro");
         return;
     }
-
-    // A fatura é extraída automaticamente da data da compra (YYYY-MM)
-    const faturaBaseStr = dataStr.substring(0, 7);
 
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
