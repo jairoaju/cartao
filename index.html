@@ -59,33 +59,16 @@
                 <h2 id="titulo-formulario" class="form-title">Novo Lançamento</h2>
                 
                 <div class="flex flex-col gap-3">
-                    <div>
-                        <label>Data da Compra</label>
-                        <input type="date" id="input-data" class="font-mono" onchange="verificarPreenchimentoFormulario()">
-                    </div>
-
-                    <div>
-                        <label>Fatura Referente</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                            <select id="select-fatura-mes" class="font-mono input-field" onchange="atualizarValorFaturaOculto(); verificarPreenchimentoFormulario()">
-                                <option value="01">Jan</option>
-                                <option value="02">Fev</option>
-                                <option value="03">Mar</option>
-                                <option value="04">Abr</option>
-                                <option value="05">Mai</option>
-                                <option value="06">Jun</option>
-                                <option value="07">Jul</option>
-                                <option value="08">Ago</option>
-                                <option value="09">Set</option>
-                                <option value="10">Out</option>
-                                <option value="11">Nov</option>
-                                <option value="12">Dez</option>
-                            </select>
-                            <select id="select-fatura-ano" class="font-mono input-field" onchange="atualizarValorFaturaOculto(); verificarPreenchimentoFormulario()">
-                                <!-- Preenchido via JS -->
-                            </select>
+                    <!-- Linha: Data da Compra e Fatura Lado a Lado -->
+                    <div class="grid-data-fatura">
+                        <div>
+                            <label>Data da Compra</label>
+                            <input type="date" id="input-data" class="font-mono" onchange="aoMudarDataCompra(); verificarPreenchimentoFormulario()">
                         </div>
-                        <input type="hidden" id="input-fatura">
+                        <div>
+                            <label>Fatura</label>
+                            <input type="month" id="input-fatura" class="font-mono" onchange="verificarPreenchimentoFormulario()">
+                        </div>
                     </div>
 
                     <!-- Seleção de Cartão -->

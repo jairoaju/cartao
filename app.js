@@ -157,31 +157,6 @@ function mostrarAlerta(mensagem, tipo = 'sucesso') {
     }, 4000);
 }
 
-function popularAnosFatura() {
-    const selectAno = document.getElementById('select-fatura-ano');
-    if (!selectAno) return;
-    
-    selectAno.innerHTML = '';
-    const anoAtual = new Date().getFullYear();
-    
-    for (let ano = anoAtual - 1; ano <= anoAtual + 5; ano++) {
-        const option = document.createElement('option');
-        option.value = ano;
-        option.textContent = ano;
-        selectAno.appendChild(option);
-    }
-}
-
-function atualizarValorFaturaOculto() {
-    const mes = document.getElementById('select-fatura-mes').value;
-    const ano = document.getElementById('select-fatura-ano').value;
-    const inputFatura = document.getElementById('input-fatura');
-    
-    if (inputFatura) {
-        inputFatura.value = `${ano}-${mes}`;
-    }
-}
-
 function definirValoresPadrao() {
     if (idEmEdicao !== null) return;
     const hoje = new Date();
@@ -190,16 +165,7 @@ function definirValoresPadrao() {
     const dia = String(hoje.getDate()).padStart(2, '0');
     
     const inputData = document.getElementById('input-data');
-    const selectMes = document.getElementById('select-fatura-mes');
-    const selectAno = document.getElementById('select-fatura-ano');
-
     if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
-    
-    popularAnosFatura();
-    if (selectMes) selectMes.value = mes;
-    if (selectAno) selectAno.value = ano;
-    
-    atualizarValorFaturaOculto();
 }
 
 definirValoresPadrao();
@@ -272,17 +238,16 @@ initSqlJs({
 }).catch(err => console.error("Erro ao carregar sql.js:", err));
 
 function verificarPreenchimentoFormulario() {
+    const dataStr = document.getElementById("input-data").value.trim();
     const estabelecimento = document.getElementById("input-estabelecimento").value.trim();
     const valorInput = document.getElementById("input-valor").value.trim();
     const parcelasInput = document.getElementById("input-parcelas-total").value.trim();
-    const inputFaturaEl = document.getElementById("input-fatura");
     
-    const faturaInput = inputFaturaEl ? inputFaturaEl.value.trim() : "";
     const btnSalvar = document.getElementById("btn-salvar");
     const btnConfirma = document.getElementById("btn-confirma");
 
     const numParcelas = parseInt(parcelasInput) || 1;
-    const formularioValido = estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1 && faturaInput !== "";
+    const formularioValido = dataStr !== "" && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
 
     if (idEmEdicao !== null) {
         if (btnConfirma) btnConfirma.disabled = !formularioValido;
@@ -818,7 +783,6 @@ function mostrarModalDetalhes(dadosJson) {
         divGrid1.appendChild(col1);
         divGrid1.appendChild(col2);
 
-        // Bloco de destaque de valores corrigido para alto contraste no modo escuro
         const divHighlight = document.createElement("div");
         const highlightBg = isDark ? "rgba(3, 105, 161, 0.3)" : "#e0f2fe";
         const highlightBorder = isDark ? "#0284c7" : "#bae6fd";
@@ -878,7 +842,6 @@ function mostrarModalDetalhes(dadosJson) {
         divModalBtns.appendChild(btnEditModal);
         divModalBtns.appendChild(btnDelModal);
 
-        // Botão Fechar corrigido para refletir as cores do tema
         const btnCloseModal = document.createElement("button");
         btnCloseModal.className = "btn-cancela-edicao";
         btnCloseModal.style.cssText = "padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; text-align: center;";
@@ -947,13 +910,6 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     fecharModalDetalhes();
     document.getElementById("input-data").value = data;
     
-    if (fatura) {
-        const [anoF, mesF] = fatura.split('-');
-        document.getElementById("select-fatura-mes").value = mesF;
-        document.getElementById("select-fatura-ano").value = anoF;
-        atualizarValorFaturaOculto();
-    }
-    
     selecionarCartao(cartao);
     selecionarUsuario(dono);
 
@@ -989,14 +945,13 @@ function cancelarEdicao() {
 function salvarOuAtualizarRegistro() {
     if (!db) return;
     const dataStr = document.getElementById("input-data").value;
-    const faturaBaseStr = document.getElementById("input-fatura").value;
     const cartao = cartaoSelecionadoState;
     const dono = usuarioSelecionadoState;
     let estabelecimentoBase = document.getElementById("input-estabelecimento").value.trim();
     const valorTotalInput = document.getElementById("input-valor").value;
     const totalParcelas = parseInt(document.getElementById("input-parcelas-total").value) || 1;
 
-    if (!dataStr || !faturaBaseStr || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
+    if (!dataStr || !cartao || !dono || !estabelecimentoBase || !valorTotalInput) {
         mostrarAlerta("Por favor, preencha todos os campos!", "erro");
         return;
     }
@@ -1006,6 +961,9 @@ function salvarOuAtualizarRegistro() {
         mostrarAlerta("Insira um valor válido em reais!", "erro");
         return;
     }
+
+    // A fatura é extraída automaticamente da data da compra (YYYY-MM)
+    const faturaBaseStr = dataStr.substring(0, 7);
 
     if (idEmEdicao === null) {
         if (totalParcelas > 1) {
