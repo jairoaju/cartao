@@ -189,6 +189,7 @@ definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
 document.addEventListener("DOMContentLoaded", () => {
+    definirValoresPadrao();
     const inputValor = document.getElementById("input-valor");
     if (inputValor) {
         inputValor.addEventListener("keydown", function(event) {
