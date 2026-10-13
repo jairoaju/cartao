@@ -1,4 +1,5 @@
 :root {
+    color-scheme: light dark;
     --bg-light: #f1f5f9;
     --bg-dark: #020617;
     --card-light: rgba(255, 255, 255, 0.9);
@@ -28,6 +29,12 @@
     --inner-card-dark: rgba(30, 41, 59, 0.6);
 
     --valor-destaque: #1793d1;
+}
+
+/* Força a barra inferior a seguir o fundo claro do app */
+body {
+    background-color: #f8f9fa; /* ou a cor de fundo exata do seu body */
+    bottom-navigation-color: #ffffff;
 }
 
 body.dark-mode {
