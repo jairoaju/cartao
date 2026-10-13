@@ -2,7 +2,7 @@
   "name": "Controle de Gastos do Cartão",
   "short_name": "GastosCartão",
   "start_url": ".",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#f8f9fa",
   "theme_color": "#f8f9fa",
   "icons": [
