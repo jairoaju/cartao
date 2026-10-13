@@ -31,6 +31,12 @@
     --valor-destaque: #1793d1;
 }
 
+@media (prefers-color-scheme: light) {
+  html {
+    background-color: #ffffff;
+  }
+}
+
 /* Força a barra inferior a seguir o fundo claro do app */
 body {
     background-color: #f8f9fa; /* ou a cor de fundo exata do seu body */
