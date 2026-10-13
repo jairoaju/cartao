@@ -31,8 +31,12 @@
     --valor-destaque: #1793d1;
 }
 
-body.dark-mode {
+/* Quando o modo escuro estiver ativo, força o esquema escuro na raiz (html) e no body */
+html.dark-mode, body.dark-mode {
     color-scheme: dark;
+}
+
+body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
     --valor-destaque: #38bdf8;
