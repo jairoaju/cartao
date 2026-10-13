@@ -1168,3 +1168,17 @@ function importarBackup(event) {
     reader.readAsArrayBuffer(arquivo);
     event.target.value = "";
 }
+
+function sairDoApp() {
+    // Tenta fechar a janela (funciona em alguns contextos de PWA)
+    if (window.closed !== undefined) {
+        window.close();
+    }
+    
+    // Fallback caso o navegador bloqueie o fechamento direto:
+    // Redireciona para uma página em branco ou tenta fechar via history
+    setTimeout(() => {
+        // Se a janela não fechou após 100ms, orienta o usuário ou limpa a visualização
+        window.location.href = "about:blank";
+    }, 100);
+}
