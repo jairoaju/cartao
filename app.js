@@ -51,11 +51,11 @@ function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
-        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
+        document.getElementById('').setAttribute('content', '#020617');
         atualizarTextoMenuTema(true);
     } else {
         localStorage.setItem(THEME_KEY, 'light');
-        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
+        document.getElementById('').setAttribute('content', '#ffffff');
         atualizarTextoMenuTema(false);
     }
 
@@ -63,7 +63,7 @@ function alternarTema() {
     const metaThemeColor = document.getElementById('meta-theme-color');
     if (metaThemeColor) {
         // Use a cor de fundo exata do seu modo escuro e do modo claro
-        metaThemeColor.setAttribute('content', isDarkMode ? '#020617' : '#f8f9fa');
+        metaThemeColor.setAttribute('content', isDarkMode ? '#020617' : '#ffffff');
     }
     
 }
