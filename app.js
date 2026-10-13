@@ -58,6 +58,14 @@ function alternarTema() {
         document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
         atualizarTextoMenuTema(false);
     }
+
+// ATUALIZA A COR DA BARRA DO SISTEMA DINAMICAMENTE (PWA)
+    const metaThemeColor = document.getElementById('meta-theme-color');
+    if (metaThemeColor) {
+        // Use a cor de fundo exata do seu modo escuro e do modo claro
+        metaThemeColor.setAttribute('content', isDarkMode ? '#121212' : '#f8f9fa');
+    }
+    
 }
 
 function alternarMenuOpcoes(event) {
