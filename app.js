@@ -49,23 +49,20 @@ function inicializarTema() {
 
 function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
+    
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
-        document.getElementById('').setAttribute('content', '#020617');
         atualizarTextoMenuTema(true);
     } else {
         localStorage.setItem(THEME_KEY, 'light');
-        document.getElementById('').setAttribute('content', '#ffffff');
         atualizarTextoMenuTema(false);
     }
 
-// ATUALIZA A COR DA BARRA DO SISTEMA DINAMICAMENTE (PWA)
+    // ATUALIZA A COR DA BARRA DO SISTEMA DINAMICAMENTE (PWA)
     const metaThemeColor = document.getElementById('meta-theme-color');
     if (metaThemeColor) {
-        // Use a cor de fundo exata do seu modo escuro e do modo claro
-        metaThemeColor.setAttribute('content', isDarkMode ? '#020617' : '#ffffff');
+        metaThemeColor.setAttribute('content', isDark ? '#020617' : '#ffffff');
     }
-    
 }
 
 function alternarMenuOpcoes(event) {
