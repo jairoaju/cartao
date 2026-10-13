@@ -63,7 +63,7 @@ function alternarTema() {
     const metaThemeColor = document.getElementById('meta-theme-color');
     if (metaThemeColor) {
         // Use a cor de fundo exata do seu modo escuro e do modo claro
-        metaThemeColor.setAttribute('content', isDarkMode ? '#121212' : '#f8f9fa');
+        metaThemeColor.setAttribute('content', isDarkMode ? '#020617' : '#f8f9fa');
     }
     
 }
