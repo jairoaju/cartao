@@ -49,6 +49,7 @@ function inicializarTema() {
 
 function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
+    document.documentElement.classList.toggle('dark-mode', isDark); // <--- Adicione esta linha
     
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
