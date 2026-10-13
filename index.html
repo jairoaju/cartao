@@ -5,27 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gerenciador de Cartão de Crédito</title>
     <meta name="theme-color" id="meta-theme-color" content="#f8f9fa">  
-    <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <!-- sql.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 
-<script>
-    // Executa imediatamente antes de renderizar a página para evitar o "piscar"
-    (function() {
-        const temaSalvo = localStorage.getItem('theme'); // Ajuste 'theme' para a chave exata que você usa (THEME_KEY)
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const metaTheme = document.getElementById('meta-theme-color');
-        
-        if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
-            document.documentElement.classList.add('dark-mode'); // ou no body se preferir
-            if (metaTheme) metaTheme.setAttribute('content', '#020617');  // preto
-        } else {
-            if (metaTheme) metaTheme.setAttribute('content', '#f8f9fa');  // branco
-        }
-    })();
-</script>
-    
+    <script>
+        // Executa imediatamente antes de renderizar a página para evitar o "piscar"
+        (function() {
+            const temaSalvo = localStorage.getItem('theme'); // Ajuste 'theme' para a chave exata que você usa (THEME_KEY)
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const metaTheme = document.getElementById('meta-theme-color');
+            
+            if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
+                document.documentElement.classList.add('dark-mode'); // ou no body se preferir
+                if (metaTheme) metaTheme.setAttribute('content', '#020617');  // preto
+            } else {
+                if (metaTheme) metaTheme.setAttribute('content', '#f8f9fa');  // branco
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="style.css">
+   
 </head>
 <body>
 
