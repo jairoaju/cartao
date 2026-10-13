@@ -268,8 +268,13 @@ body.dark-mode #dropdown-menu-opcoes {
     -webkit-tap-highlight-color: transparent;
 }
 
-body.dark-mode .dropdown-item {
+/* body.dark-mode .dropdown-item {
     color: var(--text-dark);
+    color: var(--text-dark) !important;
+} */
+body.dark-mode .dropdown-item,
+body.dark-mode label.dropdown-item {
+    color: var(--text-muted-dark) !important;
 }
 
 .dropdown-item:active {
@@ -277,7 +282,8 @@ body.dark-mode .dropdown-item {
 }
 
 body.dark-mode .dropdown-item:active {
-    background-color: var(--btn-secondary-bg-dark);
+    /* background-color: var(--btn-secondary-bg-dark); */
+    background-color: var(--btn-secondary-bg-dark) !important;
 }
 
 .dropdown-divider {
