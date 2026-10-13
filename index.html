@@ -62,14 +62,14 @@
                     
                 <!-- Linha: Data da Compra e Fatura Lado a Lado -->
                 <div class="grid-data-fatura">
-                    <div style="grid-column: span 11 / span 11;">
+                    <div style="grid-column: span 10 / span 10;">
                         <label>Data da Compra</label>
                         <input type="date" id="input-data" class="font-mono" onchange="aoMudarDataCompra(); verificarPreenchimentoFormulario()">
                     </div>
                     <!-- Coluna em branco pulando 2 espaços -->
                     <div style="grid-column: span 1 / span 1;"></div>
                     
-                    <div style="grid-column: span 12 / span 12;">
+                    <div style="grid-column: span 13 / span 13;">
                         <label>Fatura</label>
                         <input type="month" id="input-fatura" class="font-mono" onchange="verificarPreenchimentoFormulario()" oninput="verificarPreenchimentoFormulario()" onblur="garantirFaturaValida()">
                     </div>
