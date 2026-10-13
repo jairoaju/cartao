@@ -1125,6 +1125,9 @@ function exportarBackup() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        mostrarAlerta(`Backup salvo na pasta Downloads (${NOME_ARQUIVO})`, "sucesso");
+        
     } catch (e) {
         console.error("Erro ao exportar backup:", e);
         mostrarAlerta("Erro ao exportar backup.", "erro");
