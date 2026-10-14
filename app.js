@@ -38,11 +38,9 @@ function inicializarTema() {
     
     if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
         document.body.classList.add('dark-mode');
-        document.getElementById('meta-theme-color').setAttribute('content', '#020617');
         atualizarTextoMenuTema(true);
     } else {
         document.body.classList.remove('dark-mode');
-        document.getElementById('meta-theme-color').setAttribute('content', '#ffffff');
         atualizarTextoMenuTema(false);
     }
 }
