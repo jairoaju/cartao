@@ -1,5 +1,5 @@
 :root {
-    color-scheme: light;  /* Define o esquema padrão como claro */
+    /* color-scheme: light;  /* Define o esquema padrão como claro */ 
     --bg-light: #f1f5f9;
     --bg-dark: #020617;
     --card-light: rgba(255, 255, 255, 0.9);
@@ -32,9 +32,9 @@
 }
 
 /* Quando o modo escuro estiver ativo, força o esquema escuro na raiz (html) e no body */
-html.dark-mode, body.dark-mode {
+/* html.dark-mode, body.dark-mode {
     color-scheme: dark;
-}
+} */
 
 body.dark-mode {
     background-color: var(--bg-dark) !important;
