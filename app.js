@@ -58,12 +58,6 @@ function alternarTema() {
         localStorage.setItem(THEME_KEY, 'light');
         atualizarTextoMenuTema(false);
     }
-
-    // ATUALIZA A COR DA BARRA DO SISTEMA DINAMICAMENTE (PWA)
-    const metaThemeColor = document.getElementById('meta-theme-color');
-    if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', isDark ? '#11608A' : '#ffffff');
-    }
 }
 
 function alternarMenuOpcoes(event) {
