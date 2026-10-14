@@ -88,8 +88,6 @@ document.addEventListener("click", (event) => {
     }
 });
 
-inicializarTema();
-
 function selecionarCartao(cartao) {
     cartaoSelecionadoState = cartao;
     const card10 = document.getElementById("card-cartao-visa10");
@@ -1166,3 +1164,8 @@ function importarBackup(event) {
     event.target.value = "";
 }
 
+// Garante que o tema só roda quando o HTML estiver totalmente pronto
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarTema();
+    // ... suas outras funções de inicialização, se houver
+});
