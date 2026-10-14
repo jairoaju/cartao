@@ -32,7 +32,7 @@
 
     <!-- CABEÇALHO -->
     <header>
-        <h1 class="header-title">Gerenciador de Faturas</h1>
+        <h1 class="header-title">Cartões JKJ</h1>
         
         <!-- MENU HAMBÚRGUER DE OPÇÕES -->
         <div class="menu-container">
@@ -81,15 +81,15 @@
                     
                 <!-- Linha: Data da Compra e Fatura Lado a Lado -->
                 <div class="grid-data-fatura">
-                    <div style="grid-column: span 10 / span 10;">
+                    <div style="grid-column: span 11 / span 11;">
                         <label>Data da Compra</label>
                         <input type="date" id="input-data" onchange="aoMudarDataCompra(); verificarPreenchimentoFormulario()">
                     </div>
                     <!-- Coluna em branco pulando 1 espaço -->
-                    <div style="grid-column: span 1 / span 1;"></div>
+                    <!-- <div style="grid-column: span 1 / span 1;"></div> -->
                     
                     <div style="grid-column: span 13 / span 13;">
-                        <label>Fatura</label>
+                        <label>Mês da Fatura</label>
                         <input type="month" id="input-fatura" onchange="verificarPreenchimentoFormulario()" oninput="verificarPreenchimentoFormulario()" onblur="garantirFaturaValida()">
                     </div>
                 </div>
