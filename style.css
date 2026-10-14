@@ -42,18 +42,18 @@ body.dark-mode {
     --valor-destaque: #38bdf8;
 }
 
-/* Força os inputs de data e mês a ignorarem o esquema escuro nativo do navegador, mantendo o controle do seu CSS */
-input[type="date"], input[type="month"] {
-    color-scheme: light dark; /* Permite que o texto se adapte, mas evita o redesenho agressivo do ícone */
+/* Impede que o navegador altere o layout interno dos inputs de data/mês */
+input[type="date"], 
+input[type="month"] {
+    color-scheme: light; /* Mantém o padrão limpo no modo claro */
 }
 
 body.dark-mode input[type="date"], 
 body.dark-mode input[type="month"] {
     color-scheme: dark;
-    /* Se necessário, garanta que a cor do texto e dos ícones internos fiquem visíveis */
     color: var(--text-dark);
+    background-color: transparent; /* Garante que respeite o fundo do seu card */
 }
-
 
 body.dark-mode header, 
 body.dark-mode nav, 
