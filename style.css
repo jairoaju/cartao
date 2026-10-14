@@ -42,17 +42,30 @@ body.dark-mode {
     --valor-destaque: #38bdf8;
 }
 
-/* Impede que o navegador altere o layout interno dos inputs de data/mês */
+/* --- CORREÇÃO DOS INPUTS DE DATA E MÊS (ÍCONES E CORES) --- */
 input[type="date"], 
 input[type="month"] {
-    color-scheme: light; /* Mantém o padrão limpo no modo claro */
+    color-scheme: light;
 }
 
 body.dark-mode input[type="date"], 
 body.dark-mode input[type="month"] {
-    color-scheme: dark;
-    color: var(--text-dark);
-    background-color: transparent; /* Garante que respeite o fundo do seu card */
+    color-scheme: dark !important;
+    background-color: var(--input-bg-dark) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+body.dark-mode input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: none !important; /* Mantém o ícone visível no modo escuro sem sumir */
+    opacity: 0.9;
 }
 
 body.dark-mode header, 
@@ -67,17 +80,6 @@ body.dark-mode select {
     background-color: var(--input-bg-dark) !important;
     color: var(--text-dark) !important;
     border-color: var(--border-dark) !important;
-}
-
-body.dark-mode input[type="date"],
-body.dark-mode input[type="month"] {
-    color: #f8fafc !important;
-}
-
-body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
-body.dark-mode input[type="month"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(2);
-    opacity: 0.9;
 }
 
 body.dark-mode input::placeholder,
@@ -287,10 +289,6 @@ body.dark-mode #dropdown-menu-opcoes {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* body.dark-mode .dropdown-item {
-    color: var(--text-dark);
-    color: var(--text-dark) !important;
-} */
 body.dark-mode .dropdown-item,
 body.dark-mode label.dropdown-item {
     color: var(--text-muted-dark) !important;
@@ -301,7 +299,6 @@ body.dark-mode label.dropdown-item {
 }
 
 body.dark-mode .dropdown-item:active {
-    /* background-color: var(--btn-secondary-bg-dark); */
     background-color: var(--btn-secondary-bg-dark) !important;
 }
 
