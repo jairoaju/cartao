@@ -33,18 +33,22 @@ function atualizarTextoMenuTema(isDark) {
 }
 
 function inicializarTema() {
-    const temaSalvo = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isDark = (temaSalvo === 'dark' || (!temaSalvo && prefersDark));
-    
-    if (isDark) {
-        document.body.classList.add('dark-mode');
-        document.documentElement.classList.add('dark-mode');
-        atualizarTextoMenuTema(true);
-    } else {
-        document.body.classList.remove('dark-mode');
-        document.documentElement.classList.remove('dark-mode');
-        atualizarTextoMenuTema(false);
+    try {
+        const temaSalvo = localStorage.getItem(THEME_KEY);
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = (temaSalvo === 'dark' || (!temaSalvo && prefersDark));
+        
+        if (isDark) {
+            if (document.body) document.body.classList.add('dark-mode');
+            if (document.documentElement) document.documentElement.classList.add('dark-mode');
+            atualizarTextoMenuTema(true);
+        } else {
+            if (document.body) document.body.classList.remove('dark-mode');
+            if (document.documentElement) document.documentElement.classList.remove('dark-mode');
+            atualizarTextoMenuTema(false);
+        }
+    } catch (e) {
+        console.error("Erro ao inicializar o tema:", e);
     }
 }
 
