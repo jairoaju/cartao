@@ -197,20 +197,22 @@ function garantirFaturaValida() {
 }
 
 function definirValoresPadrao() {
+    // Se estiver a editar ou se os campos já tiverem algum valor preenchido, não mexe para não perder os dados!
+    const inputData = document.getElementById('input-data');
+    const inputFatura = document.getElementById('input-fatura');
+    
     if (idEmEdicao !== null) return;
+    if (inputData && inputData.value && inputFatura && inputFatura.value) return;
+
     const hoje = new Date();
     const ano = hoje.getFullYear();
     const mes = String(hoje.getMonth() + 1).padStart(2, '0');
     const dia = String(hoje.getDate()).padStart(2, '0');
     
-    const inputData = document.getElementById('input-data');
-    const inputFatura = document.getElementById('input-fatura');
-
-    if (inputData) inputData.value = `${ano}-${mes}-${dia}`;
-    if (inputFatura) inputFatura.value = `${ano}-${mes}`;
+    if (inputData && !inputData.value) inputData.value = `${ano}-${mes}-${dia}`;
+    if (inputFatura && !inputFatura.value) inputFatura.value = `${ano}-${mes}`;
 }
 
-definirValoresPadrao();
 selecionarCartao("Visa - 10");
 
 document.addEventListener("DOMContentLoaded", () => {
