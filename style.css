@@ -486,7 +486,8 @@ input:focus, select:focus {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 0.125rem;
+    gap: 0.4rem; /* Espaço entre a imagem e o texto */
+    padding: 0.4rem 0.75rem;
     border-radius: 0.75rem;
     border: 1px solid #cbd5e1;
     cursor: pointer;
@@ -502,7 +503,34 @@ input:focus, select:focus {
     text-overflow: ellipsis;
 }
 
-.pill-card.ativo {
+/* Tamanho da imagem do cartão */
+.pill-card .cartao-img {
+    height: 20px;       /* Controla a altura fixa da logo */
+    width: auto;        /* Mantém a proporção correta sem distorcer */
+    object-fit: contain;
+    display: inline-block;
+}
+
+/* Estilo do texto do vencimento */
+.pill-card .cartao-texto {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: inherit;     /* Herda a cor definida pelo tema/card ativo */
+}
+
+/* Efeito opcional quando o cartão estiver ativo */
+.pill-card.ativo .cartao-img {
+    transform: scale(1.3);
+}
+
+/* Caso queira um efeito visual se o cartão estiver desativado/bloqueado */
+.pill-card.bloqueado {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* .pill-card.ativo {
     background-color: var(--emerald-light-bg);
     border-color: var(--emerald-main);
     color: var(--emerald-text-light);
@@ -515,7 +543,7 @@ input:focus, select:focus {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
-}
+} */
 
 .tab-btn {
     flex: 1;
