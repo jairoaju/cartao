@@ -1,5 +1,4 @@
 :root {
-    /* color-scheme: light;  /* Define o esquema padrão como claro */ 
     --bg-light: #f1f5f9;
     --bg-dark: #020617;
     --card-light: rgba(255, 255, 255, 0.9);
@@ -31,11 +30,6 @@
     --valor-destaque: #1793d1;
 }
 
-/* Quando o modo escuro estiver ativo, força o esquema escuro na raiz (html) e no body */
-/* html.dark-mode, body.dark-mode {
-    color-scheme: dark;
-} */
-
 body.dark-mode {
     background-color: var(--bg-dark) !important;
     color: var(--text-dark) !important;
@@ -64,7 +58,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 
 body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
 body.dark-mode input[type="month"]::-webkit-calendar-picker-indicator {
-    filter: none !important; /* Mantém o ícone visível no modo escuro sem sumir */
+    filter: none !important;
     opacity: 0.9;
 }
 
@@ -105,25 +99,91 @@ body.dark-mode #lista-registros li {
     color: var(--text-dark) !important;
 }
 
+/* Estilo base padrão apenas para os botões de utilizadores */
+.pill-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    border: 1px solid var(--border-light, #cbd5e1);
+    background-color: var(--card-light);
+    transition: all 0.2s ease;
+    font-size: 12px;
+    font-weight: 600;
+}
+
 body.dark-mode .pill-card {
     background-color: rgba(3, 7, 18, 0.6);
     border-color: var(--border-dark);
     color: var(--text-muted-dark);
 }
 
-body.dark-mode .pill-card.ativo {
-    background-color: var(--emerald-dark-bg);
-    color: var(--emerald-text-dark);
-    border-color: var(--emerald-main);
+/* Container que agrupa os cartões lado a lado */
+.secao-cartoes-container, .cards-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
 }
 
-body.dark-mode .pill-card.bloqueado {
-    background-color: rgba(15, 23, 42, 0.2) !important;
-    border-color: #090d16 !important;
-    color: #475569 !important;
-    opacity: 0.35 !important;
+/* Estilo exclusivo para os botões de cartões (Visa 10 e Visa 25) - Lado a lado */
+.pill-card.card-cartao-especial {
+    flex: 1;
+    max-width: 160px;
+    height: 65px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.pill-card.card-cartao-especial .cartao-img-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0; /* Removido para o espaçamento ser feito exclusivamente pela célula vazia */
+}
+
+/* Imagem do cartão proporcional e limpa dentro do botão */
+.pill-card.card-cartao-especial .cartao-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Span do texto do vencimento ao lado da imagem */
+.pill-card.card-cartao-especial .cartao-texto {
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* ==========================================
+   ESTADO ATIVO (SELECIONADO) - MODO CLARO E ESCURO
+   ========================================== */
+
+/* Modo Claro (Destaque em azul) */
+.pill-card.ativo {
+    background-color: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+}
+
+/* Modo Escuro (Destaque em azul consistente) */
+body.dark-mode .pill-card.ativo,
+html.dark-mode .pill-card.ativo {
+    background-color: rgba(3, 105, 161, 0.3);
+    border-color: #0284c7;
+    color: #38bdf8;
+}
+
+/* Bloqueado */
+.pill-card.bloqueado {
+    opacity: 0.4;
+    pointer-events: none;
     cursor: not-allowed !important;
-    pointer-events: none !important;
 }
 
 body.dark-mode .btn-desativado {
@@ -352,6 +412,11 @@ main {
     position: relative;
 }
 
+/* Espaçamento vertical interno seguro para evitar sobreposições */
+.card-formulario .flex.flex-col.gap-3 {
+    gap: 1.15rem !important;
+}
+
 .form-title,
 .historico-title,
 .resumo-main-title {
@@ -477,73 +542,9 @@ input:focus, select:focus {
 .selecao-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.375rem;
-    height: 40px;
+    gap: 0.5rem;
+    margin-top: 0.375rem;
 }
-
-.pill-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem; /* Espaço entre a imagem e o texto */
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.75rem;
-    border: 1px solid #cbd5e1;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 11px;
-    font-weight: bold;
-    background-color: #f8fafc;
-    color: var(--text-muted-light);
-    height: 40px;
-    box-sizing: border-box;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Tamanho da imagem do cartão */
-.pill-card .cartao-img {
-    height: 25px;       /* Controla a altura fixa da logo */
-    width: auto;        /* Mantém a proporção correta sem distorcer */
-    object-fit: contain;
-    display: inline-block;
-}
-
-/* Estilo do texto do vencimento */
-.pill-card .cartao-texto {
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-    color: inherit;     /* Herda a cor definida pelo tema/card ativo */
-}
-
-/* Efeito opcional quando o cartão estiver ativo */
-.pill-card.ativo .cartao-img {
-    transform: scale(1.4);
-}
-
-/* Caso queira um efeito visual se o cartão estiver desativado/bloqueado */
-.pill-card.bloqueado {
-    opacity: 0.4;
-    pointer-events: none;
-}
-
-/* .pill-card.ativo {
-    background-color: var(--emerald-light-bg);
-    border-color: var(--emerald-main);
-    color: var(--emerald-text-light);
-}
-
-.pill-card.bloqueado {
-    background-color: #f1f5f9;
-    border-color: #e2e8f0;
-    color: #cbd5e1;
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
-} */
 
 .tab-btn {
     flex: 1;

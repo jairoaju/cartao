@@ -6,29 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gerenciador de Cartão de Crédito</title>
-    <!-- Abaixo põe a cor azul escuro #11608A -->
-    <!-- <meta name="theme-color" id="meta-theme-color" content="#11608A">   -->
     <link rel="manifest" href="manifest.json">
     <!-- sql.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-
-    <!-- <script>
-        // Executa imediatamente antes de renderizar a página para evitar o "piscar"
-        (function() {
-            const temaSalvo = localStorage.getItem('theme'); // Ajuste 'theme' para a chave exata que você usa (THEME_KEY)
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const metaTheme = document.getElementById('meta-theme-color');
-            
-            if (temaSalvo === 'dark' || (!temaSalvo && prefersDark)) {
-                document.documentElement.classList.add('dark-mode'); // ou no body se preferir
-                if (metaTheme) metaTheme.setAttribute('content', '#020617');  // preto
-            } else {
-                if (metaTheme) metaTheme.setAttribute('content', '#f8f9fa');  // branco
-            }
-        })();
-    </script> -->
     <link rel="stylesheet" href="style.css">
-   
 </head>
 <body>
 
@@ -87,8 +68,6 @@
                         <label>Data da Compra</label>
                         <input type="date" id="input-data" onchange="aoMudarDataCompra(); verificarPreenchimentoFormulario()">
                     </div>
-                    <!-- Coluna em branco pulando 1 espaço -->
-                    <!-- <div style="grid-column: span 1 / span 1;"></div> -->
                     
                     <div style="grid-column: span 13 / span 13;">
                         <label>Mês da Fatura</label>
@@ -96,25 +75,39 @@
                     </div>
                 </div>
                     
-                    <!-- Seleção de Cartão -->
+                    <!-- Seleção de Cartão com Grid Proporcional -->
                     <div>
                         <label>Cartão</label>
-                        <div class="selecao-grid">
-                            <div id="card-cartao-visa10" class="pill-card ativo" onclick="selecionarCartao('Visa - 10')">
-                                <img src="./imagens/visa-10.png" alt="Visa Platinum" class="cartao-img">
-                                <span class="cartao-texto">Venc. 10</span>
+                        <div class="grid-data-fatura">
+                            <div style="grid-column: span 10 / span 10;">
+                                <div id="card-cartao-visa10" class="pill-card card-cartao-especial ativo" onclick="selecionarCartao('Visa - 10')" style="width: 100%;">
+                                    <span class="cartao-img-container">
+                                        <img src="./imagens/visa-10.png" alt="Visa Platinum" class="cartao-img">
+                                    </span>
+                                    <!-- Célula vazia de espaçamento entre a imagem e o texto -->
+                                    <span style="width: 12px; display: inline-block;"></span>
+                                    <span class="cartao-texto">Venc. 10</span>
+                                </div>
                             </div>
+                            
+                            <!-- Célula vazia de espaçamento entre os 2 cartões -->
+                            <span style="width: 12px; display: inline-block;"></span>
 
-                            <div id="card-cartao-visa25" class="pill-card" onclick="selecionarCartao('Visa - 25')">
-                                <img src="./imagens/visa-25.png" alt="Visa Infinite" class="cartao-img">
-                                <span class="cartao-texto">Venc. 25</span>
+                            <div style="grid-column: span 10 / span 10;">
+                                <div id="card-cartao-visa25" class="pill-card card-cartao-especial" onclick="selecionarCartao('Visa - 25')" style="width: 100%;">
+                                    <span class="cartao-img-container">
+                                        <img src="./imagens/visa-25.png" alt="Visa Infinite" class="cartao-img">
+                                    </span>
+                                    <!-- Célula vazia de espaçamento entre a imagem e o texto -->
+                                    <span style="width: 12px; display: inline-block;"></span>                                    
+                                    <span class="cartao-texto">Venc. 25</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Seleção de Usuário -->
                     <div>
-                        <label>Usuário</label>
                         <div class="selecao-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
                             <div id="card-usuario-jairo" class="pill-card ativo" onclick="selecionarUsuario('Jairo')">Jairo</div>
                             <div id="card-usuario-katia" class="pill-card" onclick="selecionarUsuario('Kátia')">Kátia</div>
