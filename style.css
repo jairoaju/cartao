@@ -505,7 +505,7 @@ input:focus, select:focus {
 
 /* Tamanho da imagem do cartão */
 .pill-card .cartao-img {
-    height: 20px;       /* Controla a altura fixa da logo */
+    height: 25px;       /* Controla a altura fixa da logo */
     width: auto;        /* Mantém a proporção correta sem distorcer */
     object-fit: contain;
     display: inline-block;
