@@ -521,7 +521,7 @@ input:focus, select:focus {
 
 /* Efeito opcional quando o cartão estiver ativo */
 .pill-card.ativo .cartao-img {
-    transform: scale(1.3);
+    transform: scale(1.5);
 }
 
 /* Caso queira um efeito visual se o cartão estiver desativado/bloqueado */
