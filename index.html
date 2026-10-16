@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <!-- CABEÇALHO -->
     <header>
         <h1 class="header-title">Cartões JKJ</h1>
@@ -38,7 +37,13 @@
                     📂 Importar Backup
                     <input type="file" id="input-importar-menu" accept=".sqlite" onchange="importarBackup(event); fecharMenuOpcoes();" class="hidden">
                 </label>
-               
+
+                <div class="dropdown-divider"></div>
+
+                <button onclick="abrirModalExportarPdf(); fecharMenuOpcoes();" class="dropdown-item">
+                    📄 Exportar PDF
+                </button>
+
             </div>
         </div>
     </header>
@@ -177,6 +182,62 @@
         </section>
     </main>
 
+    <!-- jsPDF library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- módulo de exportação PDF -->
+    <script src="pdfExport.js"></script>
+
+    <!-- script principal -->
     <script src="app.js"></script>
+
+
+
+    <!-- MODAL DE EXPORTAÇÃO DE PDF -->
+    <div id="modal-exportar-pdf" class="hidden" style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div class="glass-card" style="width: 90%; max-width: 360px; background-color: var(--card-light); padding: 1.25rem;">
+            <h3 class="form-title" style="margin-bottom: 1rem;">Exportar Relatório PDF</h3>
+            
+            <div class="flex flex-col gap-3">
+                <!-- Seleção de Mês/Ano -->
+                <div>
+                    <label>Mês da Fatura</label>
+                    <input type="month" id="pdf-modal-mes" style="width: 100%;">
+                </div>
+
+                <!-- Seleção de Cartão -->
+                <div>
+                    <label>Cartão</label>
+                    <select id="pdf-modal-cartao" style="width: 100%;">
+                        <option value="Todos">Todos os Cartões</option>
+                        <option value="Visa - 10">Visa - 10</option>
+                        <option value="Visa - 25">Visa - 25</option>
+                    </select>
+                </div>
+
+                <!-- Seleção de Usuário -->
+                <div>
+                    <label>Usuário / Dono</label>
+                    <select id="pdf-modal-usuario" style="width: 100%;">
+                        <option value="Todos">Todos os Usuários</option>
+                        <option value="Jairo">Jairo</option>
+                        <option value="Kátia">Kátia</option>
+                        <option value="Juliana">Juliana</option>
+                    </select>
+                </div>
+
+                <!-- Botões de Ação do Modal -->
+                <div class="flex gap-2" style="margin-top: 0.5rem;">
+                    <button onclick="fecharModalExportarPdf()" class="btn-acao btn-cancela-edicao" style="flex: 1;">Cancelar</button>
+                    <button onclick="confirmarExportacaoPDF()" class="btn-acao btn-salvar-ativo" style="flex: 1;">Gerar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
 </body>
 </html>
