@@ -41,7 +41,7 @@
                 <div class="dropdown-divider"></div>
 
                 <button onclick="abrirModalExportarPdf(); fecharMenuOpcoes();" class="dropdown-item">
-                    📄 Exportar PDF
+                    🔗 Compartilhar Fatura
                 </button>
 
             </div>
@@ -198,7 +198,7 @@
     <!-- MODAL DE EXPORTAÇÃO DE PDF -->
     <div id="modal-exportar-pdf" class="hidden" style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999;">
         <div class="glass-card" style="width: 90%; max-width: 360px; background-color: var(--card-light); padding: 1.25rem;">
-            <h3 class="form-title" style="margin-bottom: 1rem;">Exportar Relatório PDF</h3>
+            <h3 class="form-title" style="margin-bottom: 1rem;">Compartilhar</h3>
             
             <div class="flex flex-col gap-3">
                 <!-- Seleção de Mês/Ano -->
@@ -231,7 +231,7 @@
                 <!-- Botões de Ação do Modal -->
                 <div class="flex gap-2" style="margin-top: 0.5rem;">
                     <button onclick="fecharModalExportarPdf()" class="btn-acao btn-cancela-edicao" style="flex: 1;">Cancelar</button>
-                    <button onclick="confirmarExportacaoPDF()" class="btn-acao btn-salvar-ativo" style="flex: 1;">Gerar PDF</button>
+                    <button onclick="confirmarExportacaoPDF()" class="btn-acao btn-salvar-ativo" style="flex: 1;">Compartilhar Fatura</button>
                 </div>
             </div>
         </div>

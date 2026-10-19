@@ -54,7 +54,7 @@ function confirmarExportacaoPDF() {
     gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado);
 }
 
-function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
+async function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
     console.log("Gerando PDF com filtros:", { mesFiltro, cartaoSelecionado, usuarioSelecionado });
 
     if (typeof window.jspdf === 'undefined') {
@@ -71,7 +71,11 @@ function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
     const doc = new jsPDF();
 
     try {
-        let query = "SELECT * FROM cartao_gastos WHERE fatura = ?";
+        let query = `
+            SELECT * FROM cartao_gastos 
+            WHERE fatura = ?
+        `;
+
         let params = [mesFiltro];
 
         if (cartaoSelecionado && cartaoSelecionado !== 'Todos') {
@@ -83,7 +87,21 @@ function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
             params.push(usuarioSelecionado);
         }
 
-        query += " ORDER BY fatura, cartao, dono_do_cartao, data"
+        // A função INSTR(estabelecimento, 'Parcela') verifica se o texto do estabelecimento
+        // contém a palavra "Parcela". Se não tiver a palavra "Parcela" (retorno = 0), a 
+        // expressão devolve 0 (compras à vista). Se tiver a palavra "Parcela" (retorno > 0),
+        // a expressão devolve 1 (compras parceladas). Ao ordenar de forma crescente, o valor 0
+        // vem antes do valor 1, colocando automaticamente todas as compras de 1 parcela no topo.
+
+        query += `
+            ORDER BY 
+                fatura, cartao, dono_do_cartao, 
+                CASE 
+                    WHEN INSTR(estabelecimento, 'Parcela') = 0 THEN 0 
+                    ELSE 1 
+                END, 
+                data
+        `;
 
         const stmtExec = db.prepare(query);
         stmtExec.bind(params);
@@ -117,11 +135,11 @@ function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
         // Cabeçalho da Tabela
         let y = 50;
         doc.setFont("helvetica", "bold");
-        doc.text("Data", 14, y);
-        doc.text("Estabelecimento", 45, y);
+        doc.text("Data Compra", 14, y);
+        doc.text("Descrição", 45, y);  // Campo "Estabelecimento"
         doc.text("Usuário", 110, y);
         doc.text("Cartão", 140, y);
-        doc.text("Valor (R$)", 175, y, { align: "right" });
+        doc.text("Valor (R$)", 196, y, { align: "right" });
 
         doc.setLineWidth(0.5);
         doc.line(14, y + 2, 196, y + 2);
@@ -136,17 +154,24 @@ function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
                 y = 20;
             }
 
-            const dataCompra = reg.data_compra || reg.data || '';
+            const dataIso = reg.data_compra || reg.data || '';
+            const dataFormatada = formatarDataCurta(dataIso); // Formata para DD/MM
             const estabelecimento = reg.estabelecimento || reg.local || '';
             const usuarioReg = reg.dono_do_cartao || '';
             const cartaoReg = reg.cartao || '';
             const valorReg = Number(reg.valor || 0);
 
-            doc.text(String(dataCompra), 14, y);
+            // Formata o valor no padrão brasileiro (ex: 1.234,56)
+            const valorFormatado = valorReg.toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+
+            doc.text(String(dataFormatada), 14, y);
             doc.text(String(estabelecimento), 45, y, { maxWidth: 60 });
             doc.text(String(usuarioReg), 110, y);
             doc.text(String(cartaoReg), 140, y);
-            doc.text(`R$ ${valorReg.toFixed(2)}`, 196, y, { align: "right" });
+            doc.text(valorFormatado, 196, y, { align: "right" });
 
             y += 7;
         });
@@ -154,14 +179,54 @@ function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado) {
         // Total Geral
         y += 10;
         doc.setFont("helvetica", "bold");
-        doc.text(`Total Geral: R$ ${valorTotalGeral.toFixed(2)}`, 196, y, { align: "right" });
+        const valorTotalGeralFormatado = valorTotalGeral.toLocaleString('pt-BR', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        });
+        doc.text(`Total:   R$ ${valorTotalGeralFormatado}`, 196, y, { align: "right" });
 
-        // Descarregar o PDF
-        const nomeArquivo = `relatorio_${mesFiltro}_${cartaoSelecionado.replace(/\s+/g, '_')}.pdf`;
-        doc.save(nomeArquivo);
+
+        // Nome do arquivo PDF
+        const nomeCartaoLimpo = cartaoSelecionado.replace(/\s+/g, '_');
+        const nomeArquivo = `fatura_${mesFiltro}_${nomeCartaoLimpo}.pdf`;
+
+        // 1. Gera o PDF em memória no formato Blob
+        const pdfBlob = doc.output('blob');
+        const arquivoPdf = new File([pdfBlob], nomeArquivo, { type: 'application/pdf' });
+
+        // 2. Dispara a API nativa de compartilhamento do dispositivo
+        if (navigator.canShare && navigator.canShare({ files: [arquivoPdf] })) {
+            await navigator.share({
+                title: `Fatura ${mesFiltro}`,
+                text: `Segue a fatura do cartão (${cartaoSelecionado}) para o mês ${mesFiltro}.`,
+                files: [arquivoPdf]
+            });
+        } else if (navigator.share) {
+            // Caso o navegador compartilhe texto mas não arquivos de mídia diretamente
+            await navigator.share({
+                title: `Fatura ${mesFiltro}`,
+                text: `Fatura ${mesFiltro} (${cartaoSelecionado}) - Total: R$ ${valorTotalGeral.toFixed(2)}`
+            });
+            doc.save(nomeArquivo);
+        } else {
+            // Fallback: se estiver em um navegador de desktop antigo sem suporte a Web Share API
+            doc.save(nomeArquivo);
+        }
+
+
+
 
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
         alert('Erro ao gerar o relatório em PDF.');
     }
+}
+
+function formatarDataCurta(dataIso) {
+    if (!dataIso) return '';
+    const partes = dataIso.split('-'); // Espera "AAAA-MM-DD"
+    if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}`; // Retorna "DD/MM"
+    }
+    return dataIso;
 }
