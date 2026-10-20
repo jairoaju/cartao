@@ -155,7 +155,7 @@ async function gerarArquivoPDF(mesFiltro, cartaoSelecionado, usuarioSelecionado)
             }
 
             const dataIso = reg.data_compra || reg.data || '';
-            const dataFormatada = formatarDataCurta(dataIso); // Formata para DD/MM
+            const dataFormatada = formatarDataBR(dataIso); // Formata para DD/MM/AA
             const estabelecimento = reg.estabelecimento || reg.local || '';
             const usuarioReg = reg.dono_do_cartao || '';
             const cartaoReg = reg.cartao || '';
