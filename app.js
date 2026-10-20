@@ -362,8 +362,12 @@ function formatarMoeda(valor) {
 
 function formatarDataBR(dataIso) {
     if (!dataIso) return '';
-    const partes = dataIso.split('-');
-    return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dataIso;
+    const partes = dataIso.split('-'); // [ano, mes, dia]
+    if (partes.length === 3) {
+        const anoDoisDigitos = partes[0].slice(-2);
+        return `${partes[2]}/${partes[1]}/${anoDoisDigitos}`;
+    }
+    return dataIso;
 }
 
 function mudarMesHistorico(direcao) {
@@ -519,7 +523,7 @@ function carregarRegistros() {
                 const divRow2 = document.createElement("div");
                 divRow2.style.cssText = "display: flex; gap: 0.5rem; align-items: center; font-size: 10px; color: var(--text-muted-light);";
                 divRow2.className = "font-mono";
-                divRow2.textContent = `📅 ${formatarDataBR(data)} • 💳 ${cartao} • 👤 ${dono}`;
+                divRow2.textContent = `📅 ${formatarDataBR(data)} 💳 ${cartao} 👤 ${dono}`;
 
                 divMain.appendChild(divRow1);
                 divMain.appendChild(divRow2);
@@ -665,7 +669,7 @@ function gerarResumoPorCartao() {
                     const divRow2 = document.createElement("div");
                     divRow2.style.cssText = "display: flex; gap: 0.4rem; align-items: center; font-size: 9px; color: var(--text-muted-light);";
                     divRow2.className = "font-mono";
-                    divRow2.textContent = `📅 ${formatarDataBR(g.data)} • 👤 ${g.dono}`;
+                    divRow2.textContent = `📅 ${formatarDataBR(g.data)} 👤 ${g.dono}`;
 
                     divInfo.appendChild(divRow1);
                     divInfo.appendChild(divRow2);
