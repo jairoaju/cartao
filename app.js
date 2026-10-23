@@ -642,7 +642,7 @@ function gerarResumoPorCartao() {
 
                 const labelLanc = document.createElement("span");
                 labelLanc.style.cssText = "font-size: 12px; font-weight: 600; color: var(--text-muted-light); letter-spacing: 0.05em; margin-top: 0.125rem;";
-                labelLanc.textContent = "🚨 LANÇAMENTOS (Clique para detalhes) 🚨";
+                labelLanc.textContent = "🚨 LANÇAMENTOS (Clique para detalhes)";
                 cardDiv.appendChild(labelLanc);
 
                 const ulEl = document.createElement("ul");
