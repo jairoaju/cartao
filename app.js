@@ -54,7 +54,7 @@ function inicializarTema() {
 
 function alternarTema() {
     const isDark = document.body.classList.toggle('dark-mode');
-    document.documentElement.classList.toggle('dark-mode', isDark); // <--- Adicione esta linha
+    document.documentElement.classList.toggle('dark-mode', isDark);
     
     if (isDark) {
         localStorage.setItem(THEME_KEY, 'dark');
@@ -521,9 +521,9 @@ function carregarRegistros() {
                 divRow1.appendChild(spanValor);
 
                 const divRow2 = document.createElement("div");
-                divRow2.style.cssText = "display: flex; gap: 0.5rem; align-items: center; font-size: 10px; color: var(--text-muted-light);";
+                divRow2.style.cssText = "display: flex; gap: 0.5rem; align-items: center; font-size: 11px; color: var(--text-muted-light);";
                 divRow2.className = "font-mono";
-                divRow2.textContent = `📅 ${formatarDataBR(data)} 💳 ${cartao} 👤 ${dono}`;
+                divRow2.textContent = `${formatarDataBR(data)}  ${cartao}  ${dono}`; // Mudei aqui. A fonte ficou em 11px
 
                 divMain.appendChild(divRow1);
                 divMain.appendChild(divRow2);
@@ -641,7 +641,7 @@ function gerarResumoPorCartao() {
                 cardDiv.appendChild(subBox);
 
                 const labelLanc = document.createElement("span");
-                labelLanc.style.cssText = "font-size: 10px; font-weight: 600; color: var(--text-muted-light); letter-spacing: 0.05em; margin-top: 0.125rem;";
+                labelLanc.style.cssText = "font-size: 12px; font-weight: 600; color: var(--text-muted-light); letter-spacing: 0.05em; margin-top: 0.125rem;";
                 labelLanc.textContent = "Lançamentos (clique para detalhes):";
                 cardDiv.appendChild(labelLanc);
 
@@ -667,9 +667,10 @@ function gerarResumoPorCartao() {
                     divRow1.appendChild(spanEst);
 
                     const divRow2 = document.createElement("div");
-                    divRow2.style.cssText = "display: flex; gap: 0.4rem; align-items: center; font-size: 9px; color: var(--text-muted-light);";
+                    divRow2.style.cssText = "display: flex; gap: 0.4rem; align-items: center; font-size: 11px; color: var(--text-muted-light);";
                     divRow2.className = "font-mono";
-                    divRow2.textContent = `📅 ${formatarDataBR(g.data)} 👤 ${g.dono}`;
+                    // divRow2.textContent = `📅 ${formatarDataBR(g.data)} 👤 ${g.dono}`; mudei aqui e a fonte ficou em 11px
+                    divRow2.textContent = `${formatarDataBR(g.data)}  ${g.dono}`;
 
                     divInfo.appendChild(divRow1);
                     divInfo.appendChild(divRow2);
