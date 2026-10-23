@@ -805,7 +805,7 @@ function mostrarModalDetalhes(dadosJson) {
         divEstOrig.style.cssText = `border-bottom: 1px solid ${bordaCor}; padding-bottom: 0.5rem;`;
         
         const pEstLabel = document.createElement("p");
-        pEstLabel.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.15rem;";
+        pEstLabel.style.cssText = "font-size: 12px; color: var(--text-muted-light); margin-bottom: 0.15rem;";
         pEstLabel.textContent = "Estabelecimento";
 
         const pEstVal = document.createElement("p");
@@ -821,20 +821,20 @@ function mostrarModalDetalhes(dadosJson) {
 
         const col1 = document.createElement("div");
         const pCol1Lbl = document.createElement("p");
-        pCol1Lbl.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
+        pCol1Lbl.style.cssText = "font-size: 12px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
         pCol1Lbl.textContent = "Status / Parcela";
         const pCol1Val = document.createElement("p");
-        pCol1Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
+        pCol1Val.style.cssText = `font-size: 12px; font-weight: 600; color: ${textoCor};`;
         pCol1Val.textContent = parcelaInfo;
         col1.appendChild(pCol1Lbl);
         col1.appendChild(pCol1Val);
 
         const col2 = document.createElement("div");
         const pCol2Lbl = document.createElement("p");
-        pCol2Lbl.style.cssText = "font-size: 10px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
+        pCol2Lbl.style.cssText = "font-size: 12px; color: var(--text-muted-light); margin-bottom: 0.1rem;";
         pCol2Lbl.textContent = "👤 Usuário";
         const pCol2Val = document.createElement("p");
-        pCol2Val.style.cssText = `font-size: 11px; font-weight: 600; color: ${textoCor};`;
+        pCol2Val.style.cssText = `font-size: 12px; font-weight: 600; color: ${textoCor};`;
         pCol2Val.textContent = dados.dono;
         col2.appendChild(pCol2Lbl);
         col2.appendChild(pCol2Val);
@@ -852,7 +852,7 @@ function mostrarModalDetalhes(dadosJson) {
         const rowP = document.createElement("div");
         rowP.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanPLbl = document.createElement("span");
-        spanPLbl.style.cssText = `font-size: 10px; color: ${highlightText}; font-weight: 600;`;
+        spanPLbl.style.cssText = `font-size: 12px; color: ${highlightText}; font-weight: 600;`;
         spanPLbl.textContent = "Valor desta parcela:";
         const spanPVal = document.createElement("span");
         spanPVal.className = "font-mono";
@@ -864,7 +864,7 @@ function mostrarModalDetalhes(dadosJson) {
         const rowT = document.createElement("div");
         rowT.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
         const spanTLbl = document.createElement("span");
-        spanTLbl.style.cssText = `font-size: 10px; color: ${highlightText}; font-weight: 600;`;
+        spanTLbl.style.cssText = `font-size: 12px; color: ${highlightText}; font-weight: 600;`;
         spanTLbl.textContent = "Valor total da compra:";
         const spanTVal = document.createElement("span");
         spanTVal.className = "font-mono";
@@ -877,7 +877,7 @@ function mostrarModalDetalhes(dadosJson) {
         divHighlight.appendChild(rowT);
 
         const divMeta = document.createElement("div");
-        divMeta.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 10px; color: var(--text-muted-light);";
+        divMeta.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 12px; color: var(--text-muted-light);";
         const spanComp = document.createElement("span");
         spanComp.textContent = `📅 Compra: ${formatarDataBR(dados.data)}`;
         const spanFat = document.createElement("span");
@@ -889,12 +889,12 @@ function mostrarModalDetalhes(dadosJson) {
         divModalBtns.style.cssText = `display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; border-top: 1px solid ${bordaCor}; padding-top: 0.625rem; margin-top: 0.125rem;`;
 
         const btnEditModal = document.createElement("button");
-        btnEditModal.style.cssText = "background-color: #d97706; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;";
+        btnEditModal.style.cssText = "background-color: #d97706; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 12px; font-weight: 600; cursor: pointer;";
         btnEditModal.textContent = "✏️ Editar";
         btnEditModal.addEventListener('click', () => editarDoModal(dados.id, dados.data, dados.fatura, dados.cartao, dados.dono, dados.estabelecimento, dados.valor));
 
         const btnDelModal = document.createElement("button");
-        btnDelModal.style.cssText = "background-color: #dc2626; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer;";
+        btnDelModal.style.cssText = "background-color: #dc2626; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 12px; font-weight: 600; cursor: pointer;";
         btnDelModal.textContent = "🗑 Excluir";
         btnDelModal.addEventListener('click', pedirConfirmacaoExclusaoModal);
 
@@ -903,7 +903,7 @@ function mostrarModalDetalhes(dadosJson) {
 
         const btnCloseModal = document.createElement("button");
         btnCloseModal.className = "btn-cancela-edicao";
-        btnCloseModal.style.cssText = "padding: 0.5rem; border-radius: 0.5rem; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; text-align: center;";
+        btnCloseModal.style.cssText = "padding: 0.5rem; border-radius: 0.5rem; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; text-align: center;";
         btnCloseModal.textContent = "Fechar";
         btnCloseModal.addEventListener('click', fecharModalDetalhes);
 
