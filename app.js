@@ -465,7 +465,7 @@ function carregarRegistros() {
                 const divInfo = document.createElement("div");
                 divInfo.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
                 const spanWarn = document.createElement("span");
-                spanWarn.textContent = "❌ Confirmar exclusão?";
+                spanWarn.textContent = "❌ ⚠️ Confirmar exclusão?";
                 const spanVal = document.createElement("span");
                 spanVal.className = "font-mono";
                 spanVal.style.color = "#92400e";
