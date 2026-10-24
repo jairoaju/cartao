@@ -764,7 +764,7 @@ function mostrarModalDetalhes(dadosJson) {
         divDelRow1.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
         
         const spanDelWarn = document.createElement("span");
-        spanDelWarn.textContent = "❌ Confirmar exclusão?";
+        spanDelWarn.textContent = "❌⚠️ Confirmar exclusão?";
         const spanDelVal = document.createElement("span");
         spanDelVal.className = "font-mono";
         spanDelVal.style.color = "#92400e";
