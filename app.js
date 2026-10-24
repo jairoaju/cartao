@@ -463,18 +463,18 @@ function carregarRegistros() {
                 li.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
                 
                 const divInfo = document.createElement("div");
-                divInfo.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
+                divInfo.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
                 const spanWarn = document.createElement("span");
-                spanWarn.textContent = "❌ ⚠️ Confirmar exclusão?";
+                spanWarn.textContent = "⚠️ Confirmar exclusão?";
                 const spanVal = document.createElement("span");
                 spanVal.className = "font-mono";
-                spanVal.style.color = "#92400e";
+                spanVal.style.color = "#926d0e";
                 spanVal.textContent = formatarMoeda(valor);
                 divInfo.appendChild(spanWarn);
                 divInfo.appendChild(spanVal);
 
                 const divEst = document.createElement("div");
-                divEst.style.cssText = "font-size: 11px; color: #d97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
+                divEst.style.cssText = "font-size: 13px; color: #d97706; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
                 divEst.textContent = estabelecimento;
 
                 const divBtns = document.createElement("div");
@@ -761,19 +761,19 @@ function mostrarModalDetalhes(dadosJson) {
         divDelBox.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
 
         const divDelRow1 = document.createElement("div");
-        divDelRow1.style.cssText = "font-size: 11px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
+        divDelRow1.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
         
         const spanDelWarn = document.createElement("span");
-        spanDelWarn.textContent = "❌⚠️ Confirmar exclusão?";
+        spanDelWarn.textContent = "⚠️ Confirmar exclusão?";
         const spanDelVal = document.createElement("span");
         spanDelVal.className = "font-mono";
-        spanDelVal.style.color = "#92400e";
+        spanDelVal.style.color = "#926d0e";
         spanDelVal.textContent = valorParcelaFormatado;
         divDelRow1.appendChild(spanDelWarn);
         divDelRow1.appendChild(spanDelVal);
 
         const divDelEst = document.createElement("div");
-        divDelEst.style.cssText = "font-size: 11px; color: #d97706; word-break: break-word;";
+        divDelEst.style.cssText = "font-size: 13px; color: #d97706; word-break: break-word;";
         divDelEst.textContent = dados.estabelecimento;
 
         const divDelBtns = document.createElement("div");
