@@ -754,7 +754,7 @@ function mostrarModalDetalhes(dadosJson) {
     btnClose.style.cssText = "position: absolute; top: 0.625rem; right: 0.625rem; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted-light); line-height: 1;";
     btnClose.innerHTML = "&times;";
     btnClose.addEventListener('click', fecharModalDetalhes);
-    container.appendChild(btnClose);
+    // container.appendChild(btnClose);  // Botão Fechar
 
     if (confirmandoExclusaoModal) {
         const divDelBox = document.createElement("div");
