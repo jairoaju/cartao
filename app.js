@@ -460,10 +460,12 @@ function carregarRegistros() {
             const li = document.createElement("li");
             
             if (idEmExclusaoPendente === id) {
-                li.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
+                // li.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
+                li.style.cssText = "background-color: transparent; border: 1px solid var(--borda-vermelha, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 
                 const divInfo = document.createElement("div");
                 divInfo.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
+                
                 const spanWarn = document.createElement("span");
                 spanWarn.textContent = "⚠️ Confirmar exclusão?";
                 const spanVal = document.createElement("span");
@@ -758,8 +760,9 @@ function mostrarModalDetalhes(dadosJson) {
 
     if (confirmandoExclusaoModal) {
         const divDelBox = document.createElement("div");
-        divDelBox.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
-
+        // divDelBox.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
+        // divDelBox.style.cssText = "background-color: transparent; border: 1px solid var(--border-light, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
+        divDelBox.style.cssText = "background-color: transparent; border: 1px solid var(--borda-vermelha, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
         const divDelRow1 = document.createElement("div");
         divDelRow1.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
         
