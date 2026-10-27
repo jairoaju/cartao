@@ -68,7 +68,6 @@ body.dark-mode input[type="month"]::-webkit-calendar-picker-indicator {
 }
 
 body.dark-mode header, 
-body.dark-mode nav, 
 body.dark-mode .glass-card {
     background-color: var(--card-dark) !important;
     border-color: var(--border-dark) !important;
@@ -92,8 +91,8 @@ body.dark-mode label {
 }
 
 body.dark-mode nav {
-    background-color: rgba(15, 23, 42, 0.6) !important;
-    border-color: rgba(30, 41, 59, 0.6) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
 }
 
 body.dark-mode .inner-item-box, 
@@ -321,19 +320,11 @@ body.dark-mode #btn-menu-principal {
     color: var(--text-dark);
 }
 
-body.dark-mode .header-title {
-    /* Cor do texto Cartões JKJ no modo escuro */
-    color:#f4fac0 !important; 
-}
-
-body.dark-mode #titulo-formulario {
-    /* Cor do texto NOVO LANÇAMENTO no modo escuro */
-    color:#f4fac0 !important; 
-}
-
-body.dark-mode .historico-title,
+body.dark-mode .header-title,       /* Cor do texto Cartões JKJ no modo escuro */
+body.dark-mode #titulo-formulario,  /* Cor do texto NOVO LANÇAMENTO no modo escuro */
+body.dark-mode .historico-title,    /* Cor do texto Fatura/Mês no modo escuro */
 body.dark-mode .resumo-main-title {
-    color: #f4fac0 !important; 
+    color:#c0defa !important; 
 }
 
 #dropdown-menu-opcoes {
@@ -400,8 +391,7 @@ body.dark-mode .dropdown-divider {
 }
 
 nav {
-    background-color: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
+    background-color: transparent !important; /* Torna o fundo completamente transparente no modo claro */    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border-light);
     padding: 0.5rem;
