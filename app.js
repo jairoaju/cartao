@@ -732,7 +732,7 @@ function mostrarModalDetalhes(dadosJson) {
     modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
 
     const isDark = document.body.classList.contains('dark-mode');
-    const bgCor = isDark ? "#0f172a" : "#ffffff";
+    const bgCor = isDark ? "#1e293b" : "#ffffff";
     const textoCor = isDark ? "#f1f5f9" : "#0f172a";
     const bordaCor = isDark ? "#334155" : "#e2e8f0";
 
@@ -894,12 +894,12 @@ function mostrarModalDetalhes(dadosJson) {
 
         const btnEditModal = document.createElement("button");
         btnEditModal.style.cssText = "background-color: #d97706; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 12px; font-weight: 600; cursor: pointer;";
-        btnEditModal.textContent = "✏️ Editar";
+        btnEditModal.textContent = "Editar";
         btnEditModal.addEventListener('click', () => editarDoModal(dados.id, dados.data, dados.fatura, dados.cartao, dados.dono, dados.estabelecimento, dados.valor));
 
         const btnDelModal = document.createElement("button");
         btnDelModal.style.cssText = "background-color: #dc2626; color: white; border: none; padding: 0.4rem; border-radius: 0.5rem; font-size: 12px; font-weight: 600; cursor: pointer;";
-        btnDelModal.textContent = "🗑 Excluir";
+        btnDelModal.textContent = "Excluir";
         btnDelModal.addEventListener('click', pedirConfirmacaoExclusaoModal);
 
         divModalBtns.appendChild(btnEditModal);
