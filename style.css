@@ -502,7 +502,7 @@ main {
 
 label {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     margin-bottom: 0.25rem;
     color: var(--text-muted-light);
