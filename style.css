@@ -1,36 +1,32 @@
 :root {
     --bg-light: #f1f5f9;
-    /* --bg-dark: #020617; */
-    --bg-dark: #063E63;
-    --card-light: rgba(255, 255, 255, 0.9);
-    /* --card-dark: rgba(15, 23, 42, 0.9); */
-    --card-dark: #063E63;
+    --bg-dark: #063E63;                 /* --bg-dark: #020617; */
+    --card-light: #ffffffe6;
+    --card-dark: #063E63;               /* --card-dark: rgba(15, 23, 42, 0.9); */
     --text-light: #1e293b;
     --text-dark: #f8fafc;
     --text-muted-light: #64748b;
     --text-muted-dark: #94a3b8;
     --border-light: #e2e8f0;
     --borda-vermelha:#dc2626;
-    /* --border-dark: #1e293b; */
-    --border-dark: #063E63;
+    --border-dark: #063E63;             /* --border-dark: #1e293b; */
     
-    --emerald-main: #1793d1; /* azul */
+    --emerald-main: #1793d1;
     --emerald-light-bg: #e0f2fe;
-    --emerald-dark-bg: rgba(23, 147, 209, 0.25);
+    --emerald-dark-bg: #1793d140;
     --emerald-text-light: #0369a1;
     --emerald-text-dark: #38bdf8;
     --emerald-border-light: #bae6fd;
     --emerald-border-dark: #0369a1;
     
     --input-bg-light: #f8fafc;
-    /* --input-bg-dark: #030712; */
-    --input-bg-dark: #023354;
+    --input-bg-dark: #023354;           /* --input-bg-dark: #030712; */
     --btn-secondary-bg-light: #e2e8f0;
     --btn-secondary-bg-dark: #1e293b;
     --btn-secondary-text-light: #334155;
     --btn-secondary-text-dark: #94a3b8;
-    --inner-card-light: rgba(248, 250, 252, 0.6);
-    --inner-card-dark: rgba(30, 41, 59, 0.6);
+    --inner-card-light: #f8fafc99;
+    --inner-card-dark: #1e293b99;
 
     --valor-destaque: #1793d1;
 }
@@ -276,7 +272,8 @@ header {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid var(--border-light);
+    /* border-bottom: 1px solid var(--border-light); */
+    border-bottom: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -391,9 +388,11 @@ body.dark-mode .dropdown-divider {
 }
 
 nav {
-    background-color: transparent !important; /* Torna o fundo completamente transparente no modo claro */    backdrop-filter: blur(8px);
+    background-color: transparent !important; /* Torna o fundo completamente transparente no modo claro */
+    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border-light);
+    /* border-bottom: 1px solid var(--border-light); */
+    border-bottom: none;
     padding: 0.5rem;
     display: flex;
     gap: 0.5rem;

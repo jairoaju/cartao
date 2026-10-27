@@ -594,7 +594,8 @@ function gerarResumoPorCartao() {
             cardDiv.style.cssText = "display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem;";
 
             const cardHeader = document.createElement("div");
-            cardHeader.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;";
+            // cardHeader.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 0.375rem;";
+            cardHeader.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom: none; padding-bottom: 0.375rem;";
             
             const spanCardNome = document.createElement("span");
             spanCardNome.style.cssText = "font-weight: bold; color: var(--valor-destaque); font-size: 12px;";
@@ -984,11 +985,11 @@ function carregarParaEdicao(id, data, fatura, cartao, dono, estabelecimento, val
     document.getElementById("input-valor").value = Number(valor).toFixed(2);
     document.getElementById("input-parcelas-total").value = "1";
 
-    const tituloEl = document.getElementById("titulo-formulario");
-    if (tituloEl) {
-        tituloEl.textContent = "Editando Lançamento";
-        tituloEl.style.color = "#d97706";
-    }
+    // const tituloEl = document.getElementById("titulo-formulario");
+    // if (tituloEl) {
+    //     tituloEl.textContent = "Editando Lançamento";
+    //     tituloEl.style.color = "#d97706";
+    // }
     ativarBotaoSalvar();
 }
 
@@ -1001,11 +1002,11 @@ function cancelarEdicao() {
     selecionarCartao("Visa - 10");
     selecionarUsuario("Jairo");
 
-    const tituloEl = document.getElementById("titulo-formulario");
-    if (tituloEl) {
-        tituloEl.textContent = "Novo Lançamento";
-        tituloEl.style.color = "var(--valor-destaque)";
-    }
+    // const tituloEl = document.getElementById("titulo-formulario");
+    // if (tituloEl) {
+    //     tituloEl.textContent = "Novo Lançamento";
+    //     tituloEl.style.color = "var(--valor-destaque)";
+    // }
     ativarBotaoSalvar();
 }
 
