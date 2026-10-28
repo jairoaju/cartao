@@ -461,7 +461,7 @@ function carregarRegistros() {
             
             if (idEmExclusaoPendente === id) {
                 // li.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
-                li.style.cssText = "background-color: transparent; border: 1px solid var(--borda-azul, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
+                li.style.cssText = "background-color: transparent; border: none; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 
                 const divInfo = document.createElement("div");
                 divInfo.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
@@ -732,7 +732,8 @@ function mostrarModalDetalhes(dadosJson) {
     modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
 
     const isDark = document.body.classList.contains('dark-mode');
-    const bgCor = isDark ? "#1e293b" : "#ffffff";
+    // const bgCor = isDark ? "#1e293b" : "#ffffff";
+    const bgCor = isDark ? "var(--bg-dark)" : "#ffffff";
     const textoCor = isDark ? "#f1f5f9" : "#0f172a";
     const bordaCor = isDark ? "#334155" : "#e2e8f0";
 
@@ -763,7 +764,7 @@ function mostrarModalDetalhes(dadosJson) {
         const divDelBox = document.createElement("div");
         // divDelBox.style.cssText = "background-color: #fffbeb; border: 1px solid #fde68a; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
         // divDelBox.style.cssText = "background-color: transparent; border: 1px solid var(--border-light, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
-        divDelBox.style.cssText = "background-color: transparent; border: 1px solid var(--borda-azul, #334155); padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
+        divDelBox.style.cssText = "background-color: transparent; border: none; paddivDelBoxding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
         const divDelRow1 = document.createElement("div");
         divDelRow1.style.cssText = "font-size: 13px; font-weight: 600; color: #b45309; display: flex; justify-content: space-between; align-items: center;";
         
