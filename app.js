@@ -308,7 +308,9 @@ function verificarPreenchimentoFormulario() {
     const regexFaturaValida = /^\d{4}-\d{2}$/;
     const faturaEhValida = regexFaturaValida.test(faturaInput);
 
-    const formularioValido = dataInput !== "" && faturaEhValida && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
+    const valorNum = parseFloat(valorInput);
+    const formularioValido = dataInput !== "" && faturaEhValida && estabelecimento !== "" && valorInput !== "" && !isNaN(valorNum) && valorNum !== 0 && numParcelas >= 1;
+    // const formularioValido = dataInput !== "" && faturaEhValida && estabelecimento !== "" && valorInput !== "" && parseFloat(valorInput) > 0 && numParcelas >= 1;
 
     if (idEmEdicao !== null) {
         if (btnConfirma) btnConfirma.disabled = !formularioValido;
@@ -1039,7 +1041,7 @@ function salvarOuAtualizarRegistro() {
     }
 
     const valorTotal = parseFloat(valorTotalInput);
-    if (isNaN(valorTotal) || valorTotal <= 0) {
+    if (isNaN(valorTotal) || valorTotal === 0) {
         mostrarAlerta("Insira um valor válido em reais!", "erro");
         return;
     }
