@@ -462,7 +462,8 @@ function carregarRegistros() {
             const li = document.createElement("li");
             
             if (idEmExclusaoPendente === id) {
-                li.style.cssText = "background-color: #ccf5fd; border: 1px solid #4279f9; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;";
+                // Cores do diálogo exclusão do lançamento - Excluir registro
+                li.style.cssText = "background-color: #e0f2fe; border: 1px solid #0284c7; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 // li.style.cssText = "background-color: transparent; border: none; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 
                 const divInfo = document.createElement("div");
@@ -733,6 +734,7 @@ function mostrarModalDetalhes(dadosJson) {
     modal.classList.remove("hidden");
     modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 0.75rem; box-sizing: border-box;";
 
+    // Cores do diálogo exclusão no quadro Resumo
     const isDark = document.body.classList.contains('dark-mode');
     // const bgCor = isDark ? "#1e293b" : "#ffffff";
     const bgCor = isDark ? "var(--bg-dark)" : "#ffffff";

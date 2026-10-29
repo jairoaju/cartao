@@ -1,5 +1,5 @@
 :root {
-    --bg-light: #f1f5f9;
+    --bg-light: #4794e0;
     --bg-dark: #063E63;                 /* --bg-dark: #020617; */
     --card-light: #ffffffe6;
     --card-dark: #063E63;               /* --card-dark: rgba(15, 23, 42, 0.9); */
@@ -167,7 +167,7 @@ body.dark-mode .pill-card {
    ESTADO ATIVO (SELECIONADO) - MODO CLARO E ESCURO
    ========================================== */
 
-/* Modo Claro (Destaque em azul) */
+/* Cores Cartões de Crédito e Usuários Modo Claro (Destaque em azul) */
 .pill-card.ativo {
     background-color: #e0f2fe;
     border-color: #0284c7;
