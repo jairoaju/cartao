@@ -250,7 +250,7 @@ html, body {
     min-height: 100dvh;
     margin: 0;
     padding: 0;
-    background-color: var(--bg-light);
+    background-color: #cce8f7;    /* Tela de fundo */
     color: var(--text-light);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     user-select: none;
@@ -550,7 +550,7 @@ input:focus, select:focus {
 .btn-salvar-ativo {
     /* Cor do botão Salvar Lançamento */
     /* background-color: var(--emerald-main); */
-    background-color:#6370c4 ;
+    background-color:#5a6ff6 ;
     color: white;
 }
 
