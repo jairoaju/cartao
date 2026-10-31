@@ -557,7 +557,7 @@ input:focus, select:focus {
 .btn-salvar-ativo {
     /* Cor do botão Salvar Lançamento */
     /* background-color: var(--emerald-main); */
-    background-color:#4682B4 ;
+    background-color:#2E8B57 ;
     color: white;
 }
 
