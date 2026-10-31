@@ -109,7 +109,8 @@ body.dark-mode #lista-registros li {
     border-radius: 0.75rem;
     cursor: pointer;
     border: 1px solid var(--border-light, #cbd5e1);
-    background-color: var(--card-light);
+    /* Cartão e usuário não-selecionados */
+    background-color: var(--card-light); 
     transition: all 0.2s ease;
     font-size: 12px;
     font-weight: 600;
@@ -170,9 +171,14 @@ body.dark-mode .pill-card {
 
 /* Cores Cartões de Crédito e Usuários Modo Claro (Destaque em azul) */
 .pill-card.ativo {
-    background-color: #e0f2fe;
+    /* background-color: #e0f2fe; */
+    /* background-color: #4682B4; */
+    background-color: var(--emerald-main);
+    /* border-color: #0284c7; */
     border-color: #0284c7;
-    color: #0369a1;
+    /* color: #0369a1; */
+    color: var(--input-bg-light);
+
 }
 
 /* Modo Escuro (Destaque em azul consistente) */
@@ -551,7 +557,7 @@ input:focus, select:focus {
 .btn-salvar-ativo {
     /* Cor do botão Salvar Lançamento */
     /* background-color: var(--emerald-main); */
-    background-color:#5a6ff6 ;
+    background-color:#4682B4 ;
     color: white;
 }
 
@@ -583,6 +589,7 @@ input:focus, select:focus {
 }
 
 .tab-ativa {
+    /* Botões Lançamentos e Resumo por Cartão */
     background-color: var(--emerald-main);
     color: white;
 }
