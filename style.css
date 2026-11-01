@@ -100,7 +100,7 @@ body.dark-mode #lista-registros li {
     color: var(--text-dark) !important;
 }
 
-/* Estilo base padrão apenas para os botões de utilizadores */
+/* Estilo base padrão apenas para os botões de usuários */
 .pill-card {
     display: flex;
     align-items: center;
@@ -169,11 +169,12 @@ body.dark-mode .pill-card {
    ESTADO ATIVO (SELECIONADO) - MODO CLARO E ESCURO
    ========================================== */
 
-/* Cores Cartões de Crédito e Usuários Modo Claro (Destaque em azul) */
+/* Cartão e Usuário no modo claro */
 .pill-card.ativo {
     /* background-color: #e0f2fe; */
     /* background-color: #4682B4; */
-    background-color: var(--emerald-main);
+    /* background-color: var(--emerald-main); */
+    background-color: #008080;
     /* border-color: #0284c7; */
     border-color: #0284c7;
     /* color: #0369a1; */
@@ -181,12 +182,11 @@ body.dark-mode .pill-card {
 
 }
 
-/* Modo Escuro (Destaque em azul consistente) */
 /* Cartão e Usuário no modo escuro */
 body.dark-mode .pill-card.ativo,
 html.dark-mode .pill-card.ativo {
-    /* background-color: rgba(3, 105, 161, 0.3); */
-    background-color: var(--emerald-main);
+    /* background-color: var(--emerald-main); */
+    background-color: #008080;
     border-color: #0284c7;
     /* color: #38bdf8; */
     color: var(--input-bg-light);
