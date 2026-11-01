@@ -100,7 +100,8 @@ body.dark-mode #lista-registros li {
     color: var(--text-dark) !important;
 }
 
-/* Estilo base padrão apenas para os botões de usuários */
+/* Estilo base padrão botões de usuários */
+/* Cartão e Usuário no modo claro não selecionados */
 .pill-card {
     display: flex;
     align-items: center;
@@ -110,7 +111,8 @@ body.dark-mode #lista-registros li {
     cursor: pointer;
     border: 1px solid var(--border-light, #cbd5e1);
     /* Cartão e usuário não-selecionados */
-    background-color: var(--card-light); 
+    background-color: var(--card-light);
+    border-color: var(--bg-light);
     transition: all 0.2s ease;
     font-size: 12px;
     font-weight: 600;
@@ -175,7 +177,6 @@ body.dark-mode .pill-card {
     /* background-color: #4682B4; */
     /* background-color: var(--emerald-main); */
     background-color: #008080;
-    /* border-color: #0284c7; */
     border-color: #0284c7;
     /* color: #0369a1; */
     color: var(--input-bg-light);
