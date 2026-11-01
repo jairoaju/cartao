@@ -33,7 +33,7 @@
 
 body.dark-mode {
     /* background-color: var(--bg-dark) !important; */
-    background-color: #000000dc !important;
+    background-color: #061021 !important;
     color: var(--text-dark) !important;
     --valor-destaque: #38bdf8;
 }
@@ -277,7 +277,7 @@ body {
 header {
     padding: 0.375rem 1rem;
     /* background-color: var(--card-light); */
-    background-color: #cce8f7;
+    background-color: #b7dff4;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
