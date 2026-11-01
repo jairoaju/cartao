@@ -344,7 +344,7 @@ function ativarBotaoSalvar() {
         if (containerEdicao) containerEdicao.style.setProperty('display', 'none', 'important');
         if (btnSalvar) {
             btnSalvar.className = "btn-acao btn-salvar-ativo";
-            btnSalvar.textContent = "Salvar Lançamento";
+            btnSalvar.textContent = "Gravar Lançamento";
         }
         if (inputParcelas) inputParcelas.disabled = false;
     }

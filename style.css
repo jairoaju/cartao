@@ -1,7 +1,7 @@
 :root {
     --bg-light: #4794e0;
-    --bg-dark: #063E63;                 /* --bg-dark: #020617; */
-    --card-light: #ffffffe6;
+    --bg-dark: #dfeef7;                 /* --bg-dark: #020617; */
+    --card-light: #eff9f8e6;
     --card-dark: #063E63;               /* --card-dark: rgba(15, 23, 42, 0.9); */
     --text-light: #1e293b;
     --text-dark: #f8fafc;
@@ -111,11 +111,11 @@ body.dark-mode #lista-registros li {
     border-radius: 0.75rem;
     cursor: pointer;
     border: 1px solid #cbd5e1; /*Cor da borda no modo claro */
-    background-color: var(--card-light);
+    /* background-color: var(--card-light); */
     /* border-color: var(--bg-light); */
     transition: all 0.2s ease;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 550;
 }
 
 body.dark-mode .pill-card {
@@ -502,9 +502,7 @@ label {
     font-size: 13px;
     font-weight: 500;
     margin-bottom: 0.25rem;
-    color: #185fb0;
-    /* color: var(--emerald-main); */
-    /* color:#c0defa !important;  */
+    color: var(--emerald-main);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -565,7 +563,7 @@ input:focus, select:focus {
 }
 
 .btn-desativado {
-    background-color: #cbd5e1;
+    background-color: var(--btn-secondary-bg-light);
     color: #64748b;
     cursor: not-allowed;
     box-shadow: none;
