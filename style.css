@@ -8,7 +8,8 @@
     --text-muted-light: #64748b;
     --text-muted-dark: #94a3b8;
     --border-light: #e2e8f0;
-    --border-dark: #063E63;             /* --border-dark: #1e293b; */
+    /* --border-dark: #063E63;             --border-dark: #1e293b; */
+    --border-dark: #2a4e67;             /* --border-dark: #1e293b; */
     /* --bg-azul:#0369a14d; */
 
     --emerald-main: #1793d1;
