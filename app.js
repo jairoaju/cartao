@@ -463,7 +463,7 @@ function carregarRegistros() {
             
             if (idEmExclusaoPendente === id) {
                 // Cores do diálogo exclusão do lançamento - Excluir registro
-                li.style.cssText = "background-color: #e0f2fe; border: 1px solid #0284c7; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
+                li.style.cssText = "background-color: #e0f2fe; border: 1px solid #9dd8f6; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 // li.style.cssText = "background-color: transparent; border: none; padding: 0.75rem; border-radius: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem;";
                 
                 const divInfo = document.createElement("div");
@@ -473,7 +473,8 @@ function carregarRegistros() {
                 spanWarn.textContent = "⚠️ Confirmar exclusão?";
                 const spanVal = document.createElement("span");
                 spanVal.className = "font-mono";
-                spanVal.style.color = "#926d0e";
+                // spanVal.style.color = "#926d0e";
+                spanVal.style.color = "#b45309";
                 spanVal.textContent = formatarMoeda(valor);
                 divInfo.appendChild(spanWarn);
                 divInfo.appendChild(spanVal);
@@ -776,7 +777,8 @@ function mostrarModalDetalhes(dadosJson) {
         spanDelWarn.textContent = "⚠️ Confirmar exclusão?";
         const spanDelVal = document.createElement("span");
         spanDelVal.className = "font-mono";
-        spanDelVal.style.color = "#926d0e";
+        // spanDelVal.style.color = "#926d0e";
+        spanDelVal.style.color = "#b45309";
         spanDelVal.textContent = valorParcelaFormatado;
         divDelRow1.appendChild(spanDelWarn);
         divDelRow1.appendChild(spanDelVal);
