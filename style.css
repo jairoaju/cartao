@@ -31,6 +31,15 @@
 
     --valor-destaque: #1793d1;
 }
+/* Força o celular e o navegador a aplicarem o esquema escuro em elementos nativos (calendários, selects, etc.) */
+body.dark-mode {
+    color-scheme: dark;
+}
+
+/* Garante o esquema claro quando o modo claro estiver ativo */
+body:not(.dark-mode) {
+    color-scheme: light;
+}
 
 body.dark-mode {
     /* background-color: var(--bg-dark) !important; */
