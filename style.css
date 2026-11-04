@@ -183,13 +183,11 @@ body.dark-mode .pill-card {
 
 /* Cartão e Usuário no modo claro */
 .pill-card.ativo {
-    /* background-color: #e0f2fe; */
-    /* background-color: #4682B4; */
-    /* background-color: var(--emerald-main); */
-    background-color: #008080;
-    border-color: #0284c7;
+    /* background-color: #008080; */
+    /* border-color: #0284c7; */
+    border: 2px solid #0284c7;
     /* color: #0369a1; */
-    color: var(--input-bg-light);
+    /* color: var(--input-bg-light); */
 
 }
 
