@@ -127,11 +127,11 @@ body.dark-mode #lista-registros li {
     font-size: 12px;
     font-weight: 550;
 }
-
+/* Cartão e Usuário no modo escuro INATIVO */
 body.dark-mode .pill-card {
     /* Normal/inativo */
     /* background-color: rgba(3, 7, 18, 0.6); */
-    background-color: var(--border-dark);
+    /* background-color: var(--border-dark); */
     /* border-color: var(--border-dark); */
     border-color: var(--emerald-border-dark);
     color: var(--text-muted-dark);
@@ -191,11 +191,11 @@ body.dark-mode .pill-card {
 
 }
 
-/* Cartão e Usuário no modo escuro */
+/* Cartão e Usuário no modo escuro ATIVO */
 body.dark-mode .pill-card.ativo,
 html.dark-mode .pill-card.ativo {
     /* background-color: var(--emerald-main); */
-    background-color: #008080;
+    /* background-color: #008080; */
     border-color: #0284c7;
     /* color: #38bdf8; */
     color: var(--input-bg-light);
